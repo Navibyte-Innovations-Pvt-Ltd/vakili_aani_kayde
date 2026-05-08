@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Phone, MapPin, Instagram, MessageCircle, ShieldCheck, Scale, ExternalLink } from "lucide-react";
+import { Mail, Phone, MapPin, Instagram, MessageCircle, ShieldCheck, Scale } from "lucide-react";
 import { SITE_INSTAGRAM_URL } from "@/lib/constants/site";
 
 const QUICK_LINKS = [
@@ -180,15 +180,6 @@ export function Footer() {
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-gold/60" />
                 पुणे, महाराष्ट्र
               </li>
-              <li className="pt-1">
-                <Link
-                  href="/dashboard"
-                  className="flex items-center gap-1.5 text-xs font-medium text-white/30 transition-colors hover:text-white/60"
-                >
-                  <ExternalLink className="h-3 w-3" />
-                  Admin Login
-                </Link>
-              </li>
             </ul>
           </div>
         </div>
@@ -199,9 +190,9 @@ export function Footer() {
         <div className="mx-auto max-w-6xl space-y-4">
           {/* Copyright */}
           <div className="flex flex-col items-center gap-2 text-center md:flex-row md:justify-between md:text-left">
-            <p className="text-xs text-white/35">
+            <Link href="/dashboard" className="text-xs text-white/35 transition-colors hover:text-white/35 cursor-default select-none">
               &copy; {new Date().getFullYear()} वकिली आणि कायदे. All rights reserved.
-            </p>
+            </Link>
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-3.5 w-3.5 text-brand-gold/60" />
               <p className="text-[10px] font-semibold tracking-wider text-white/30 uppercase">

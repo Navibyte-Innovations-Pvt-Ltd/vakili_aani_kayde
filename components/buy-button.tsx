@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { toast } from "sonner";
-import { Pointer, Loader2, ShieldCheck, Zap, Info, X } from "lucide-react";
+import { Pointer, Loader2, ShieldCheck, Zap, Info, X, User, Phone, ArrowRight, Lock } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Sheet,
@@ -785,261 +785,274 @@ function CheckoutForm({
     }
   };
 
+  const WA_SVG = (
+    <svg viewBox="0 0 24 24" className="h-3 w-3 fill-current" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+    </svg>
+  );
+
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(handlePayment)}
-        className={cn(
-          "relative bg-white transition-all",
-          isMobile ? "px-5 pt-1.5 pb-24" : "p-6",
-        )}
-      >
-        {/* Intelligence-driven Trust & Urgency Bar - Slimmer on mobile */}
-        <div
-          className={cn(
-            "-mx-5 flex items-center justify-between border-b border-brand-teal/10 bg-brand-teal/5 px-5 py-2 shadow-sm",
-            isMobile ? "-mt-1.5 mb-3" : "-mt-2 mb-4",
-          )}
-        >
-          <div className="flex items-center gap-1.5 text-[9px] font-bold tracking-widest text-brand-teal/70 uppercase">
-            <CheckCircle2 className="h-3 w-3 fill-green-50 text-green-500" />
-            {labels.readerCount}
-          </div>
-          <SaleTimer className="animate-pulse rounded-full border-rose-100 bg-rose-50 px-2 py-0.5 text-[10px] text-rose-600 shadow-none" />
-        </div>
+      <form onSubmit={form.handleSubmit(handlePayment)} className="relative bg-[#F7F7F4]">
 
-        <div
-          className={cn(
-            "grid grid-cols-[1fr_auto] items-center gap-3 border-b border-gray-100 pb-2.5",
-            isMobile ? "mb-4" : "mb-5",
-          )}
-        >
-          <div className="min-w-0 overflow-hidden">
-            <p className="mb-0.5 text-[9px] font-bold tracking-widest text-gray-400 uppercase">
-              {labels.selectedBook}
-            </p>
-            <p
-              className="truncate text-sm font-black text-brand-teal"
-              title={title}
-            >
-              {title}
-            </p>
-          </div>
-          <div className="shrink-0 text-right">
-            <p className="mb-0.5 text-[9px] font-bold tracking-widest text-gray-400 uppercase">
-              {labels.priceHeader}
-            </p>
-            <div className="flex flex-col items-end">
-              <p className="text-lg leading-none font-black text-green-600">
-                ₹{price}
-              </p>
+        {/* ── HEADER ── */}
+        <div className="relative overflow-hidden bg-brand-teal px-4 pb-4 pt-4">
+          {/* Subtle glow */}
+          <div className="absolute -top-8 -right-8 h-32 w-32 rounded-full bg-brand-gold/10 blur-2xl" />
+
+          {/* Top row: step label */}
+          <div className="relative mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <div className="flex h-4 w-4 items-center justify-center rounded-full bg-green-400/20">
+                <CheckCircle2 className="h-2.5 w-2.5 text-green-400" />
+              </div>
+              <span className="text-[9px] font-black tracking-[0.15em] text-white/40 uppercase">Secure Checkout</span>
             </div>
+            <span className="text-[9px] font-black text-white/30">Step {step} of 2</span>
+          </div>
+
+          {/* Book info row */}
+          <div className="relative flex items-start gap-3">
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <p className="text-[9px] font-black tracking-widest text-brand-gold/60 uppercase">{labels.selectedBook}</p>
+              <p className="line-clamp-2 text-[13px] font-black leading-snug text-white" title={title}>{title}</p>
+            </div>
+            <div className="shrink-0 rounded-2xl bg-brand-gold/20 px-3 py-2 text-center ring-1 ring-brand-gold/20">
+              <p className="text-[8px] font-bold text-brand-gold/60 uppercase">Price</p>
+              <p className="text-xl font-black leading-tight text-brand-gold">₹{price}</p>
+            </div>
+          </div>
+
+          {/* SaleTimer if active */}
+          <div className="relative mt-3">
+            <SaleTimer />
           </div>
         </div>
 
-        {step === 1 && (
-          <div className={cn("animate-in fade-in slide-in-from-left-2 space-y-3", isMobile && "space-y-2.5")}>
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="ml-1 text-[10px] font-bold text-gray-500 uppercase">
-                    {labels.nameLabel}
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={labels.namePlaceholder}
-                      maxLength={50}
-                      className="h-12 rounded-xl border-2 border-brand-teal/20 bg-brand-teal/5 text-base shadow-sm ring-offset-white transition-all placeholder:text-gray-400 focus:border-brand-teal focus:bg-white focus:ring-4 focus:ring-brand-teal/10"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="ml-1 text-[9px] font-medium text-red-500" />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="ml-1 text-[10px] font-bold text-gray-500 uppercase">
-                    {labels.phoneLabel} <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="tel"
-                      autoFocus={!isMobile}
-                      placeholder={labels.phonePlaceholder}
-                      className={cn(
-                        "h-12 rounded-xl border-2 border-brand-teal/20 bg-brand-teal/5 text-lg font-bold shadow-sm ring-offset-white transition-all placeholder:text-gray-400 focus:border-brand-teal focus:bg-white focus:ring-4 focus:ring-brand-teal/10",
-                        form.formState.errors.phone &&
-                          "border-red-200 bg-red-50 focus:border-red-500 focus:ring-red-50",
-                      )}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="ml-1 text-[9px] font-medium text-red-500" />
-                </FormItem>
-              )}
-            />
-
-            <Button
-              type="button"
-              onClick={handleNextStep}
-              size="lg"
-              className="mt-6 w-full rounded-2xl bg-brand-teal text-lg font-bold text-white shadow-xl transition-all hover:bg-brand-teal/90 hover:shadow-2xl active:scale-95"
-            >
-              {labels.nextBtn}
-            </Button>
-
-            <div className="mt-4 flex items-center justify-center gap-4">
-              <div className="flex items-center gap-1.5 text-[10px] font-bold tracking-wider text-gray-500">
-                <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
-                {labels.secureText}
+        {/* ── STEP PROGRESS ── */}
+        <div className="flex items-center gap-2 border-b border-gray-100 bg-white px-4 py-2.5">
+          {[
+            { n: 1, label: "Your Info" },
+            { n: 2, label: "Confirm & Pay" },
+          ].map((s, i) => (
+            <div key={s.n} className="flex flex-1 items-center gap-1.5">
+              <div className={cn(
+                "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-black transition-all",
+                step >= s.n ? "bg-brand-gold text-white" : "bg-gray-100 text-gray-400"
+              )}>
+                {step > s.n ? "✓" : s.n}
               </div>
-              <div className="h-3 w-px bg-gray-200" />
-              <div className="flex items-center gap-1.5 text-[10px] font-bold tracking-wider text-gray-500">
-                <Zap className="h-3.5 w-3.5 fill-yellow-400 text-yellow-500" />
-                {labels.instantPdf}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="animate-in fade-in slide-in-from-right-2">
-            <div className="mb-4 flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2">
-              <div className="text-xs">
-                <p className="font-medium text-gray-500">{labels.yourInfo}</p>
-                <p className="font-bold text-brand-teal">{form.getValues("name")}</p>
-                <p className="font-bold text-brand-teal">+91 {form.getValues("phone")}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setStep(1)}
-                className="text-[10px] font-bold text-blue-600 underline underline-offset-2"
-              >
-                {labels.editBtn}
-              </button>
-            </div>
-
-            <div className="flex items-center gap-1.5 rounded-lg border border-green-100 bg-green-50/50 p-2">
-              <svg
-                viewBox="0 0 24 24"
-                className="h-3.5 w-3.5 shrink-0 fill-current text-green-600"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-              </svg>
-              <span className="text-[10px] leading-tight font-bold text-green-700">
-                {labels.whatsappInfo}
+              <span className={cn("text-[10px] font-bold transition-colors", step >= s.n ? "text-brand-teal" : "text-gray-300")}>
+                {s.label}
               </span>
+              {i < 1 && <div className={cn("ml-auto h-px flex-1 transition-all", step > 1 ? "bg-brand-gold" : "bg-gray-100")} />}
             </div>
+          ))}
+        </div>
 
-            {/* PDF-only notice */}
-            <div className="mt-3 flex items-start gap-2 rounded-xl border border-blue-200 bg-blue-50 p-3">
-              <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
-              <p className="text-xs leading-relaxed font-medium text-blue-800">
-                📱 {labels.pdfNotice}
-              </p>
+        {/* ── FORM BODY ── */}
+        <div className={cn("px-4", isMobile ? "pt-4 pb-28" : "pt-4 pb-5")}>
+
+          {/* ── STEP 1: Info ── */}
+          {step === 1 && (
+            <div className="animate-in fade-in slide-in-from-left-2 space-y-3.5">
+
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="space-y-1.5">
+                    <FormLabel className="text-[10px] font-black tracking-widest text-gray-400 uppercase">{labels.nameLabel}</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <User className="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-gray-300" />
+                        <Input
+                          placeholder="Your full name"
+                          maxLength={50}
+                          className="h-12 rounded-2xl border border-gray-200 bg-white pl-10 text-sm shadow-none transition-all placeholder:text-gray-300 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/15 focus-visible:ring-offset-0"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage className="text-[9px] font-medium text-red-500" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem className="space-y-1.5">
+                    <FormLabel className="text-[10px] font-black tracking-widest text-gray-400 uppercase">
+                      {labels.phoneLabel} <span className="text-red-400">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <div className="absolute top-1/2 left-3.5 flex -translate-y-1/2 items-center gap-1.5">
+                          <Phone className="h-4 w-4 text-gray-300" />
+                          <span className="text-sm font-bold text-gray-300 select-none">+91</span>
+                          <span className="h-4 w-px bg-gray-200" />
+                        </div>
+                        <Input
+                          type="tel"
+                          autoFocus={!isMobile}
+                          placeholder="10-digit number"
+                          className={cn(
+                            "h-12 rounded-2xl border border-gray-200 bg-white pl-[4.5rem] text-base font-bold shadow-none transition-all placeholder:font-normal placeholder:text-gray-300 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/15 focus-visible:ring-offset-0",
+                            form.formState.errors.phone && "border-red-200 bg-red-50 focus:border-red-400 focus:ring-red-100",
+                          )}
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage className="text-[9px] font-medium text-red-500" />
+                  </FormItem>
+                )}
+              />
+
+              {/* WhatsApp delivery notice */}
+              <div className="flex items-center gap-2.5 rounded-2xl border border-green-100 bg-green-50 px-3.5 py-2.5">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#25D366] text-white">{WA_SVG}</div>
+                <p className="text-[10px] font-semibold leading-tight text-green-800">PDF delivered to this WhatsApp number instantly after payment</p>
+              </div>
+
+              <Button
+                type="button"
+                onClick={handleNextStep}
+                size="lg"
+                className="group h-12 w-full rounded-2xl bg-brand-gold font-black text-white shadow-lg shadow-brand-gold/20 transition-all hover:bg-brand-gold/90 active:scale-[0.98]"
+              >
+                <span className="flex items-center gap-2">
+                  {labels.nextBtn}
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </span>
+              </Button>
+
+              <div className="flex items-center justify-center gap-3">
+                <div className="flex items-center gap-1 text-[10px] font-bold text-gray-400">
+                  <ShieldCheck className="h-3 w-3 text-green-500" />
+                  {labels.secureText}
+                </div>
+                <span className="h-3 w-px bg-gray-200" />
+                <div className="flex items-center gap-1 text-[10px] font-bold text-gray-400">
+                  <Zap className="h-3 w-3 text-brand-gold" />
+                  {labels.instantPdf}
+                </div>
+              </div>
             </div>
+          )}
 
-            {isIAB && (
-              <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-900">
-                <div className="flex items-start gap-3">
-                  <span className="text-xl">⚠️</span>
-                  <div className="space-y-1">
-                    <p className="text-xs font-bold tracking-wider text-amber-800 uppercase">
-                      {labels.iabTitle}
-                    </p>
-                    <p className="text-xs leading-relaxed font-medium">
-                      {labels.iabMsg1}
-                    </p>
-                    <p className="text-xs leading-relaxed font-black text-amber-700">
-                      {labels.iabMsg2}
-                    </p>
+          {/* ── STEP 2: Confirm ── */}
+          {step === 2 && (
+            <div className="animate-in fade-in slide-in-from-right-2 space-y-3">
+
+              {/* Delivery summary card */}
+              <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+                <div className="border-b border-gray-50 px-3.5 py-2.5">
+                  <p className="text-[9px] font-black tracking-widest text-gray-400 uppercase">Delivery Details</p>
+                </div>
+                <div className="space-y-0 divide-y divide-gray-50">
+                  {form.getValues("name") && (
+                    <div className="flex items-center gap-3 px-3.5 py-3">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-teal/8">
+                        <User className="h-3.5 w-3.5 text-brand-teal/60" />
+                      </div>
+                      <div>
+                        <p className="text-[9px] text-gray-400">Name</p>
+                        <p className="text-[13px] font-black text-brand-teal">{form.getValues("name")}</p>
+                      </div>
+                      <button type="button" onClick={() => setStep(1)} className="ml-auto rounded-xl border border-gray-100 bg-gray-50 px-2.5 py-1 text-[9px] font-black text-gray-500 hover:text-brand-teal active:scale-95">
+                        {labels.editBtn}
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-3 px-3.5 py-3">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-50">
+                      <div className="h-3.5 w-3.5 text-[#25D366]">{WA_SVG}</div>
+                    </div>
+                    <div>
+                      <p className="text-[9px] text-gray-400">WhatsApp</p>
+                      <p className="text-[13px] font-black text-brand-teal">+91 {form.getValues("phone")}</p>
+                    </div>
+                    {!form.getValues("name") && (
+                      <button type="button" onClick={() => setStep(1)} className="ml-auto rounded-xl border border-gray-100 bg-gray-50 px-2.5 py-1 text-[9px] font-black text-gray-500 hover:text-brand-teal active:scale-95">
+                        {labels.editBtn}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
-            )}
 
-            <div className="mt-4 text-center">
-              <p className="text-[10px] text-gray-400">
-                {labels.consentPrefix}{" "}
-                <button
-                  type="button"
-                  onClick={() => setLegalModal("terms")}
-                  className="font-bold text-gray-500 underline-offset-2 hover:text-brand-teal hover:underline"
-                >
-                  {labels.termsText}
-                </button>{" "}
-                {labels.consentAnd}{" "}
-                <button
-                  type="button"
-                  onClick={() => setLegalModal("privacy")}
-                  className="font-bold text-gray-500 underline-offset-2 hover:text-brand-teal hover:underline"
-                >
-                  {labels.privacyText}
-                </button>{" "}
-                {labels.consentSuffix}
-              </p>
-            </div>
+              {/* What you get */}
+              <div className="flex items-start gap-2.5 rounded-2xl border border-brand-gold/20 bg-brand-gold/5 px-3.5 py-3">
+                <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-gold" />
+                <p className="text-[10px] leading-relaxed text-gray-600">{labels.pdfNotice}</p>
+              </div>
 
-            <Button
-              type="submit"
-              size="lg"
-              disabled={loading}
-              className="group relative mt-5 w-full overflow-hidden rounded-2xl bg-brand-teal text-lg font-bold text-white shadow-xl transition-all hover:bg-brand-teal/90 hover:shadow-2xl active:scale-95 disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              <span className="relative z-10 flex items-center justify-center gap-2 py-3">
-                {loading ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    {labels.processingText}
-                  </>
-                ) : (
-                  <>
-                    <Zap className="h-5 w-5 fill-yellow-400 text-yellow-400 group-hover:animate-pulse" />
-                    {labels.payBtn}
-                  </>
-                )}
-              </span>
-              {!loading && (
-                <div className="group-hover:animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent" />
-              )}
-            </Button>
-            
-            <p className="mt-4 text-center text-[10px] font-bold tracking-wider text-gray-400 uppercase">
-              <ShieldCheck className="mr-1 inline-block h-3 w-3 text-green-500" />
-              SECURE CHECKOUT • RAZORPAY
-            </p>
-
-            <div className="mt-5 flex justify-center">
-              <a 
-                href="https://wa.me/918149319058?text=Hello,%20I%20need%20help%20with%20buying%20an%20ebook%20(Payment%20Issue)" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 rounded-full bg-gray-50 px-3 py-1.5 text-[11px] font-bold text-gray-600 transition-colors hover:bg-green-50 hover:text-green-700"
-              >
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-green-100 text-green-600">
-                  <svg viewBox="0 0 24 24" className="h-3 w-3 fill-current" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                  </svg>
+              {/* IAB warning */}
+              {isIAB && (
+                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3">
+                  <div className="flex items-start gap-2">
+                    <span className="text-sm">⚠️</span>
+                    <div className="space-y-0.5">
+                      <p className="text-[10px] font-black tracking-wider text-amber-800 uppercase">{labels.iabTitle}</p>
+                      <p className="text-[10px] leading-relaxed text-amber-700">{labels.iabMsg1}</p>
+                      <p className="text-[10px] font-black text-amber-800">{labels.iabMsg2}</p>
+                    </div>
+                  </div>
                 </div>
-                काही अडचण आहे? WhatsApp वर मदत मागा
-              </a>
-            </div>
-          </div>
-        )}
+              )}
 
-        {/* Legal Content Modal */}
-        <LegalContentModal
-          type={legalModal}
-          onClose={() => setLegalModal(null)}
-        />
+              {/* Consent */}
+              <p className="text-center text-[10px] text-gray-400">
+                {labels.consentPrefix}{" "}
+                <button type="button" onClick={() => setLegalModal("terms")} className="font-bold text-brand-teal/70 underline-offset-2 hover:underline hover:text-brand-teal">{labels.termsText}</button>
+                {" "}{labels.consentAnd}{" "}
+                <button type="button" onClick={() => setLegalModal("privacy")} className="font-bold text-brand-teal/70 underline-offset-2 hover:underline hover:text-brand-teal">{labels.privacyText}</button>
+                {" "}{labels.consentSuffix}
+              </p>
+
+              {/* Pay button */}
+              <Button
+                type="submit"
+                size="lg"
+                disabled={loading}
+                className="group relative h-13 w-full overflow-hidden rounded-2xl bg-brand-gold font-black text-white shadow-xl shadow-brand-gold/25 transition-all hover:bg-brand-gold/90 active:scale-[0.98] disabled:opacity-60"
+              >
+                <span className="relative z-10 flex items-center justify-center gap-2 text-base">
+                  {loading ? (
+                    <><Loader2 className="h-5 w-5 animate-spin" />{labels.processingText}</>
+                  ) : (
+                    <><Lock className="h-4 w-4" />{labels.payBtn} — ₹{price}</>
+                  )}
+                </span>
+                {!loading && (
+                  <div className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                )}
+              </Button>
+
+              {/* Bottom row */}
+              <div className="flex items-center justify-between pt-0.5">
+                <div className="flex items-center gap-1.5 text-[10px] text-gray-400">
+                  <ShieldCheck className="h-3.5 w-3.5 text-green-500" />
+                  <span className="font-bold">Secured by Razorpay</span>
+                </div>
+                <a
+                  href="https://wa.me/918149319058?text=Hello,%20I%20need%20help%20with%20buying%20an%20ebook"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 rounded-full border border-green-100 bg-green-50 px-2.5 py-1 text-[10px] font-bold text-green-700 transition-colors hover:bg-green-100"
+                >
+                  <div className="flex h-4 w-4 items-center justify-center rounded-full bg-[#25D366] text-white">{WA_SVG}</div>
+                  Need help?
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <LegalContentModal type={legalModal} onClose={() => setLegalModal(null)} />
       </form>
     </Form>
   );

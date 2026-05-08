@@ -5,85 +5,75 @@ import { Home, BookOpen, Sparkles, Download } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
+const NAV_ITEMS = [
+  { href: "/", icon: Home, label: "Home" },
+  { href: "/ebooks", icon: BookOpen, label: "E-Books" },
+  { href: "/combos", icon: Sparkles, label: "Combos", special: true },
+  { href: "/my-books", icon: Download, label: "My Books" },
+];
+
 export function BottomNav() {
   const pathname = usePathname();
 
-  const isActive = (path: string) => pathname === path;
-
   return (
-    <nav className="pb-safe fixed right-0 bottom-0 left-0 z-50 border-t border-gray-100 bg-white/95 shadow-[0_-4px_20px_rgba(0,0,0,0.04)] backdrop-blur-md md:hidden">
-      <div className="flex h-14 items-center justify-around px-1">
-        <NavItem
-          href="/"
-          icon={Home}
-          label="मुख्यपृष्ठ"
-          active={isActive("/")}
-        />
+    <nav className="pb-safe fixed right-0 bottom-0 left-0 z-50 md:hidden">
+      {/* Blur backing */}
+      <div className="absolute inset-0 bg-white/90 backdrop-blur-xl" />
+      {/* Top border accent */}
+      <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-brand-gold/30 to-transparent" />
 
-        <NavItem
-          href="/ebooks"
-          icon={BookOpen}
-          label="ई-बुक्स"
-          active={isActive("/ebooks")}
-        />
+      <div className="relative flex h-16 items-center justify-around px-2">
+        {NAV_ITEMS.map(({ href, icon: Icon, label, special }) => {
+          const active = pathname === href;
+          return (
+            <Link
+              key={href}
+              href={href}
+              className="flex flex-1 flex-col items-center justify-center gap-1 py-1 transition-all active:scale-90"
+            >
+              {/* Icon pill */}
+              <div
+                className={cn(
+                  "relative flex h-9 w-9 items-center justify-center rounded-2xl transition-all duration-200",
+                  active
+                    ? "bg-brand-teal shadow-[0_4px_12px_rgba(10,31,61,0.18)]"
+                    : special
+                      ? "bg-brand-gold/10"
+                      : "bg-transparent",
+                )}
+              >
+                <Icon
+                  className={cn(
+                    "h-[18px] w-[18px] transition-colors",
+                    active
+                      ? "text-white"
+                      : special
+                        ? "text-brand-gold"
+                        : "text-gray-400",
+                  )}
+                />
+                {special && !active && (
+                  <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-orange-500" />
+                )}
+              </div>
 
-        <NavItem
-          href="/combos"
-          icon={Sparkles}
-          label="कॉम्बो"
-          active={isActive("/combos")}
-          special={true}
-        />
-
-
-        <NavItem
-          href="/my-books"
-          icon={Download}
-          label="माझी पुस्तके"
-          active={isActive("/my-books")}
-        />
+              {/* Label */}
+              <span
+                className={cn(
+                  "text-[10px] leading-none transition-colors",
+                  active
+                    ? "font-black text-brand-teal"
+                    : special
+                      ? "font-bold text-brand-gold"
+                      : "font-medium text-gray-400",
+                )}
+              >
+                {label}
+              </span>
+            </Link>
+          );
+        })}
       </div>
     </nav>
   );
 }
-
-const NavItem = ({
-  href,
-  icon: Icon,
-  label,
-  active,
-  special = false,
-}: {
-  href: string;
-  icon: React.ElementType;
-  label: string;
-  active: boolean;
-  special?: boolean;
-}) => (
-  <Link
-    href={href}
-    className={cn(
-      "flex h-full flex-1 flex-col items-center justify-center gap-0.5 transition-all active:scale-95",
-      active ? "text-brand-teal" : "text-gray-500 hover:text-brand-teal",
-    )}
-  >
-    <div
-      className={cn(
-        "flex items-center justify-center rounded-xl px-3 py-1 transition-all",
-        active ? "bg-brand-teal/10" : "bg-transparent",
-        special && !active && "text-brand-gold",
-      )}
-    >
-      <Icon
-        className={cn(
-          "h-5 w-5",
-          active && "fill-current",
-          special && !active && "animate-pulse fill-brand-gold",
-        )}
-      />
-    </div>
-    <span className={cn("text-[9px]", active ? "font-bold" : "font-medium")}>
-      {label}
-    </span>
-  </Link>
-);

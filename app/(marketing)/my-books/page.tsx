@@ -165,68 +165,60 @@ export default function MyBooksPage() {
     : null;
 
   return (
-    <div className="flex min-h-screen flex-col bg-brand-cream">
+    <div className="flex min-h-screen flex-col bg-[#F5F5F0]">
 
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-brand-teal/95 backdrop-blur-md">
-        <div className="mx-auto flex max-w-4xl items-center gap-3 px-4 py-3">
-          <Link href="/" className="rounded-xl p-1.5 text-white/60 transition-colors hover:bg-white/10 hover:text-white active:scale-95">
+      <header className="sticky top-0 z-50 bg-brand-teal shadow-md">
+        <div className="mx-auto flex max-w-2xl items-center gap-3 px-4 py-3.5">
+          <Link href="/" className="rounded-lg p-1.5 text-white/50 transition-colors hover:bg-white/10 hover:text-white active:scale-95">
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <div className="flex items-center gap-2">
-            <Scale className="h-4 w-4 text-brand-gold" />
+          <div className="flex items-center gap-2.5 flex-1">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-gold/20">
+              <Scale className="h-4 w-4 text-brand-gold" />
+            </div>
             <div>
-              <h1 className="text-sm font-black leading-none text-white">माझी पुस्तके</h1>
-              <span className="text-[10px] font-bold tracking-widest text-white/40 uppercase">My Digital Bookshelf</span>
+              <h1 className="text-sm font-black leading-none text-white">My Books</h1>
+              <span className="text-[9px] font-bold tracking-widest text-white/35 uppercase">Digital Library</span>
             </div>
           </div>
+          <DownloadInstructions open={showInstructions} onOpenChange={setShowInstructions} />
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-6">
+      <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-5">
 
-        {/* Just Purchased — success card */}
+        {/* Success card after purchase */}
         {justPurchasedOrder && (
-          <div className="animate-in slide-in-from-top-4 mb-6 duration-700">
-            <div className="relative overflow-hidden rounded-2xl bg-brand-teal p-6 shadow-xl">
-              <div className="absolute -top-8 -right-8 h-32 w-32 rounded-full bg-brand-gold/10 blur-2xl" />
+          <div className="animate-in slide-in-from-top-4 mb-5 duration-700">
+            <div className="relative overflow-hidden rounded-2xl bg-brand-teal p-5 shadow-xl">
+              <div className="absolute -top-10 -right-10 h-36 w-36 rounded-full bg-brand-gold/10 blur-3xl" />
               <div className="relative flex flex-col items-center text-center">
-                <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-green-400/20 text-green-300">
-                  <CheckCircle2 className="h-8 w-8" />
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-400/20">
+                  <CheckCircle2 className="h-7 w-7 text-green-400" />
                 </div>
-                <h2 className="text-xl font-black text-white">अभिनंदन!</h2>
-                <p className="text-xs font-bold tracking-widest text-white/40 uppercase">तुमची खरेदी यशस्वी झाली</p>
-                <div className="mt-4 mb-4 w-full rounded-xl border border-white/10 bg-white/8 p-3">
-                  <p className="text-[10px] font-bold text-white/40 uppercase">आता डाऊनलोड करा</p>
-                  <h3 className="mt-0.5 text-base font-black leading-tight text-white">{justPurchasedOrder.title}</h3>
+                <h2 className="text-lg font-black text-white">Purchase Successful!</h2>
+                <div className="mt-3 mb-3 w-full rounded-xl border border-white/10 bg-white/8 px-4 py-3">
+                  <h3 className="text-sm font-black leading-tight text-white">{justPurchasedOrder.title}</h3>
                 </div>
-                <div className="mb-5 w-full rounded-xl border border-green-400/20 bg-green-400/10 p-3 text-left">
-                  <div className="flex items-center gap-2">
-                    <FaWhatsapp className="h-4 w-4 text-green-400" />
-                    <span className="text-[11px] font-black text-green-300">WhatsApp वर PDF पाठवली आहे!</span>
-                  </div>
-                  <p className="mt-1 text-[10px] leading-relaxed text-green-300/70">तुम्हाला व्हॉट्सएपवर लगेच मेसेज येईल. जर मेसेज आला नाही तर खालील बटनावरून डाऊनलोड करा.</p>
+                <div className="mb-4 w-full flex items-start gap-2 rounded-xl border border-green-400/20 bg-green-400/10 px-3 py-2.5">
+                  <FaWhatsapp className="mt-0.5 h-3.5 w-3.5 shrink-0 text-green-400" />
+                  <p className="text-[10px] leading-relaxed text-green-300/80 text-left">PDF sent to your WhatsApp. If not received, use the button below.</p>
                 </div>
                 {justPurchasedItem ? (
-                  <div className="flex w-full flex-col gap-3">
-                    <Button asChild size="lg" className="w-full rounded-xl bg-brand-gold text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5 active:scale-95">
+                  <div className="flex w-full flex-col gap-2">
+                    <Button asChild size="lg" className="w-full rounded-xl bg-brand-gold font-black text-white shadow-lg active:scale-95">
                       <a href={justPurchasedItem.url} target="_blank" rel="noopener noreferrer">
-                        <Download className="mr-2 h-5 w-5 animate-bounce" />
-                        PDF डाऊनलोड करा
+                        <Download className="mr-2 h-4 w-4" />
+                        Download PDF
                       </a>
                     </Button>
-                    <Button asChild variant="outline" size="sm" className="w-full rounded-xl border-white/20 bg-white/5 text-green-300 hover:bg-white/10">
-                      <a href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`नमस्कार,\nहे माझे पुस्तक आहे: ${justPurchasedItem.title}\nलिंक: ${justPurchasedItem.url}\n\nकृपया हा मेसेज सेव्ह राहू द्या.`)}`} target="_blank" rel="noopener noreferrer">
-                        <FaWhatsapp className="mr-2 h-4 w-4" />
-                        लिंक WhatsApp वर सेव्ह करा
-                      </a>
-                    </Button>
-                    <p className="text-[10px] text-white/30"><span className="font-bold text-brand-gold">टीप:</span> PDF तुमच्या ब्राउझरच्या &quot;Downloads&quot; फोल्डरमध्ये सेव्ह होईल.</p>
+                    <p className="text-[10px] text-white/30">Saved to your browser&apos;s &quot;Downloads&quot; folder.</p>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 text-sm font-bold text-white/50">
                     <Loader2 className="h-4 w-4 animate-spin text-brand-gold" />
-                    तुमची लिंक तयार होत आहे...
+                    Preparing your link...
                   </div>
                 )}
               </div>
@@ -235,57 +227,49 @@ export default function MyBooksPage() {
         )}
 
         {/* Search */}
-        <div className="mb-5">
-          <div className="rounded-2xl border border-brand-gold/15 bg-white p-4 shadow-sm">
-            <p className="mb-3 text-[11px] font-black tracking-widest text-brand-teal/50 uppercase">पुस्तके शोधा</p>
-            <form onSubmit={handleSearch} className="flex gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <Input
-                  type="text"
-                  placeholder="WhatsApp नंबर किंवा Email टाका..."
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  className="h-11 rounded-xl border-gray-200 bg-brand-cream pl-9 text-sm font-bold shadow-none focus:border-brand-teal focus:bg-white focus:ring-1 focus:ring-brand-teal focus-visible:ring-offset-0"
-                />
-              </div>
-              <Button
-                type="submit"
-                disabled={loading || !query.trim()}
-                className="h-11 shrink-0 rounded-xl bg-brand-teal px-5 text-xs font-black text-white shadow-md shadow-brand-teal/20 active:scale-95 disabled:opacity-50"
-              >
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "शोध"}
-              </Button>
-            </form>
-            <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
-              <a href="tel:+918149319058" className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-bold text-brand-teal transition-all hover:bg-brand-teal/5 active:scale-95">
-                <Phone className="h-3.5 w-3.5" />
-                कॉल करा
-              </a>
-              <DownloadInstructions open={showInstructions} onOpenChange={setShowInstructions} />
-              <a href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent("नमस्कार, मला माझी पुस्तके डाऊनलोड करण्यास मदत हवी आहे.")}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-bold text-green-600 transition-all hover:bg-green-50 active:scale-95">
-                <FaWhatsapp className="h-3.5 w-3.5" />
-                मदत हवी?
-              </a>
-            </div>
+        <form onSubmit={handleSearch} className="mb-4 flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Enter your WhatsApp number..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="h-12 rounded-xl border-gray-200 bg-white pl-10 text-sm font-semibold shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal focus-visible:ring-offset-0"
+            />
           </div>
+          <Button
+            type="submit"
+            disabled={loading || !query.trim()}
+            className="h-12 shrink-0 rounded-xl bg-brand-teal px-6 font-black text-white shadow-sm active:scale-95 disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+          </Button>
+        </form>
+
+        {/* Quick actions */}
+        <div className="mb-5 flex gap-2">
+          <a href="tel:+918149319058" className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-white py-2.5 text-xs font-bold text-brand-teal shadow-sm transition-all hover:border-brand-teal/30 active:scale-95">
+            <Phone className="h-3.5 w-3.5" />
+            Call Us
+          </a>
+          <a href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent("Hello, I need help downloading my books.")}`} target="_blank" rel="noopener noreferrer" className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-green-100 bg-white py-2.5 text-xs font-bold text-green-600 shadow-sm transition-all hover:border-green-300 active:scale-95">
+            <FaWhatsapp className="h-3.5 w-3.5" />
+            WhatsApp Help
+          </a>
         </div>
 
         {/* Finalizing */}
         {isFinalizing && (
-          <div className="animate-in fade-in slide-in-from-top-2 mb-5 duration-500">
-            <div className="flex flex-col items-center gap-3 rounded-2xl border border-brand-gold/20 bg-white p-6 text-center shadow-sm">
-              <div className="relative">
+          <div className="animate-in fade-in mb-4 duration-500">
+            <div className="flex items-center gap-4 rounded-2xl border border-brand-gold/20 bg-white p-4 shadow-sm">
+              <div className="relative shrink-0">
                 <div className="absolute inset-0 animate-ping rounded-full bg-brand-teal/15" />
-                <CheckCircle2 className="relative h-12 w-12 text-brand-teal" />
+                <CheckCircle2 className="relative h-10 w-10 text-brand-teal" />
               </div>
               <div>
-                <h2 className="text-lg font-black text-brand-teal">खरेदी पूर्ण झाली!</h2>
-                <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Finalizing Your Order...</p>
-              </div>
-              <div className="flex items-center gap-2 rounded-full border border-brand-teal/10 bg-brand-cream px-4 py-1.5 text-[10px] font-bold text-brand-teal">
-                <ShieldCheck className="h-3 w-3" />
-                Secure Verification Successful
+                <h2 className="font-black text-brand-teal">Order Complete!</h2>
+                <p className="text-xs text-gray-400">Verifying your payment securely...</p>
               </div>
             </div>
           </div>
@@ -293,116 +277,92 @@ export default function MyBooksPage() {
 
         {/* Polling timed out */}
         {pollingTimedOut && (
-          <div className="animate-in fade-in slide-in-from-top-2 mb-5 duration-500">
-            <div className="flex flex-col items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-center">
-              <ShieldCheck className="h-10 w-10 text-amber-500" />
-              <div>
-                <h2 className="font-black text-amber-800">पेमेंट पडताळणी प्रक्रियेत आहे</h2>
-                <p className="mt-1 max-w-xs text-xs text-amber-700/80">तुमचे पेमेंट यशस्वी झाले असावे, पण सर्व्हर जोडणीस थोडा वेळ लागत आहे.</p>
+          <div className="animate-in fade-in mb-4 duration-500">
+            <div className="flex items-center gap-4 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+              <ShieldCheck className="h-8 w-8 shrink-0 text-amber-500" />
+              <div className="flex-1">
+                <h2 className="text-sm font-black text-amber-800">Payment processing...</h2>
+                <p className="text-xs text-amber-700/70">Your payment was received but delivery is delayed. Tap refresh.</p>
               </div>
-              <Button onClick={() => { setPollingTimedOut(false); performSearch(query); }} className="rounded-xl bg-amber-500 text-sm font-bold text-white hover:bg-amber-600 active:scale-95">
-                <RefreshCw className="mr-2 h-4 w-4" />
-                रिफ्रेश करा
+              <Button size="sm" onClick={() => { setPollingTimedOut(false); performSearch(query); }} className="shrink-0 rounded-xl bg-amber-500 text-xs font-bold text-white hover:bg-amber-600 active:scale-95">
+                <RefreshCw className="h-3.5 w-3.5" />
               </Button>
             </div>
           </div>
         )}
 
         {/* Results */}
-        <div className="space-y-3">
-          {orders === null ? (
-            <div className="flex flex-col items-center justify-center py-14 text-center">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-brand-gold/15 bg-white shadow-sm">
-                <BookOpen className="h-8 w-8 text-brand-gold/60" />
-              </div>
-              <p className="font-black text-brand-teal">तुमची पुस्तके शोधा</p>
-              <p className="mt-1 text-sm text-gray-400">वर तुमचा WhatsApp नंबर टाका</p>
+        {orders === null ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-3xl border-2 border-dashed border-brand-gold/20 bg-white">
+              <BookOpen className="h-9 w-9 text-brand-gold/40" />
             </div>
-          ) : orders.length > 0 ? (
-            <>
-              <div className="flex items-center gap-2 px-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand-gold" />
-                <p className="text-xs font-black tracking-wide text-brand-teal/60 uppercase">{orders.length} ऑर्डर सापडल्या</p>
-              </div>
-              {orders.map((order) => (
-                <div key={order.id} className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md">
-                  {/* Order header */}
-                  <div className="flex items-center justify-between border-b border-brand-cream bg-brand-cream/60 px-4 py-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-teal/10">
-                        <FileText className="h-3.5 w-3.5 text-brand-teal" />
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">खरेदी दिनांक</p>
-                        <p className="text-xs font-black text-brand-teal">{format(new Date(order.date), "dd MMM yyyy")}</p>
-                      </div>
-                    </div>
-                    <div className="rounded-lg border border-green-100 bg-green-50 px-2.5 py-1 text-[11px] font-black text-green-700">
-                      ₹{order.amount} Paid
-                    </div>
+            <p className="font-black text-brand-teal">Find Your Books</p>
+            <p className="mt-1 text-sm text-gray-400">Enter your WhatsApp number above</p>
+          </div>
+        ) : orders.length > 0 ? (
+          <div className="space-y-3">
+            <p className="px-1 text-[11px] font-black tracking-widest text-gray-400 uppercase">{orders.length} orders found</p>
+            {orders.map((order) => (
+              <div key={order.id} className="overflow-hidden rounded-2xl bg-white shadow-sm">
+                {/* Thin gold top bar */}
+                <div className="h-1 w-full bg-brand-gold/40" />
+                <div className="flex items-center justify-between px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-3.5 w-3.5 text-gray-400" />
+                    <span className="text-xs font-semibold text-gray-400">{format(new Date(order.date), "dd MMM yyyy")}</span>
                   </div>
-
-                  {/* Items */}
-                  <div className="p-3 space-y-2">
-                    {order.items.map((item, idx) => (
-                      <div key={idx} className="flex flex-col gap-3 rounded-xl border border-gray-100 bg-brand-cream/40 p-3 transition-colors hover:bg-brand-cream sm:flex-row sm:items-center sm:justify-between">
-                        <div className="min-w-0 flex-1">
-                          <h3 className="text-sm font-black leading-tight text-brand-teal">{item.title}</h3>
-                          <div className="mt-1.5 flex flex-wrap gap-1.5">
-                            {item.pages ? (
-                              <span className="rounded border border-brand-gold/20 bg-brand-gold/8 px-1.5 py-0.5 text-[10px] font-bold text-brand-gold">{item.pages} पाने</span>
-                            ) : null}
-                            {item.isCombo && (
-                              <span className="rounded border border-amber-100 bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-600">सर्व पुस्तके एकाच PDF मध्ये</span>
-                            )}
-                            {justPurchasedOrder?.ebookId === item.ebookId && (
-                              <span className="animate-pulse rounded border border-green-100 bg-green-50 px-1.5 py-0.5 text-[10px] font-bold text-green-600">नवीन खरेदी</span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex gap-2 sm:shrink-0">
-                          <Button asChild size="sm" variant="outline" className="h-9 flex-1 rounded-xl border-green-200 bg-green-50 text-green-700 hover:bg-green-100 active:scale-95 sm:h-8 sm:flex-initial">
-                            <a href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`नमस्कार,\nहे माझे पुस्तक आहे: ${item.title}\nलिंक: ${item.url}\nकृपया हे सेव्ह राहू द्या.`)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5 px-3">
-                              <FaWhatsapp className="h-3.5 w-3.5" />
-                              <span className="text-[10px] font-black whitespace-nowrap">लिंक सेव्ह</span>
-                            </a>
-                          </Button>
-                          <Button asChild size="sm" className="h-9 flex-1 rounded-xl bg-brand-teal text-white shadow-sm transition-all hover:bg-brand-teal/90 active:scale-95 sm:h-8 sm:flex-initial">
-                            <a href={item.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5 px-3" onClick={() => setShowInstructions(true)}>
-                              <Download className="h-3.5 w-3.5" />
-                              <span className="text-[10px] font-black whitespace-nowrap">डाऊनलोड</span>
-                            </a>
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <span className="rounded-full bg-green-50 px-2.5 py-0.5 text-[11px] font-black text-green-600">₹{order.amount} Paid</span>
                 </div>
-              ))}
-            </>
-          ) : (
-            <div className="flex flex-col items-center justify-center gap-4 py-10 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-red-100 bg-red-50">
-                <BookOpen className="h-8 w-8 text-red-300" />
+
+                <div className="space-y-px">
+                  {order.items.map((item, idx) => (
+                    <div key={idx} className="px-4 pb-4">
+                      <h3 className="mb-2 text-sm font-black leading-snug text-brand-teal">{item.title}</h3>
+                      <div className="mb-3 flex flex-wrap gap-1.5">
+                        {item.pages ? <span className="rounded-full border border-brand-gold/25 bg-brand-gold/8 px-2 py-0.5 text-[10px] font-bold text-brand-gold">{item.pages} pages</span> : null}
+                        {item.isCombo && <span className="rounded-full border border-amber-100 bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-600">Combo PDF</span>}
+                        {justPurchasedOrder?.ebookId === item.ebookId && <span className="animate-pulse rounded-full border border-green-100 bg-green-50 px-2 py-0.5 text-[10px] font-bold text-green-600">New</span>}
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <a href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`Hello,\nMy book: ${item.title}\nLink: ${item.url}\nPlease save this message.`)}`} target="_blank" rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-1.5 rounded-xl border border-green-200 bg-green-50 py-2.5 text-xs font-bold text-green-700 transition-colors hover:bg-green-100 active:scale-95">
+                          <FaWhatsapp className="h-3.5 w-3.5" />
+                          Save Link
+                        </a>
+                        <a href={item.url} target="_blank" rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-1.5 rounded-xl bg-brand-teal py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-brand-teal/90 active:scale-95"
+                          onClick={() => setShowInstructions(true)}>
+                          <Download className="h-3.5 w-3.5" />
+                          Download PDF
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div>
-                <p className="font-black text-red-500">पुस्तके सापडली नाहीत</p>
-                <p className="mt-1 text-xs text-gray-400">नंबर बरोबर असल्याची खात्री करा किंवा मदत घ्या.</p>
-              </div>
-              <Button variant="outline" className="rounded-xl border-dashed border-gray-300 text-xs text-gray-500 hover:border-brand-teal hover:text-brand-teal" onClick={() => window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`नमस्कार, मी आताच पुस्तक विकत घेतले पण 'माझी पुस्तके' मध्ये दिसत नाही. नंबर: ${query || "N/A"}`)}`, '_blank')}>
-                मी पैसे भरले, पण पुस्तक दिसत नाही?
-              </Button>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-red-100 bg-red-50">
+              <BookOpen className="h-8 w-8 text-red-300" />
             </div>
-          )}
-        </div>
+            <div>
+              <p className="font-black text-gray-700">No books found</p>
+              <p className="mt-1 text-xs text-gray-400">Check your number or contact support.</p>
+            </div>
+            <button onClick={() => window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`Hello, I paid for a book but it's not showing. My number: ${query || "N/A"}`)}`, '_blank')}
+              className="rounded-xl border border-dashed border-gray-300 px-4 py-2.5 text-xs font-bold text-gray-500 transition-colors hover:border-brand-teal hover:text-brand-teal active:scale-95">
+              I paid but book is missing?
+            </button>
+          </div>
+        )}
 
         {/* Recommended combos */}
         {orders !== null && orders.length > 0 && (
           <div className="mt-8 mb-2">
-            <div className="mb-3 flex items-center gap-2 px-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand-gold" />
-              <h2 className="text-xs font-black tracking-widest text-brand-teal/50 uppercase">तुमच्यासाठी खास कॉम्बोस</h2>
-            </div>
+            <p className="mb-3 px-1 text-[11px] font-black tracking-widest text-gray-400 uppercase">Recommended for you</p>
             <ComboCarousel />
           </div>
         )}

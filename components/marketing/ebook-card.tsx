@@ -120,18 +120,18 @@ export function EbookCard({ ebook, searchQuery, className }: EbookCardProps) {
         )}
 
         {/* Price row */}
-        <div className="mt-auto flex items-center justify-between">
-          <div className="flex flex-col gap-0.5">
-            <span className="text-[10px] font-medium text-gray-300 line-through">₹{crossedPrice}</span>
-            <span className={`text-lg font-extrabold leading-none ${isSaleActive ? "text-red-500" : "text-brand-teal"}`}>
+        <div className="mt-auto flex flex-col gap-2">
+          <div className="flex items-baseline gap-1.5">
+            <span className={`text-[15px] font-extrabold leading-none ${isSaleActive ? "text-red-500" : "text-brand-teal"}`}>
               ₹{finalPrice}
             </span>
+            <span className="text-[10px] font-medium text-gray-300 line-through">₹{crossedPrice}</span>
           </div>
 
-          {/* CTA */}
-          <div className="flex items-center gap-1 rounded-xl bg-brand-teal px-3.5 py-2 text-[11px] font-bold text-white transition-colors group-hover:bg-brand-gold">
+          {/* CTA — full width */}
+          <div className="flex w-full items-center justify-center gap-1 rounded-xl bg-brand-teal px-2 py-2 text-[11px] font-bold text-white transition-colors group-hover:bg-brand-gold">
             Download PDF
-            <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRight className="h-3 w-3 shrink-0 transition-transform group-hover:translate-x-0.5" />
           </div>
         </div>
       </div>
