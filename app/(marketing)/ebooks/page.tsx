@@ -1,6 +1,6 @@
 import { getEbooks } from "@/lib/data-access";
 import { EbookCatalog } from "@/components/marketing/ebook-catalog";
-import { Scale, BookOpen, Zap } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 

@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { BuyButton } from "@/components/buy-button";
-import { ShieldCheck, BookOpen, Download as DownloadIcon, Zap, Mail, Home, ChevronRight, ChevronLeft, FileText, Smartphone, RefreshCw, Scale, ArrowRight } from "lucide-react";
+import { ShieldCheck, BookOpen, Download as DownloadIcon, Zap, Mail, Home, ChevronRight, ChevronLeft, FileText, Smartphone, RefreshCw, Scale } from "lucide-react";
 import { EbookPreview } from "@/components/ebook-preview";
 import { ShareButtons } from "@/components/share-buttons";
 import { RecommendedCarousel } from "./recommended-carousel";
@@ -343,7 +343,7 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
         <div className="bg-white">
           <div className="flex gap-4 p-4">
             {/* Cover — fixed dimensions, not aspect-ratio stretched */}
-            <div className="relative w-[120px] shrink-0 self-start overflow-hidden rounded-xl shadow-lg" style={{ aspectRatio: "3/4" }}>
+            <div className="relative w-30 shrink-0 self-start overflow-hidden rounded-xl shadow-lg" style={{ aspectRatio: "3/4" }}>
               {ebook.coverImage
                 ? <Image src={ebook.coverImage} alt={ebook.title} fill unoptimized priority className="object-cover" />
                 : <div className="flex h-full w-full items-center justify-center bg-gray-100"><BookOpen className="h-8 w-8 text-gray-300" /></div>}

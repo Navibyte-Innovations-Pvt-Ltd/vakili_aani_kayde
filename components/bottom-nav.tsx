@@ -44,7 +44,7 @@ export function BottomNav() {
               >
                 <Icon
                   className={cn(
-                    "h-[18px] w-[18px] transition-colors",
+                    "h-4.5 w-4.5 transition-colors",
                     active
                       ? "text-white"
                       : special

@@ -899,7 +899,7 @@ function CheckoutForm({
                           autoFocus={!isMobile}
                           placeholder="10-digit number"
                           className={cn(
-                            "h-12 rounded-2xl border border-gray-200 bg-white pl-[4.5rem] text-base font-bold shadow-none transition-all placeholder:font-normal placeholder:text-gray-300 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/15 focus-visible:ring-offset-0",
+                            "h-12 rounded-2xl border border-gray-200 bg-white pl-18 text-base font-bold shadow-none transition-all placeholder:font-normal placeholder:text-gray-300 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/15 focus-visible:ring-offset-0",
                             form.formState.errors.phone && "border-red-200 bg-red-50 focus:border-red-400 focus:ring-red-100",
                           )}
                           {...field}
