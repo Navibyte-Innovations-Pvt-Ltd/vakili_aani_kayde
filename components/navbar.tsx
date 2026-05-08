@@ -10,16 +10,16 @@ import { GlobalSearch } from "./global-search";
 import { Badge } from "@/components/ui/badge";
 
 const NAV_LINKS = [
-  { href: "/", label: "मुख्यपृष्ठ", sub: "Home", icon: Home },
-  { href: "/ebooks", label: "ई-बुक्स", sub: "E-Books", icon: BookOpen },
+  { href: "/", label: "Home", sub: "Home", icon: Home },
+  { href: "/ebooks", label: "E-Books", sub: "E-Books", icon: BookOpen },
   {
     href: "/combos",
-    label: "कॉम्बो पॅक्स",
+    label: "Combo Packs",
     sub: "Combos",
     icon: Library,
     badge: "Sale",
   },
-  { href: "/about", label: "आमच्याबद्दल", sub: "About", icon: Info },
+  { href: "/about", label: "About", sub: "About", icon: Info },
 ];
 
 export function Navbar() {
@@ -91,7 +91,7 @@ export function Navbar() {
               href="/my-books"
               className="group relative ml-1 flex items-center gap-1 rounded-lg border border-brand-teal/20 px-3 py-1.5 text-sm font-bold text-brand-teal transition-all hover:border-brand-gold/40 hover:bg-brand-gold/5 hover:text-brand-teal"
             >
-              📚 माझी पुस्तके
+              📚 My Books
             </Link>
           </div>
 
@@ -103,7 +103,7 @@ export function Navbar() {
               size="sm"
               className="h-9 rounded-lg bg-brand-gold px-5 font-black text-white shadow-sm transition-all hover:bg-brand-gold/90 hover:shadow-md active:scale-[0.97]"
             >
-              <Link href="/ebooks">खरेदी करा</Link>
+              <Link href="/ebooks">Buy Now</Link>
             </Button>
           </div>
 
@@ -184,7 +184,7 @@ export function Navbar() {
                       <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-gold/20">
                         📚
                       </span>
-                      माझी पुस्तके
+                      My Books
                     </div>
                     <ChevronRight className="h-4 w-4 opacity-60" />
                   </Link>
@@ -194,7 +194,7 @@ export function Navbar() {
                 <div className="border-t border-white/10 px-5 py-5 space-y-3">
                   <Link href="/ebooks" onClick={() => setIsOpen(false)}>
                     <Button className="w-full rounded-xl bg-brand-gold py-5 text-base font-black text-white shadow-lg hover:bg-brand-gold/90">
-                      📖 Ebooks खरेदी करा — ₹49
+                      📖 Buy Ebooks — Starting ₹49
                     </Button>
                   </Link>
                   <Link

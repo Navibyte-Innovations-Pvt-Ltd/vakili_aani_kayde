@@ -28,7 +28,6 @@ const LANGUAGE_LABELS: Record<string, string> = {
 
 export function EbookCatalog({ initialEbooks }: { initialEbooks: Ebook[] }) {
     const [searchQuery, setSearchQuery] = useState("");
-    const [idSearchQuery, setIdSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [selectedLanguage, setSelectedLanguage] = useState("All");
 
@@ -51,18 +50,15 @@ export function EbookCatalog({ initialEbooks }: { initialEbooks: Ebook[] }) {
 
     const filteredEbooks = initialEbooks.filter((ebook) => {
         const normalizedQuery = searchQuery.toLowerCase().trim();
-        const normalizedIdQuery = idSearchQuery.trim();
-
         const matchesSearch = normalizedQuery === "" || (
             ebook.title.toLowerCase().includes(normalizedQuery) ||
             ebook.description.toLowerCase().includes(normalizedQuery)
         );
 
-        const matchesId = normalizedIdQuery === "" || ebook.displayId.toString() === normalizedIdQuery;
         const matchesCategory = selectedCategory === "All" || ebook.category === selectedCategory;
         const matchesLanguage = selectedLanguage === "All" || ebook.language === selectedLanguage;
 
-        return matchesSearch && matchesId && matchesCategory && matchesLanguage;
+        return matchesSearch && matchesCategory && matchesLanguage;
     });
 
     return (
@@ -75,34 +71,6 @@ export function EbookCatalog({ initialEbooks }: { initialEbooks: Ebook[] }) {
                     </p>
 
                     <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
-                        {/* ID Search */}
-                        <div className="group relative w-full sm:w-35">
-                            <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center transition-colors group-focus-within:text-brand-teal">
-                                <span className="text-xs font-bold text-gray-400 group-focus-within:text-brand-teal">ID</span>
-                            </div>
-                            <Input
-                                placeholder="Book ID"
-                                className="h-11 rounded-xl border-gray-200 bg-gray-50 pr-8 pl-9 text-sm shadow-sm transition-all focus:bg-white focus-visible:ring-brand-teal"
-                                value={idSearchQuery}
-                                onChange={(e) => {
-                                    // Only allow numbers
-                                    const val = e.target.value;
-                                    if (val === '' || /^\d+$/.test(val)) {
-                                        setIdSearchQuery(val);
-                                    }
-                                }}
-                                type="tel" // triggers numeric keypad on mobile
-                            />
-                            {idSearchQuery && (
-                                <button
-                                    onClick={() => setIdSearchQuery("")}
-                                    className="absolute inset-y-0 right-3 flex items-center text-gray-400 transition-colors hover:text-brand-teal"
-                                >
-                                    <X className="h-3.5 w-3.5" />
-                                </button>
-                            )}
-                        </div>
-
                         {/* Main Search */}
                         <div className="group relative w-full sm:w-87.5">
                             <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center transition-colors group-focus-within:text-brand-teal">

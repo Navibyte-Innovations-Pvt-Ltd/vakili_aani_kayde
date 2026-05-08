@@ -77,21 +77,14 @@ export function EbookCard({ ebook, searchQuery, className }: EbookCardProps) {
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-brand-teal/10 to-brand-gold/10">
+          <div className="flex h-full w-full flex-col items-center justify-center bg-linear-to-br from-brand-teal/10 to-brand-gold/10">
             <BookOpen className="mb-2 h-10 w-10 text-brand-teal/30" />
             <span className="text-xs font-medium text-brand-teal/40">No Cover</span>
           </div>
         )}
 
         {/* Bottom gradient for readability */}
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/50 to-transparent" />
-
-        {/* Top-left: ID chip */}
-        {ebook.displayId && (
-          <div className="absolute top-2.5 left-2.5 z-10 rounded-md bg-brand-teal/90 px-2 py-0.5 text-[11px] font-black text-white backdrop-blur-sm">
-            #{ebook.displayId}
-          </div>
-        )}
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-black/50 to-transparent" />
 
         {/* Top-right: sale badge */}
         <div className="absolute top-2.5 right-2.5 z-10 flex flex-col items-end gap-1">
@@ -137,7 +130,7 @@ export function EbookCard({ ebook, searchQuery, className }: EbookCardProps) {
 
           {/* CTA */}
           <div className="flex items-center gap-1 rounded-xl bg-brand-teal px-3.5 py-2 text-[11px] font-bold text-white transition-colors group-hover:bg-brand-gold">
-            खरेदी करा
+            Download PDF
             <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
           </div>
         </div>

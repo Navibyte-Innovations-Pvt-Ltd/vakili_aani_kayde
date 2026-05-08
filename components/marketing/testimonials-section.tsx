@@ -101,7 +101,7 @@ export function TestimonialsSection() {
               >
                 <div className="flex h-full flex-col rounded-2xl border-l-4 border-brand-gold bg-white/5 p-5 backdrop-blur-sm transition-colors hover:bg-white/8">
                   {/* Quote mark */}
-                  <span className="mb-3 block font-serif text-5xl leading-none text-brand-gold/50 select-none">"</span>
+                  <span className="mb-3 block font-serif text-5xl leading-none text-brand-gold/50 select-none">&ldquo;</span>
 
                   {/* Stars */}
                   <div className="mb-3 flex gap-0.5">

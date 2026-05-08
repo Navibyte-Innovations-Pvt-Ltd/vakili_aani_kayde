@@ -1,75 +1,77 @@
 import { getEbooksByLanguage } from "@/lib/data-access";
 import { EbookCatalog } from "@/components/marketing/ebook-catalog";
-import { ChevronLeft } from "lucide-react";
+import { Scale, BookOpen, Zap } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-    title: "English Legal Ebooks | Legal Knowledge Library",
-    description: "Browse our collection of simplified legal ebooks and guides in English.",
+  title: "English Legal Ebooks | Vakili Aani Kayde",
+  description: "Browse simplified legal guides and ebooks in English. Property law, consumer rights, cyber fraud and more.",
 };
 
 export default async function EnglishEbooksPage() {
-    const ebooks = await getEbooksByLanguage("ENGLISH");
+  const ebooks = await getEbooksByLanguage("ENGLISH");
 
-    const jsonLd = {
-        "@context": "https://schema.org",
-        "@type": "CollectionPage",
-        "name": "English Legal Ebooks",
-        "description": "Browse our collection of simplified legal ebooks and guides in English.",
-        "url": "https://www.vakilianikayde.in/ebooks/english",
-        "inLanguage": "en",
-        "mainEntity": {
-            "@type": "ItemList",
-            "itemListElement": ebooks.map((ebook, index) => ({
-                "@type": "ListItem",
-                "position": index + 1,
-                "url": `https://www.vakilianikayde.in/ebooks/${ebook.id}`,
-                "name": ebook.title,
-            })),
-        },
-    };
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "English Legal Ebooks | Vakili Aani Kayde",
+    "description": "Browse simplified legal guides and ebooks in English.",
+    "url": "https://www.vakilianikayde.in/ebooks/english",
+    "inLanguage": "en",
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": ebooks.map((ebook, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "url": `https://www.vakilianikayde.in/ebooks/${ebook.id}`,
+        "name": ebook.title,
+      })),
+    },
+  };
 
-    return (
-        <div className="min-h-screen bg-white">
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-            />
-            <div className="relative overflow-hidden bg-slate-900 py-3 text-white">
-                <div className="relative z-10 container mx-auto flex items-center px-4">
-                    <Link
-                        href="/ebooks"
-                        className="shrink-0 rounded-full p-1.5 transition-colors hover:bg-white/10"
-                        aria-label="All ebooks"
-                    >
-                        <ChevronLeft className="h-5 w-5 text-brand-gold" />
-                    </Link>
-                    <div className="flex-1 pr-8 text-center">
-                        <h1 className="text-xl font-bold tracking-tight md:text-2xl">
-                            English Legal <span className="text-brand-gold">Ebooks Library</span>
-                        </h1>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="min-h-screen bg-brand-cream">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-            <div className="border-b border-gray-100 bg-white">
-                <div className="container mx-auto flex gap-1 overflow-x-auto px-4 py-2">
-                    <Link href="/ebooks" className="rounded-full px-4 py-1.5 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-100">All / सर्व</Link>
-                    <Link href="/ebooks/hindi" className="rounded-full px-4 py-1.5 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-100">हिंदी</Link>
-                    <span className="rounded-full bg-slate-900 px-4 py-1.5 text-xs font-bold text-white">English</span>
-                </div>
-            </div>
-
-            <div className="container mx-auto px-4 py-8">
-                {ebooks.length === 0 ? (
-                    <div className="py-16 text-center text-muted-foreground">
-                        No English ebooks available yet. Please check back soon.
-                    </div>
-                ) : (
-                    <EbookCatalog initialEbooks={ebooks} />
-                )}
-            </div>
+      {/* Language tabs */}
+      <div className="border-b border-gray-100 bg-white px-4">
+        <div className="mx-auto flex max-w-6xl gap-1 overflow-x-auto py-2">
+          <Link href="/ebooks" className="rounded-full px-4 py-1.5 text-xs font-bold text-gray-500 transition-colors hover:bg-brand-teal/8 hover:text-brand-teal">
+            सर्व
+          </Link>
+          <Link href="/ebooks/hindi" className="rounded-full px-4 py-1.5 text-xs font-bold text-gray-500 transition-colors hover:bg-brand-teal/8 hover:text-brand-teal">
+            हिंदी
+          </Link>
+          <span className="rounded-full bg-brand-teal px-4 py-1.5 text-xs font-black text-white">
+            English
+          </span>
         </div>
-    );
+      </div>
+
+      {/* Catalog */}
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        {ebooks.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-brand-gold/15 bg-white shadow-sm">
+              <BookOpen className="h-8 w-8 text-brand-gold/60" />
+            </div>
+            <p className="font-black text-brand-teal">Coming Soon</p>
+            <p className="mt-1 text-sm text-gray-400">English ebooks are being added.</p>
+          </div>
+        ) : (
+          <EbookCatalog initialEbooks={ebooks} />
+        )}
+      </div>
+
+      {/* Bottom strip */}
+      <div className="border-t border-gray-100 bg-white px-4 py-5 text-center">
+        <p className="text-xs text-gray-400">
+          वकिली आणि कायदे · vakilianikayde.in · Pune, Maharashtra
+          <span className="mx-2 text-gray-200">|</span>
+          Digital ebooks for educational purposes only — not legal advice.
+        </p>
+      </div>
+    </div>
+  );
 }

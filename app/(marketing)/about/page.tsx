@@ -80,13 +80,13 @@ export default function AboutPage() {
 
         {/* Big quote */}
         <div className="relative my-14 overflow-hidden rounded-3xl bg-brand-teal px-8 py-10 text-center md:px-16 md:py-14">
-          <span className="absolute top-4 left-6 font-serif text-8xl leading-none text-brand-gold/15 select-none">"</span>
+          <span className="absolute top-4 left-6 font-serif text-8xl leading-none text-brand-gold/15 select-none">&ldquo;</span>
           <p className="relative z-10 text-lg font-bold leading-relaxed text-white/90 md:text-2xl">
             कायद्याचे अज्ञान हे हक्क गमावण्याचे मुख्य कारण आहे.
             <br className="hidden md:block" />
             <span className="text-brand-gold"> आमचे उद्दिष्ट — प्रत्येक नागरिकाला सक्षम करणे.</span>
           </p>
-          <span className="absolute right-6 bottom-4 font-serif text-8xl leading-none text-brand-gold/15 select-none">"</span>
+          <span className="absolute right-6 bottom-4 font-serif text-8xl leading-none text-brand-gold/15 select-none">&rdquo;</span>
         </div>
 
         {/* Why us — alternating rows */}

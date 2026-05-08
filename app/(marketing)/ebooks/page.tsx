@@ -1,83 +1,76 @@
 import { getEbooks } from "@/lib/data-access";
 import { EbookCatalog } from "@/components/marketing/ebook-catalog";
-import { ChevronLeft } from "lucide-react";
+import { Scale, BookOpen, Zap } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-    title: "Legal Ebooks Library | कायदेविषयक पुस्तके",
-    description: "Browse our collection of simplified legal ebooks and guides in Marathi and English.",
+  title: "ई-बुक्स | वकिली आणि कायदे",
+  description: "मराठीत सोप्या भाषेत कायदेशीर मार्गदर्शक ई-बुक्स. मालमत्ता, ग्राहक हक्क, सायबर कायदा आणि बरेच काही.",
 };
 
 export default async function EbooksPage() {
-    const ebooks = await getEbooks();
+  const ebooks = await getEbooks();
 
-    const jsonLd = {
-        "@context": "https://schema.org",
-        "@type": "CollectionPage",
-        "name": "Legal Ebooks Library | कायदेविषयक पुस्तके",
-        "description": "Browse our collection of simplified legal ebooks and guides in Marathi and English.",
-        "url": "https://www.vakilianikayde.in/ebooks",
-        "mainEntity": {
-            "@type": "ItemList",
-            "itemListElement": ebooks.map((ebook, index) => ({
-                "@type": "ListItem",
-                "position": index + 1,
-                "url": `https://www.vakilianikayde.in/ebooks/${ebook.id}`,
-                "name": ebook.title
-            }))
-        }
-    };
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "ई-बुक्स | वकिली आणि कायदे",
+    "description": "मराठीत सोप्या भाषेत कायदेशीर मार्गदर्शक ई-बुक्स.",
+    "url": "https://www.vakilianikayde.in/ebooks",
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": ebooks.map((ebook, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "url": `https://www.vakilianikayde.in/ebooks/${ebook.id}`,
+        "name": ebook.title,
+      })),
+    },
+  };
 
-    return (
-        <div className="min-h-screen bg-white">
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-            />
-            {/* Header / Hero */}
-            <div className="relative overflow-hidden bg-slate-900 py-3 text-white">
-                <div className="relative z-10 container mx-auto flex items-center px-4">
-                    <Link
-                        href="/"
-                        className="shrink-0 rounded-full p-1.5 transition-colors hover:bg-white/10"
-                        aria-label="Back to home"
-                    >
-                        <ChevronLeft className="h-5 w-5 text-brand-gold" />
-                    </Link>
-                    <div className="flex-1 pr-8 text-center">
-                        <h1 className="text-xl font-bold tracking-tight md:text-2xl">
-                            Legal Knowledge Simplified / <span className="text-brand-gold">ज्ञान हीच शक्ती</span>
-                        </h1>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="min-h-screen bg-brand-cream">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-            {/* Language tabs */}
-            <div className="border-b border-gray-100 bg-white">
-                <div className="container mx-auto flex gap-1 overflow-x-auto px-4 py-2">
-                    <span className="rounded-full bg-slate-900 px-4 py-1.5 text-xs font-bold text-white">
-                        All / सर्व
-                    </span>
-                    <Link
-                        href="/ebooks/hindi"
-                        className="rounded-full px-4 py-1.5 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-100"
-                    >
-                        हिंदी
-                    </Link>
-                    <Link
-                        href="/ebooks/english"
-                        className="rounded-full px-4 py-1.5 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-100"
-                    >
-                        English
-                    </Link>
-                </div>
-            </div>
-
-            {/* Content */}
-            <div className="container mx-auto px-4 py-8">
-                <EbookCatalog initialEbooks={ebooks} />
-            </div>
+      {/* Language tabs */}
+      <div className="border-b border-gray-100 bg-white px-4">
+        <div className="mx-auto flex max-w-6xl gap-1 overflow-x-auto py-2">
+          <span className="rounded-full bg-brand-teal px-4 py-1.5 text-xs font-black text-white">
+            सर्व
+          </span>
+          <Link href="/ebooks/hindi" className="rounded-full px-4 py-1.5 text-xs font-bold text-gray-500 transition-colors hover:bg-brand-teal/8 hover:text-brand-teal">
+            हिंदी
+          </Link>
+          <Link href="/ebooks/english" className="rounded-full px-4 py-1.5 text-xs font-bold text-gray-500 transition-colors hover:bg-brand-teal/8 hover:text-brand-teal">
+            English
+          </Link>
         </div>
-    );
+      </div>
+
+      {/* Catalog */}
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        {ebooks.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-brand-gold/15 bg-white shadow-sm">
+              <BookOpen className="h-8 w-8 text-brand-gold/60" />
+            </div>
+            <p className="font-black text-brand-teal">लवकरच उपलब्ध होणार</p>
+            <p className="mt-1 text-sm text-gray-400">नवीन पुस्तके जोडली जात आहेत.</p>
+          </div>
+        ) : (
+          <EbookCatalog initialEbooks={ebooks} />
+        )}
+      </div>
+
+      {/* Bottom strip */}
+      <div className="border-t border-gray-100 bg-white px-4 py-5 text-center">
+        <p className="text-xs text-gray-400">
+          वकिली आणि कायदे · vakilianikayde.in · Pune, Maharashtra
+          <span className="mx-2 text-gray-200">|</span>
+          Digital ebooks for educational purposes only — not legal advice.
+        </p>
+      </div>
+    </div>
+  );
 }
