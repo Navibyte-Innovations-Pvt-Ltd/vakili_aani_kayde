@@ -1,5 +1,5 @@
 # Vakili Aani Kayde — वकिली आणि कायदे
-
+udpate
 > Live: [vakilianikayde.in](https://www.vakilianikayde.in)
 
 Marathi-first legal ebook marketplace. Customers buy, pay via Razorpay, and instantly receive watermarked PDFs on WhatsApp + email. Admin dashboard for ebook management, order tracking, and analytics.
