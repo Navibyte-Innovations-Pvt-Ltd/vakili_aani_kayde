@@ -1,5 +1,5 @@
 # 📚 Kaydyancha Ani Faydyach (कायद्याचं आणि फायद्याचं)
-
+update
 A professional Next.js-powered ebook marketplace and management platform specializing in legal and property guidance, featuring AI-assisted content creation and a mobile-first user experience.
 
 
