@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { BuyButton } from "@/components/buy-button";
-import { ShieldCheck, BookOpen, Download as DownloadIcon, Zap, Mail, Home, ChevronRight } from "lucide-react";
+import { ShieldCheck, BookOpen, Download as DownloadIcon, Zap, Mail, Home, ChevronRight, FileText, Smartphone, RefreshCw, Scale } from "lucide-react";
 import { EbookPreview } from "@/components/ebook-preview";
 import { ShareButtons } from "@/components/share-buttons";
 import { RecommendedCarousel } from "./recommended-carousel";
@@ -15,10 +15,7 @@ import { getEbookById, getComboEbooks } from "@/lib/data-access";
 import { SALE_CONFIG, getInflatedOriginalPrice } from "@/lib/sale-config";
 import { SaleTimer } from "@/components/marketing/sale-timer";
 
-// ISR: Revalidate every 24 hours - maximum edge caching efficiency
-// Pages are cached at Vercel's edge, users get faster loads
-// Use revalidateTag('ebooks') to force-refresh after updates
-export const revalidate = 86400; // 24 hours
+export const revalidate = 86400;
 
 const LANGUAGE_LABELS: Record<string, string> = {
   MARATHI: "मराठी",
@@ -35,8 +32,8 @@ const PAGE_LABELS = {
     downloadBtnDesktop: "आत्ताच डाऊनलोड करा (Download Now)",
     securePayment: "सुरक्षित पेमेंट | UPI, Card, Netbanking",
     securePaymentDesktop: "सुरक्षित पेमेंट (Safe & Secure Payment)",
-    digitalNotice: "📄 हे केवळ Digital PDF E-Book आहे — कोणतीही Physical / Printed प्रत पाठवली जात नाही.",
-    refundNotice: "⚠️ एकदा PDF डाउनलोड केल्यानंतर परतावा (Refund) शक्य नाही.",
+    digitalNotice: "हे केवळ Digital PDF E-Book आहे — कोणतीही Physical / Printed प्रत पाठवली जात नाही.",
+    refundNotice: "एकदा PDF डाउनलोड केल्यानंतर परतावा (Refund) शक्य नाही.",
     faqHeader: "नेहमी विचारले जाणारे प्रश्न",
     faq1Q: "हे पुस्तक मला कसे मिळेल?",
     faq1AfterPayment: "पेमेंट यशस्वी झाल्यानंतर:",
@@ -63,7 +60,7 @@ const PAGE_LABELS = {
     recommendedTitle: "तुम्हाला हे देखील आवडेल",
     recommendedSub: "आमची इतर काही महत्वाची पुस्तके पहा",
     authorLabel: "लेखकाबद्दल",
-    authorBio: "Adv. Ajay Mane हे पुणे उच्च न्यायालयात प्रॅक्टिस करणारे अनुभवी वकील आहेत. त्यांनी सामान्य नागरिकांसाठी कायद्याची माहिती सोप्या मराठी भाषेत उपलब्ध करून देण्यासाठी 'वकिली आणि कायदे' ची स्थापना केली.",
+    authorBio: "Adv. Omkar Shinde हे पुणे उच्च न्यायालयात प्रॅक्टिस करणारे अनुभवी वकील आहेत. त्यांनी सामान्य नागरिकांसाठी कायद्याची माहिती सोप्या मराठी भाषेत उपलब्ध करून देण्यासाठी 'वकिली आणि कायदे' ची स्थापना केली.",
     socialProof: "वाचकांनी विश्वास ठेवला",
   },
   HINDI: {
@@ -74,8 +71,8 @@ const PAGE_LABELS = {
     downloadBtnDesktop: "अभी डाउनलोड करें (Download Now)",
     securePayment: "सुरक्षित भुगतान | UPI, Card, Netbanking",
     securePaymentDesktop: "सुरक्षित भुगतान (Safe & Secure Payment)",
-    digitalNotice: "📄 यह केवल Digital PDF E-Book है — कोई Physical / Printed प्रति नहीं भेजी जाती।",
-    refundNotice: "⚠️ PDF डाउनलोड के बाद Refund संभव नहीं है।",
+    digitalNotice: "यह केवल Digital PDF E-Book है — कोई Physical / Printed प्रति नहीं भेजी जाती।",
+    refundNotice: "PDF डाउनलोड के बाद Refund संभव नहीं है।",
     faqHeader: "अक्सर पूछे जाने वाले प्रश्न",
     faq1Q: "यह पुस्तक मुझे कैसे मिलेगी?",
     faq1AfterPayment: "भुगतान सफल होने के बाद:",
@@ -102,7 +99,7 @@ const PAGE_LABELS = {
     recommendedTitle: "आपको यह भी पसंद आएगा",
     recommendedSub: "हमारी अन्य महत्वपूर्ण पुस्तकें देखें",
     authorLabel: "लेखक के बारे में",
-    authorBio: "Adv. Ajay Mane पुणे उच्च न्यायालय में प्रैक्टिस करने वाले अनुभवी वकील हैं। उन्होंने आम नागरिकों के लिए कानूनी जानकारी को सरल भाषा में उपलब्ध कराने के लिए 'वकिली आणि कायदे' की स्थापना की।",
+    authorBio: "Adv. Omkar Shinde पुणे उच्च न्यायालय में प्रैक्टिस करने वाले अनुभवी वकील हैं। उन्होंने आम नागरिकों के लिए कानूनी जानकारी को सरल भाषा में उपलब्ध कराने के लिए 'वकिली आणि कायदे' की स्थापना की।",
     socialProof: "पाठकों का विश्वास",
   },
   ENGLISH: {
@@ -113,8 +110,8 @@ const PAGE_LABELS = {
     downloadBtnDesktop: "Download Now",
     securePayment: "Secure Payment | UPI, Card, Netbanking",
     securePaymentDesktop: "Secure Payment (Safe & Secure)",
-    digitalNotice: "📄 This is a Digital PDF E-Book only — No Physical / Printed copy is shipped.",
-    refundNotice: "⚠️ No refund once PDF is downloaded.",
+    digitalNotice: "This is a Digital PDF E-Book only — No Physical / Printed copy is shipped.",
+    refundNotice: "No refund once PDF is downloaded.",
     faqHeader: "Frequently Asked Questions",
     faq1Q: "How will I get this book?",
     faq1AfterPayment: "After successful payment:",
@@ -141,587 +138,425 @@ const PAGE_LABELS = {
     recommendedTitle: "You May Also Like",
     recommendedSub: "Explore more important books",
     authorLabel: "About the Author",
-    authorBio: "Adv. Ajay Mane is a practising advocate at the Pune High Court. He founded 'Vakili Aani Kayde' to make legal knowledge accessible to every citizen in simple, everyday language.",
+    authorBio: "Adv. Omkar Shinde is a practising advocate at the Pune High Court. He founded 'Vakili Aani Kayde' to make legal knowledge accessible to every citizen in simple, everyday language.",
     socialProof: "Trusted by readers",
   },
 } as const;
 
 export async function generateMetadata(
-    props: { params: Promise<{ id: string }> }
+  props: { params: Promise<{ id: string }> }
 ): Promise<Metadata> {
-    try {
-        const params = await props.params;
-        const id = params.id;
-
-        const ebook = await getEbookById(id);
-
-        if (!ebook) {
-            return {
-                title: "Ebook Not Found | Kaydyanch ani Faydyach",
-                description: "The ebook you are looking for might have been removed or is temporarily unavailable.",
-            };
-        }
-
-        // Strip HTML tags for description and truncate to optimal length for SEO/Social (110-160 chars)
-        const plainDescription = ebook.description?.replace(/<[^>]+>/g, ' ').trim() || `Buy ${ebook.title} - Legal Ebook in Marathi`;
-        const truncatedDescription = plainDescription.length > 155 ? plainDescription.slice(0, 152) + "..." : plainDescription;
-
-        // Truncate title for OG/Twitter (strictly < 60)
-        const rawTitle = ebook.title.replace(/<[^>]+>/g, '').trim();
-        const ogTitle = rawTitle.length > 55 ? rawTitle.slice(0, 52) + "..." : rawTitle;
-
-        return {
-            title: {
-                absolute: `${ogTitle} | वकिली आणि कायदे`
-            },
-            description: truncatedDescription,
-            openGraph: {
-                title: ogTitle,
-                description: truncatedDescription,
-                url: `https://www.vakilianikayde.in/ebooks/${id}`,
-                type: 'book',
-                siteName: 'Kaydyanch Ani Faydyach',
-                images: [
-                    {
-                        url: `/ebooks/${id}/opengraph-image`,
-                        width: 1200,
-                        height: 630,
-                        alt: ogTitle,
-                    }
-                ]
-            },
-            twitter: {
-                card: 'summary_large_image',
-                title: ogTitle,
-                description: truncatedDescription,
-                images: [`/ebooks/${id}/opengraph-image`],
-            },
-            authors: [{ name: 'Adv. Ajay Mane' }],
-        };
-    } catch (error) {
-        console.error("Metadata generation failed:", error);
-        return {
-            title: "Kaydyanch ani Faydyach",
-            description: "Legal Knowledge Center. Buy Ebooks in Marathi.",
-        };
+  try {
+    const params = await props.params;
+    const ebook = await getEbookById(params.id);
+    if (!ebook) {
+      return { title: "Ebook Not Found | वकिली आणि कायदे" };
     }
+    const plainDescription = ebook.description?.replace(/<[^>]+>/g, " ").trim() || `Buy ${ebook.title} - Legal Ebook in Marathi`;
+    const truncatedDescription = plainDescription.length > 155 ? plainDescription.slice(0, 152) + "..." : plainDescription;
+    const rawTitle = ebook.title.replace(/<[^>]+>/g, "").trim();
+    const ogTitle = rawTitle.length > 55 ? rawTitle.slice(0, 52) + "..." : rawTitle;
+    return {
+      title: { absolute: `${ogTitle} | वकिली आणि कायदे` },
+      description: truncatedDescription,
+      openGraph: {
+        title: ogTitle,
+        description: truncatedDescription,
+        url: `https://www.vakilianikayde.in/ebooks/${params.id}`,
+        type: "book",
+        siteName: "वकिली आणि कायदे",
+        images: [{ url: `/ebooks/${params.id}/opengraph-image`, width: 1200, height: 630, alt: ogTitle }],
+      },
+      twitter: { card: "summary_large_image", title: ogTitle, description: truncatedDescription, images: [`/ebooks/${params.id}/opengraph-image`] },
+      authors: [{ name: "Adv. Omkar Shinde" }],
+    };
+  } catch {
+    return { title: "वकिली आणि कायदे", description: "Legal Knowledge Center." };
+  }
 }
 
-// Return empty — pages are not pre-rendered at build time.
-// ISR via revalidate=86400 handles caching after first request.
-// This prevents DB connection timeouts during CI builds.
-export async function generateStaticParams() {
-    return [];
-}
+export async function generateStaticParams() { return []; }
+
+const FaqItem = ({ q, children, open, accent }: { q: string; children: React.ReactNode; open?: boolean; accent?: "gold" | "red" }) => (
+  <details open={open} className="group overflow-hidden rounded-xl border border-gray-100 bg-white [&_summary::-webkit-details-marker]:hidden open:border-brand-gold/30 open:shadow-sm">
+    <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-3 px-4 py-3 text-[13px] font-semibold text-gray-800 transition-colors hover:bg-brand-cream group-open:text-brand-teal">
+      <span className="flex items-center gap-2.5">
+        {accent === "gold" && <Scale className="h-3.5 w-3.5 shrink-0 text-brand-gold" />}
+        {accent === "red" && <FileText className="h-3.5 w-3.5 shrink-0 text-red-400" />}
+        {q}
+      </span>
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+      </svg>
+    </summary>
+    <div className="border-t border-gray-100 px-4 pb-4 pt-3 text-[13px] leading-relaxed text-gray-600 group-open:border-brand-gold/20">
+      {children}
+    </div>
+  </details>
+);
 
 export default async function EbookDetailPage(props: { params: Promise<{ id: string }> }) {
-    const params = await props.params;
-    const { id } = params;
+  const params = await props.params;
+  const { id } = params;
+  const ebook = await getEbookById(id);
 
-    const ebook = await getEbookById(id);
-
-    if (!ebook || !ebook.isEnabled) {
-        return (
-            <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
-                <div className="space-y-4 text-center">
-                    <h1 className="text-3xl font-bold text-gray-900">Ebook not found</h1>
-                    <p className="text-muted-foreground">The book you are looking for might have been removed or is temporarily unavailable.</p>
-                    <Button asChild className="bg-brand-teal hover:bg-brand-teal/90">
-                        <Link href="/ebooks">Back to Store / मुख्यपृष्ठावर जा</Link>
-                    </Button>
-                </div>
-            </div>
-        );
-    }
-
-    // Fetch recommended ebooks (cached list) - Filtered to show only Combo Books
-    const combosOnly = await getComboEbooks();
-    const recommendedBooks = combosOnly
-        .filter((b) => b.id !== id)
-        .slice(0, 8) // Limit to a reasonable number for carousel
-        .map(b => ({
-            ...b,
-            price: Number(b.price)
-        }));
-
-    // Strip HTML tags for description (for JSON-LD)
-    const plainDescription = ebook.description?.replace(/<[^>]+>/g, ' ').trim().slice(0, 160) + '...' || `Buy ${ebook.title} - Legal Ebook in Marathi`;
-
-    const labels = PAGE_LABELS[(ebook.language ?? "MARATHI") as keyof typeof PAGE_LABELS] ?? PAGE_LABELS.MARATHI;
-
-    // Calculate final price based on Flash Sale
-    // With reverse logic: DB price IS the sale price.
-    const finalPrice = Number(ebook.price); // DB price
-
-    // Inflated original price for "Was" display
-    const crossedPrice = getInflatedOriginalPrice(finalPrice);
-
-    const isSaleActive = SALE_CONFIG.isActive;
-
-    // Calculate discount %
-    const discountPercent = isSaleActive
-        ? SALE_CONFIG.discountPercent
-        : Math.round(((crossedPrice - finalPrice) / crossedPrice) * 100);
-
-    const jsonLd = {
-        "@context": "https://schema.org",
-        "@type": "Book",
-        "name": ebook.title,
-        "description": plainDescription,
-        "image": ebook.coverImage || "",
-        "inLanguage": ebook.language === "HINDI" ? "hi" : ebook.language === "ENGLISH" ? "en" : "mr",
-        "bookFormat": "https://schema.org/EBook",
-        "fileFormat": "application/pdf",
-        "author": {
-            "@type": "Person",
-            "name": "Adv. Ajay Mane"
-        },
-        "publisher": {
-            "@type": "Organization",
-            "name": "AS Consultancy Services",
-            "url": "https://www.vakilianikayde.in"
-        },
-        "offers": {
-            "@type": "Offer",
-            "price": finalPrice,
-            "priceCurrency": "INR",
-            "availability": "https://schema.org/InStock",
-            "url": `https://www.vakilianikayde.in/ebooks/${id}`
-        }
-    };
-
-    const breadcrumbLd = {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.vakilianikayde.in" },
-            { "@type": "ListItem", "position": 2, "name": "Ebooks", "item": "https://www.vakilianikayde.in/ebooks" },
-            { "@type": "ListItem", "position": 3, "name": ebook.title, "item": `https://www.vakilianikayde.in/ebooks/${id}` },
-        ]
-    };
-
+  if (!ebook || !ebook.isEnabled) {
     return (
-        <div className="min-h-screen bg-background pb-28 md:pb-12">
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
-
-            {/* Breadcrumb nav */}
-            <div className="sticky top-0 z-30 border-b border-gray-100 bg-white/80 backdrop-blur-md">
-                <div className="container mx-auto flex h-11 items-center gap-1.5 px-4 md:h-14">
-                    <Link href="/" className="flex items-center text-muted-foreground transition-colors hover:text-brand-teal">
-                        <Home className="h-3.5 w-3.5" />
-                    </Link>
-                    <ChevronRight className="h-3 w-3 text-gray-300" />
-                    <Link href="/ebooks" className="text-xs text-muted-foreground transition-colors hover:text-brand-teal md:text-sm">
-                        Ebooks
-                    </Link>
-                    <ChevronRight className="h-3 w-3 text-gray-300" />
-                    <span className="max-w-40 truncate text-xs font-medium text-brand-teal md:max-w-xs md:text-sm">
-                        {ebook.title}
-                    </span>
-                </div>
-            </div>
-
-            <div className="container mx-auto max-w-6xl px-4 py-3 md:py-6">
-                <div className="grid gap-6 lg:grid-cols-12 lg:gap-10">
-
-                    {/* ===== LEFT: Gallery (Desktop sticky) ===== */}
-                    <div className="h-fit lg:sticky lg:top-20 lg:col-span-5">
-                        <EbookGallery
-                            coverImage={ebook.coverImage}
-                            sampleImages={ebook.sampleImages}
-                            title={ebook.title}
-                        />
-                    </div>
-
-                    {/* ===== RIGHT: Product Info ===== */}
-                    <div className="flex flex-col lg:col-span-7">
-
-                        {/* Book ID badge */}
-                        {ebook.displayId && (
-                            <div className="mb-2">
-                                <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#FFD301]/30 bg-[#0A2342] px-2 py-0.5 text-[#FFD301]">
-                                    <span className="text-[8px] font-bold tracking-wider uppercase opacity-80">ID</span>
-                                    <span className="border-l border-[#FFD301]/20 pl-1.5 font-mono text-[11px] font-bold tracking-widest">
-                                        {ebook.displayId}
-                                    </span>
-                                </span>
-                            </div>
-                        )}
-
-                        {/* Title */}
-                        <h1 className="mb-3 text-xl leading-tight font-black text-brand-teal sm:text-2xl md:text-3xl lg:text-4xl">
-                            {ebook.title}
-                        </h1>
-
-                        {/* Social proof */}
-                        <div className="mb-3 flex flex-wrap items-center gap-3 text-xs text-gray-500">
-                            <span className="flex items-center gap-1">
-                                {"★★★★★".split("").map((s, i) => <span key={i} className="text-amber-400">{s}</span>)}
-                                <span className="ml-1 font-semibold text-gray-700">4.8/5</span>
-                            </span>
-                            <span className="text-gray-300">|</span>
-                            <span>📦 <strong className="text-gray-700">10,000+</strong> {labels.socialProof}</span>
-                            <span className="text-gray-300">|</span>
-                            <span className="font-medium text-green-600">✓ Instant Digital Delivery</span>
-                        </div>
-
-                        {/* Price card — prominent */}
-                        <div className="mb-3 flex items-center gap-3 rounded-2xl border border-green-100 bg-green-50/60 p-3 md:p-4">
-                            <div className="flex flex-col">
-                                <span className="text-[11px] font-semibold text-gray-400 line-through decoration-red-400/60">
-                                    ₹{crossedPrice}
-                                </span>
-                                <div className="flex items-baseline gap-1.5">
-                                    <span className="text-3xl font-black tracking-tight text-green-600 sm:text-4xl md:text-5xl">
-                                        ₹{finalPrice}
-                                    </span>
-                                    <span className="text-[10px] font-bold text-gray-500 sm:text-xs">{labels.onlyText}</span>
-                                </div>
-                            </div>
-                            <span className={`rounded-lg border border-red-200 bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700 md:text-xs ${isSaleActive ? 'animate-pulse' : ''}`}>
-                                {discountPercent}% {labels.discount}
-                            </span>
-                            {isSaleActive && <SaleTimer />}
-                        </div>
-
-                        {/* Digital-only + no-refund notice */}
-                        <div className="mb-3 space-y-1.5">
-                            <p className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-1.5 text-[11px] font-medium text-blue-800">
-                                {labels.digitalNotice}
-                            </p>
-                            <p className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-1.5 text-[11px] font-medium text-amber-800">
-                                {labels.refundNotice}
-                            </p>
-                        </div>
-
-                        {/* ===== MOBILE CTA (shown only on mobile, right after price) ===== */}
-                        <div className="mb-4 flex flex-col gap-2 md:hidden">
-                            <BuyButton ebookId={ebook.id} price={finalPrice} title={ebook.title} customLabel={labels.downloadBtn} language={ebook.language} />
-                            <p className="flex items-center justify-center gap-1 text-center text-[10px] text-muted-foreground">
-                                <ShieldCheck className="h-3 w-3 text-green-500" /> {labels.securePayment}
-                            </p>
-                        </div>
-
-                        {/* Quick info chips */}
-                        <div className="mb-4 flex flex-wrap gap-2 text-[10px] font-medium text-muted-foreground md:text-xs">
-                            <span className="inline-flex items-center gap-1 rounded-full border border-gray-100 bg-gray-50 px-2.5 py-1">
-                                <DownloadIcon className="h-3 w-3 text-brand-teal" /> PDF ({LANGUAGE_LABELS[ebook.language ?? "MARATHI"] ?? ebook.language})
-                            </span>
-                            {ebook.pages && ebook.pages > 0 && (
-                                <span className="inline-flex items-center gap-1 rounded-full border border-gray-100 bg-gray-50 px-2.5 py-1">
-                                    <BookOpen className="h-3 w-3 text-brand-teal" /> {ebook.pages} पाने
-                                </span>
-                            )}
-                            <span className="inline-flex items-center gap-1 rounded-full border border-gray-100 bg-gray-50 px-2.5 py-1">
-                                <Zap className="h-3 w-3 text-brand-teal" /> Instant Download
-                            </span>
-                        </div>
-
-                        {/* How to Buy — horizontal flow all screens */}
-                        <div className="mb-4 rounded-2xl border border-brand-teal/10 bg-brand-teal/5 p-3 sm:p-4">
-                            <h4 className="mb-3 text-center text-[9px] font-black tracking-[0.2em] text-brand-teal/60 uppercase sm:text-[10px]">
-                                खरेदी करण्याची पद्धत / How to Buy
-                            </h4>
-                            <div className="flex items-start justify-between gap-1 text-center">
-                                {[
-                                    { n: "1", mr: "बटन दाबा", en: "Click" },
-                                    { n: "2", mr: "माहिती भरा", en: "Fill Info" },
-                                    { n: "3", mr: "पेमेंट करा", en: "Pay" },
-                                    { n: "✓", mr: "PDF मिळवा", en: "Get PDF", green: true },
-                                ].map((step, i, arr) => (
-                                    <div key={i} className="flex flex-1 items-center">
-                                        <div className="flex flex-1 flex-col items-center gap-1">
-                                            <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-black shadow-sm ${step.green ? "border-2 border-green-200 bg-green-500 text-white" : "border-2 border-brand-teal/20 bg-white text-brand-teal"}`}>
-                                                {step.n}
-                                            </div>
-                                            <div className="text-[9px] leading-tight font-bold text-gray-800 sm:text-[10px]">
-                                                {step.mr}<br /><span className="font-medium opacity-60">{step.en}</span>
-                                            </div>
-                                        </div>
-                                        {i < arr.length - 1 && (
-                                            <div className="mb-4 h-px w-3 shrink-0 bg-brand-teal/20 sm:w-4" />
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Description */}
-                        <div className="prose prose-sm dark:prose-invert mb-4 max-w-none text-muted-foreground">
-                            <h4 className="mb-1 text-sm font-bold text-brand-teal sm:text-base">वर्णन / Description</h4>
-                            <DescriptionToggle html={ebook.description} />
-                        </div>
-
-                        {/* Included Books for Combos */}
-                        {ebook.isCombo && ebook.includedEbooks.length > 0 && (() => {
-                            const individualTotal = ebook.includedEbooks.reduce((sum, b) => sum + Number(b.price), 0);
-                            const saved = individualTotal - finalPrice;
-                            return (
-                                <div className="mb-4 w-full rounded-xl border border-purple-100 bg-purple-50/70 p-3 sm:p-4">
-                                    <div className="mb-2.5 flex items-center justify-between">
-                                        <h4 className="flex items-center gap-2 text-sm font-bold text-purple-900 sm:text-base">
-                                            <BookOpen className="h-4 w-4 text-purple-600 sm:h-5 sm:w-5" />
-                                            या पॅकेजमधील पुस्तके ({ebook.includedEbooks.length})
-                                        </h4>
-                                        {saved > 0 && (
-                                            <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-[11px] font-bold text-green-700">
-                                                ₹{saved} बचत / Save ₹{saved}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div className="grid gap-2 sm:grid-cols-2">
-                                        {ebook.includedEbooks.map((book) => (
-                                            <div key={book.id} className="flex items-center gap-2.5 rounded-lg border border-purple-100 bg-white p-2 shadow-sm">
-                                                {book.coverImage ? (
-                                                    <Image src={book.coverImage} alt={book.title} width={40} height={54} className="rounded object-cover shadow-sm" />
-                                                ) : (
-                                                    <div className="flex h-14 w-10 items-center justify-center rounded bg-gray-100 text-[10px]">N/A</div>
-                                                )}
-                                                <div className="min-w-0 flex-1">
-                                                    <h5 className="line-clamp-2 text-xs leading-tight font-bold text-gray-900 sm:text-sm">{book.title}</h5>
-                                                    <span className="mt-0.5 inline-block text-[10px] font-medium text-purple-600">₹{Number(book.price)}</span>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            );
-                        })()}
-
-                        {/* Author credibility block */}
-                        <div className="mb-4 flex items-center gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4">
-                            <Image
-                                src="/ajay_mane.png"
-                                alt="Adv. Ajay Mane"
-                                width={56}
-                                height={56}
-                                className="h-14 w-14 shrink-0 rounded-full object-cover ring-2 ring-brand-teal/20"
-                            />
-                            <div className="min-w-0">
-                                <p className="text-[10px] font-bold tracking-wider text-brand-teal/70 uppercase">{labels.authorLabel}</p>
-                                <p className="text-sm font-bold text-gray-900">Adv. Ajay Mane</p>
-                                <p className="mt-0.5 text-[11px] leading-relaxed text-gray-500">{labels.authorBio}</p>
-                            </div>
-                        </div>
-
-                        {/* Preview Section — moved here so it's after description on mobile */}
-                        <div className="mb-4">
-                            <PreviewTrigger targetId="ebook-preview-section" />
-                            <div id="ebook-preview-section">
-                                <EbookPreview previewUrl={ebook.previewUrl} />
-                            </div>
-                        </div>
-
-                        {/* ===== DESKTOP CTA Card ===== */}
-                        <div className="relative mb-6 hidden w-full overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-lg md:block">
-                            <div className="pointer-events-none absolute top-0 right-0 -mt-10 -mr-10 h-28 w-28 rounded-full bg-brand-gold/10 blur-2xl"></div>
-                            <div className="relative z-10 flex flex-col gap-3">
-                                <BuyButton ebookId={ebook.id} price={finalPrice} title={ebook.title} customLabel={labels.downloadBtnDesktop} language={ebook.language} />
-                                <p className="flex items-center justify-center gap-1.5 text-center text-[10px] text-muted-foreground">
-                                    <ShieldCheck className="h-3 w-3 text-green-500" /> {labels.securePaymentDesktop}
-                                </p>
-                                {/* Payment method badges */}
-                                <div className="flex flex-wrap items-center justify-center gap-2">
-                                    {["UPI", "GPay", "PhonePe", "Paytm", "Visa / MC", "NetBanking"].map((m) => (
-                                        <span key={m} className="rounded border border-gray-200 bg-gray-50 px-2 py-0.5 text-[10px] font-semibold text-gray-500">{m}</span>
-                                    ))}
-                                </div>
-                                <div className="border-t border-gray-100 pt-3">
-                                    <ShareButtons title={ebook.title} text={`Check out this book: ${ebook.title}`} />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* FAQ Section — compact */}
-                        <div className="w-full space-y-2">
-                            <h4 className="mb-2 flex items-center gap-2 text-base font-bold text-brand-teal sm:text-lg">
-                                <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5" /> {labels.faqHeader}
-                            </h4>
-
-                            <details className="group overflow-hidden rounded-xl border border-gray-100 bg-gray-50 [&_summary::-webkit-details-marker]:hidden">
-                                <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-2 p-3 text-[13px] font-medium text-gray-900 transition-colors hover:bg-gray-100 sm:text-sm">
-                                    <span>{labels.faq1Q}</span>
-                                    <span className="shrink-0 transition duration-300 group-open:-rotate-180">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                                        </svg>
-                                    </span>
-                                </summary>
-                                <div className="border-t border-gray-100 px-3 pb-3 text-[13px] leading-relaxed text-gray-600">
-                                    <div className="mt-3 flex flex-col gap-2">
-                                        <p className="font-semibold text-gray-800">{labels.faq1AfterPayment}</p>
-                                        <div className="flex items-start gap-2 pl-1">
-                                            <DownloadIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-teal" />
-                                            <span>{labels.faq1Download}</span>
-                                        </div>
-                                        <div className="flex items-start gap-2 pl-1">
-                                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" className="mt-0.5 shrink-0 text-green-600"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.696c1.001.572 2.135.882 3.807.882 3.123 0 5.669-2.52 5.669-5.765 0-3.186-2.586-5.786-5.669-5.786zm0 10.428c-1.353 0-2.617-.464-3.56-1.115l-.25-.173-1.637.428.44-1.593-.163-.261c-3.132-5.004.286-9.853 5.166-9.853 2.593 0 4.703 2.109 4.703 4.786 0 2.673-2.158 5.782-4.703 5.782zm2.618-4.293c-.143-.072-.857-.424-.972-.472-.143-.049-.25-.072-.321.071-.108.17-.429.525-.501.62-.107.096-.214.12-.357.049-.643-.287-1.401-.762-2.008-1.554-.25-.333.178-.309.606-1.164.072-.143.036-.262-.018-.381-.053-.12-.464-1.119-.643-1.524-.16-.381-.321-.334-.446-.334-.107-.001-.25-.001-.393-.001-.143 0-.393.048-.607.286-.214.238-.821.81-0.821 1.977 0 1.166.857 2.285.964 2.452.107.166 1.678 2.57 4.07 3.665.572.263 1.016.418 1.361.525.572.179 1.18.155 1.666.084.535-.072 1.392-.572 1.589-1.119.196-.548.196-1.024.143-1.119-.054-.096-.197-.144-.34-.215z" /></svg>
-                                            <span>{labels.faq1WhatsApp}</span>
-                                        </div>
-                                        <div className="flex items-start gap-2 pl-1">
-                                            <Mail className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-600" />
-                                            <span>{labels.faq1Email}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </details>
-
-                            <details className="group overflow-hidden rounded-xl border border-gray-100 bg-gray-50 [&_summary::-webkit-details-marker]:hidden">
-                                <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-2 p-3 text-[13px] font-medium text-gray-900 transition-colors hover:bg-gray-100 sm:text-sm">
-                                    <span>{labels.faq2Q}</span>
-                                    <span className="shrink-0 transition duration-300 group-open:-rotate-180">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                                        </svg>
-                                    </span>
-                                </summary>
-                                <div className="border-t border-gray-100 px-3 pb-3 pt-2 text-[13px] leading-relaxed text-gray-600">
-                                    {labels.faq2A}
-                                </div>
-                            </details>
-
-                            <details className="group overflow-hidden rounded-xl border border-gray-100 bg-gray-50 [&_summary::-webkit-details-marker]:hidden">
-                                <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-2 p-3 text-[13px] font-medium text-gray-900 transition-colors hover:bg-gray-100 sm:text-sm">
-                                    <span>{labels.faq3Q}</span>
-                                    <span className="shrink-0 transition duration-300 group-open:-rotate-180">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                                        </svg>
-                                    </span>
-                                </summary>
-                                <div className="border-t border-gray-100 px-3 pb-3 pt-2 text-[13px] leading-relaxed text-gray-600">
-                                    {labels.faq3A}
-                                </div>
-                            </details>
-
-                            {/* FAQ 4 — Physical book confusion — open by default */}
-                            <details open className="group overflow-hidden rounded-xl border border-blue-100 bg-blue-50/60 [&_summary::-webkit-details-marker]:hidden">
-                                <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-2 p-3 text-[13px] font-medium text-gray-900 transition-colors hover:bg-blue-100/60 sm:text-sm">
-                                    <span>{labels.faq4Q}</span>
-                                    <span className="shrink-0 transition duration-300 group-open:-rotate-180">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                                    </span>
-                                </summary>
-                                <div className="border-t border-blue-100 px-3 pb-3 pt-2 text-[13px] leading-relaxed text-gray-600">
-                                    {labels.faq4A}
-                                </div>
-                            </details>
-
-                            {/* FAQ 5 — Devices */}
-                            <details className="group overflow-hidden rounded-xl border border-gray-100 bg-gray-50 [&_summary::-webkit-details-marker]:hidden">
-                                <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-2 p-3 text-[13px] font-medium text-gray-900 transition-colors hover:bg-gray-100 sm:text-sm">
-                                    <span>{labels.faq5Q}</span>
-                                    <span className="shrink-0 transition duration-300 group-open:-rotate-180">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                                    </span>
-                                </summary>
-                                <div className="border-t border-gray-100 px-3 pb-3 pt-2 text-[13px] leading-relaxed text-gray-600">
-                                    {labels.faq5A}
-                                </div>
-                            </details>
-
-                            {/* FAQ 6 — Updates */}
-                            <details className="group overflow-hidden rounded-xl border border-gray-100 bg-gray-50 [&_summary::-webkit-details-marker]:hidden">
-                                <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-2 p-3 text-[13px] font-medium text-gray-900 transition-colors hover:bg-gray-100 sm:text-sm">
-                                    <span>{labels.faq6Q}</span>
-                                    <span className="shrink-0 transition duration-300 group-open:-rotate-180">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                                    </span>
-                                </summary>
-                                <div className="border-t border-gray-100 px-3 pb-3 pt-2 text-[13px] leading-relaxed text-gray-600">
-                                    {labels.faq6A}
-                                </div>
-                            </details>
-
-                            {/* FAQ 7 — Legal advice disclaimer */}
-                            <details className="group overflow-hidden rounded-xl border border-amber-100 bg-amber-50/60 [&_summary::-webkit-details-marker]:hidden">
-                                <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-2 p-3 text-[13px] font-medium text-gray-900 transition-colors hover:bg-amber-100/60 sm:text-sm">
-                                    <span>{labels.faq7Q}</span>
-                                    <span className="shrink-0 transition duration-300 group-open:-rotate-180">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                                    </span>
-                                </summary>
-                                <div className="border-t border-amber-100 px-3 pb-3 pt-2 text-[13px] leading-relaxed text-gray-600">
-                                    {labels.faq7A}
-                                </div>
-                            </details>
-                        </div>
-
-                        {/* Share + Help — mobile only (desktop gets it in CTA card) */}
-                        <div className="mt-4 space-y-3 md:hidden">
-                            <ShareButtons title={ebook.title} text={`Check out this book: ${ebook.title}`} />
-
-                            <a
-                                href={`https://wa.me/918149319058?text=${encodeURIComponent(`${labels.waMessage} ${ebook.title}\nID: ${ebook.id}\nLink: https://www.vakilianikayde.in/ebooks/${ebook.id}`)}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center justify-between rounded-xl border border-green-100 bg-green-50 p-3 transition-colors active:bg-green-100"
-                            >
-                                <div className="flex flex-col">
-                                    <span className="text-xs font-bold text-gray-900">{labels.helpMobile}</span>
-                                    <span className="text-[10px] text-gray-500">{labels.helpMobileSub}</span>
-                                </div>
-                                <div className="flex items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-bold text-white">
-                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.696c1.001.572 2.135.882 3.807.882 3.123 0 5.669-2.52 5.669-5.765 0-3.186-2.586-5.786-5.669-5.786zm0 10.428c-1.353 0-2.617-.464-3.56-1.115l-.25-.173-1.637.428.44-1.593-.163-.261c-3.132-5.004.286-9.853 5.166-9.853 2.593 0 4.703 2.109 4.703 4.786 0 2.673-2.158 5.782-4.703 5.782zm2.618-4.293c-.143-.072-.857-.424-.972-.472-.143-.049-.25-.072-.321.071-.108.17-.429.525-.501.62-.107.096-.214.12-.357.049-.643-.287-1.401-.762-2.008-1.554-.25-.333.178-.309.606-1.164.072-.143.036-.262-.018-.381-.053-.12-.464-1.119-.643-1.524-.16-.381-.321-.334-.446-.334-.107-.001-.25-.001-.393-.001-.143 0-.393.048-.607.286-.214.238-.821.81-0.821 1.977 0 1.166.857 2.285.964 2.452.107.166 1.678 2.57 4.07 3.665.572.263 1.016.418 1.361.525.572.179 1.18.155 1.666.084.535-.072 1.392-.572 1.589-1.119.196-.548.196-1.024.143-1.119-.054-.096-.197-.144-.34-.215z" /></svg>
-                                    WhatsApp
-                                </div>
-                            </a>
-                        </div>
-
-                        {/* WhatsApp help — desktop only */}
-                        <div className="mt-4 hidden md:block">
-                            <a
-                                href={`https://wa.me/918149319058?text=${encodeURIComponent(`${labels.waMessage} ${ebook.title}\nID: ${ebook.id}\nLink: https://www.vakilianikayde.in/ebooks/${ebook.id}`)}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center justify-between rounded-xl border border-green-100 bg-green-50 p-3 transition-colors hover:bg-green-100"
-                            >
-                                <div className="flex flex-col">
-                                    <span className="text-xs font-bold text-gray-900">{labels.helpDesktop}</span>
-                                    <span className="text-[10px] text-gray-500">{labels.helpDesktopSub}</span>
-                                </div>
-                                <div className="flex items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-green-600">
-                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.696c1.001.572 2.135.882 3.807.882 3.123 0 5.669-2.52 5.669-5.765 0-3.186-2.586-5.786-5.669-5.786zm0 10.428c-1.353 0-2.617-.464-3.56-1.115l-.25-.173-1.637.428.44-1.593-.163-.261c-3.132-5.004.286-9.853 5.166-9.853 2.593 0 4.703 2.109 4.703 4.786 0 2.673-2.158 5.782-4.703 5.782zm2.618-4.293c-.143-.072-.857-.424-.972-.472-.143-.049-.25-.072-.321.071-.108.17-.429.525-.501.62-.107.096-.214.12-.357.049-.643-.287-1.401-.762-2.008-1.554-.25-.333.178-.309.606-1.164.072-.143.036-.262-.018-.381-.053-.12-.464-1.119-.643-1.524-.16-.381-.321-.334-.446-.334-.107-.001-.25-.001-.393-.001-.143 0-.393.048-.607.286-.214.238-.821.81-0.821 1.977 0 1.166.857 2.285.964 2.452.107.166 1.678 2.57 4.07 3.665.572.263 1.016.418 1.361.525.572.179 1.18.155 1.666.084.535-.072 1.392-.572 1.589-1.119.196-.548.196-1.024.143-1.119-.054-.096-.197-.144-.34-.215z" /></svg>
-                                    WhatsApp
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Recommended Books Section */}
-                {recommendedBooks.length > 0 && (
-                    <div className="mt-12 mb-4 md:mt-16 md:mb-8">
-                        <div className="mb-4 md:mb-6">
-                            <h2 className="mb-1 flex items-center gap-2 text-xl font-bold text-brand-teal md:text-3xl">
-                                <Zap className="h-5 w-5 text-brand-gold md:h-6 md:w-6" />
-                                {labels.recommendedTitle}
-                            </h2>
-                            <p className="text-xs text-muted-foreground md:text-sm">
-                                {labels.recommendedSub}
-                            </p>
-                        </div>
-                        <RecommendedCarousel books={recommendedBooks} />
-                    </div>
-                )}
-            </div>
-
-            {/* Mobile Sticky Buy Bar */}
-            <div className="animate-in slide-in-from-bottom-4 fade-in fixed right-0 bottom-(--sticky-bar-bottom) left-0 z-40 border-t border-gray-200 bg-white/95 px-3 py-2 shadow-[0_-2px_10px_rgba(0,0,0,0.08)] backdrop-blur-md duration-300 md:hidden">
-                <p className="mb-1 truncate text-[10px] font-semibold text-gray-500">{ebook.title}</p>
-                <div className="flex items-center gap-3">
-                    <div className="flex shrink-0 flex-col leading-none">
-                        <span className="text-[10px] text-gray-400 line-through">₹{crossedPrice}</span>
-                        <span className="text-lg font-black text-green-600">₹{finalPrice}</span>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                        <BuyButton ebookId={ebook.id} price={finalPrice} title={ebook.title} customLabel={labels.downloadBtn} language={ebook.language} />
-                    </div>
-                </div>
-            </div>
-
-            <ScrollToTop />
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
+        <div className="space-y-4 text-center">
+          <h1 className="text-3xl font-bold text-gray-900">Ebook not found</h1>
+          <p className="text-muted-foreground">This book may have been removed or is temporarily unavailable.</p>
+          <Button asChild className="bg-brand-teal hover:bg-brand-teal/90">
+            <Link href="/ebooks">Browse All Ebooks</Link>
+          </Button>
         </div>
+      </div>
     );
+  }
+
+  const combosOnly = await getComboEbooks();
+  const recommendedBooks = combosOnly
+    .filter((b) => b.id !== id)
+    .slice(0, 8)
+    .map((b) => ({ ...b, price: Number(b.price) }));
+
+  const plainDescription = ebook.description?.replace(/<[^>]+>/g, " ").trim().slice(0, 160) + "..." || "";
+  const labels = PAGE_LABELS[(ebook.language ?? "MARATHI") as keyof typeof PAGE_LABELS] ?? PAGE_LABELS.MARATHI;
+  const finalPrice = Number(ebook.price);
+  const crossedPrice = getInflatedOriginalPrice(finalPrice);
+  const isSaleActive = SALE_CONFIG.isActive;
+  const discountPercent = isSaleActive
+    ? SALE_CONFIG.discountPercent
+    : Math.round(((crossedPrice - finalPrice) / crossedPrice) * 100);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Book",
+    name: ebook.title,
+    description: plainDescription,
+    image: ebook.coverImage || "",
+    inLanguage: ebook.language === "HINDI" ? "hi" : ebook.language === "ENGLISH" ? "en" : "mr",
+    bookFormat: "https://schema.org/EBook",
+    fileFormat: "application/pdf",
+    author: { "@type": "Person", name: "Adv. Omkar Shinde" },
+    publisher: { "@type": "Organization", name: "Vakili Aani Kayde", url: "https://www.vakilianikayde.in" },
+    offers: { "@type": "Offer", price: finalPrice, priceCurrency: "INR", availability: "https://schema.org/InStock", url: `https://www.vakilianikayde.in/ebooks/${id}` },
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.vakilianikayde.in" },
+      { "@type": "ListItem", position: 2, name: "Ebooks", item: "https://www.vakilianikayde.in/ebooks" },
+      { "@type": "ListItem", position: 3, name: ebook.title, item: `https://www.vakilianikayde.in/ebooks/${id}` },
+    ],
+  };
+
+  return (
+    <div className="min-h-screen bg-white pb-28 md:pb-12">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+
+      {/* Breadcrumb */}
+      <div className="sticky top-0 z-30 border-b border-brand-gold/15 bg-brand-cream/95 backdrop-blur-md">
+        <div className="container mx-auto flex h-11 items-center gap-1.5 px-4 md:h-13">
+          <Link href="/" className="text-brand-teal/50 transition-colors hover:text-brand-teal">
+            <Home className="h-3.5 w-3.5" />
+          </Link>
+          <ChevronRight className="h-3 w-3 text-brand-gold/40" />
+          <Link href="/ebooks" className="text-xs text-brand-teal/50 transition-colors hover:text-brand-teal">Ebooks</Link>
+          <ChevronRight className="h-3 w-3 text-brand-gold/40" />
+          <span className="max-w-40 truncate text-xs font-semibold text-brand-teal md:max-w-sm">{ebook.title}</span>
+        </div>
+      </div>
+
+      <div className="container mx-auto max-w-6xl px-4 py-4 md:py-8">
+        <div className="grid gap-6 lg:grid-cols-12 lg:gap-12">
+
+          {/* Left: Gallery */}
+          <div className="h-fit lg:sticky lg:top-20 lg:col-span-5">
+            <EbookGallery coverImage={ebook.coverImage} sampleImages={ebook.sampleImages} title={ebook.title} />
+          </div>
+
+          {/* Right: Product Info */}
+          <div className="flex flex-col lg:col-span-7">
+
+            {/* ID + language chips */}
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              {ebook.displayId && (
+                <span className="rounded-md bg-brand-gold/15 px-2.5 py-0.5 text-[11px] font-black text-brand-gold">
+                  #{ebook.displayId}
+                </span>
+              )}
+              <span className="rounded-md border border-brand-teal/15 bg-brand-teal/5 px-2.5 py-0.5 text-[11px] font-semibold text-brand-teal">
+                {LANGUAGE_LABELS[ebook.language ?? "MARATHI"]} PDF
+              </span>
+              {ebook.isCombo && (
+                <span className="rounded-md bg-purple-100 px-2.5 py-0.5 text-[11px] font-bold text-purple-700">Combo Pack</span>
+              )}
+            </div>
+
+            {/* Title */}
+            <h1 className="mb-2 text-xl font-black leading-tight text-brand-teal sm:text-2xl md:text-3xl">
+              {ebook.title}
+            </h1>
+
+            {/* Social proof strip */}
+            <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-gray-500">
+              <span className="flex items-center gap-1">
+                {[1,2,3,4,5].map(i => <span key={i} className="text-brand-gold text-xs">★</span>)}
+                <span className="ml-1 font-bold text-gray-700">4.8</span>
+              </span>
+              <span className="h-3 w-px bg-gray-200" />
+              <span><strong className="text-gray-700">10,000+</strong> {labels.socialProof}</span>
+              <span className="h-3 w-px bg-gray-200" />
+              <span className="font-semibold text-brand-teal">⚡ Instant Delivery</span>
+            </div>
+
+            {/* Price block — dark navy */}
+            <div className="mb-4 overflow-hidden rounded-2xl bg-brand-teal">
+              <div className="flex items-center justify-between px-4 py-4">
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-medium text-white/40 line-through">₹{crossedPrice}</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className={`text-4xl font-black leading-none tracking-tight ${isSaleActive ? "text-red-300" : "text-brand-gold"}`}>
+                      ₹{finalPrice}
+                    </span>
+                    <span className="text-xs text-white/50">{labels.onlyText}</span>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <span className={`rounded-lg px-3 py-1 text-xs font-black ${isSaleActive ? "bg-red-500/20 text-red-300 animate-pulse" : "bg-brand-gold/20 text-brand-gold"}`}>
+                    {discountPercent}% {labels.discount}
+                  </span>
+                  {isSaleActive && <SaleTimer />}
+                </div>
+              </div>
+              {/* Mobile CTA inside price block */}
+              <div className="border-t border-white/10 px-4 pb-4 pt-3 md:hidden">
+                <BuyButton ebookId={ebook.id} price={finalPrice} title={ebook.title} customLabel={labels.downloadBtn} language={ebook.language} />
+                <p className="mt-2 flex items-center justify-center gap-1 text-center text-[10px] text-white/40">
+                  <ShieldCheck className="h-3 w-3" /> {labels.securePayment}
+                </p>
+              </div>
+            </div>
+
+            {/* Notices — single combined card */}
+            <div className="mb-4 rounded-xl border-l-4 border-brand-gold bg-brand-cream px-4 py-3 text-[12px] leading-relaxed text-gray-600">
+              <p className="flex items-start gap-2 mb-1.5">
+                <FileText className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-gold" />
+                {labels.digitalNotice}
+              </p>
+              <p className="flex items-start gap-2 text-amber-700">
+                <span className="mt-0.5 shrink-0 text-xs">⚠</span>
+                {labels.refundNotice}
+              </p>
+            </div>
+
+            {/* Info tags */}
+            <div className="mb-5 flex flex-wrap gap-2">
+              {[
+                { icon: <DownloadIcon className="h-3 w-3" />, label: `PDF · ${LANGUAGE_LABELS[ebook.language ?? "MARATHI"]}` },
+                ...(ebook.pages && ebook.pages > 0 ? [{ icon: <BookOpen className="h-3 w-3" />, label: `${ebook.pages} पाने` }] : []),
+                { icon: <Zap className="h-3 w-3" />, label: "Instant Download" },
+                { icon: <Smartphone className="h-3 w-3" />, label: "Mobile Readable" },
+              ].map((tag, i) => (
+                <span key={i} className="flex items-center gap-1.5 rounded-full border border-brand-gold/25 bg-brand-gold/8 px-3 py-1 text-[11px] font-semibold text-brand-teal">
+                  {tag.icon}{tag.label}
+                </span>
+              ))}
+            </div>
+
+            {/* How to Buy — dark steps */}
+            <div className="mb-5 rounded-2xl bg-brand-teal px-4 py-4">
+              <p className="mb-3 text-center text-[9px] font-black tracking-[0.18em] text-white/40 uppercase">खरेदी कशी करावी / How to Buy</p>
+              <div className="flex items-center justify-between">
+                {[
+                  { n: "1", mr: "बटन दाबा", en: "Click" },
+                  { n: "2", mr: "माहिती भरा", en: "Fill Info" },
+                  { n: "3", mr: "पेमेंट करा", en: "Pay" },
+                  { n: "✓", mr: "PDF मिळवा", en: "Get PDF", done: true },
+                ].map((step, i, arr) => (
+                  <div key={i} className="flex flex-1 items-center">
+                    <div className="flex flex-1 flex-col items-center gap-1.5 text-center">
+                      <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-black ${step.done ? "bg-brand-gold text-brand-teal" : "border border-white/20 bg-white/10 text-white"}`}>
+                        {step.n}
+                      </div>
+                      <div className="text-[9px] leading-tight text-white/70 sm:text-[10px]">
+                        {step.mr}<br /><span className="opacity-50">{step.en}</span>
+                      </div>
+                    </div>
+                    {i < arr.length - 1 && <div className="mb-4 h-px w-3 shrink-0 bg-white/15" />}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="prose prose-sm mb-5 max-w-none text-gray-600">
+              <h4 className="mb-2 flex items-center gap-2 text-sm font-black text-brand-teal sm:text-base">
+                <span className="h-4 w-1 rounded-full bg-brand-gold" />
+                वर्णन / Description
+              </h4>
+              <DescriptionToggle html={ebook.description} />
+            </div>
+
+            {/* Combo included books */}
+            {ebook.isCombo && ebook.includedEbooks.length > 0 && (() => {
+              const individualTotal = ebook.includedEbooks.reduce((sum, b) => sum + Number(b.price), 0);
+              const saved = individualTotal - finalPrice;
+              return (
+                <div className="mb-5 rounded-2xl border border-purple-100 bg-purple-50/50 p-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h4 className="flex items-center gap-2 text-sm font-bold text-purple-900">
+                      <BookOpen className="h-4 w-4 text-purple-600" />
+                      या पॅकेजमधील पुस्तके ({ebook.includedEbooks.length})
+                    </h4>
+                    {saved > 0 && (
+                      <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-[11px] font-bold text-green-700">
+                        ₹{saved} बचत
+                      </span>
+                    )}
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {ebook.includedEbooks.map((book) => (
+                      <div key={book.id} className="flex items-center gap-3 rounded-xl border border-purple-100 bg-white p-2.5 shadow-sm">
+                        {book.coverImage ? (
+                          <Image src={book.coverImage} alt={book.title} width={36} height={48} className="rounded object-cover" />
+                        ) : (
+                          <div className="flex h-12 w-9 items-center justify-center rounded bg-gray-100 text-[9px] text-gray-400">N/A</div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <h5 className="line-clamp-2 text-xs font-bold leading-tight text-gray-900">{book.title}</h5>
+                          <span className="text-[10px] font-semibold text-purple-600">₹{Number(book.price)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Author */}
+            <div className="mb-5 rounded-2xl border-l-4 border-brand-gold bg-brand-cream p-4">
+              <p className="mb-2 text-[10px] font-black tracking-widest text-brand-gold/70 uppercase">{labels.authorLabel}</p>
+              <div className="flex items-center gap-3">
+                <Image
+                  src="/omkar_shinde.png"
+                  alt="Adv. Omkar Shinde"
+                  width={52}
+                  height={52}
+                  className="h-13 w-13 shrink-0 rounded-full object-cover ring-2 ring-brand-gold/30"
+                />
+                <div>
+                  <p className="text-sm font-black text-brand-teal">Adv. Omkar Shinde</p>
+                  <p className="mt-0.5 text-[11px] leading-relaxed text-gray-500">{labels.authorBio}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Preview */}
+            <div className="mb-5">
+              <PreviewTrigger targetId="ebook-preview-section" />
+              <div id="ebook-preview-section">
+                <EbookPreview previewUrl={ebook.previewUrl} />
+              </div>
+            </div>
+
+            {/* Desktop CTA card */}
+            <div className="mb-6 hidden overflow-hidden rounded-2xl border border-brand-gold/20 bg-brand-cream p-5 shadow-sm md:block">
+              <div className="flex flex-col gap-3">
+                <BuyButton ebookId={ebook.id} price={finalPrice} title={ebook.title} customLabel={labels.downloadBtnDesktop} language={ebook.language} />
+                <p className="flex items-center justify-center gap-1.5 text-center text-[10px] text-gray-400">
+                  <ShieldCheck className="h-3 w-3 text-brand-teal" /> {labels.securePaymentDesktop}
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-1.5">
+                  {["UPI", "GPay", "PhonePe", "Paytm", "Visa / MC", "NetBanking"].map((m) => (
+                    <span key={m} className="rounded border border-brand-teal/10 bg-white px-2 py-0.5 text-[10px] font-semibold text-gray-500">{m}</span>
+                  ))}
+                </div>
+                <div className="border-t border-brand-gold/15 pt-3">
+                  <ShareButtons title={ebook.title} text={`Check out this book: ${ebook.title}`} />
+                </div>
+              </div>
+            </div>
+
+            {/* FAQ */}
+            <div className="mb-5 space-y-2">
+              <h4 className="mb-3 flex items-center gap-2 text-base font-black text-brand-teal">
+                <span className="h-5 w-1 rounded-full bg-brand-gold" />
+                {labels.faqHeader}
+              </h4>
+              <FaqItem q={labels.faq1Q}>
+                <p className="mb-2 font-semibold text-gray-800">{labels.faq1AfterPayment}</p>
+                <div className="space-y-1.5 pl-1">
+                  <div className="flex items-start gap-2"><DownloadIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-teal" /><span>{labels.faq1Download}</span></div>
+                  <div className="flex items-start gap-2"><span className="mt-0.5 shrink-0 text-green-600 text-xs">●</span><span>{labels.faq1WhatsApp}</span></div>
+                  <div className="flex items-start gap-2"><Mail className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-500" /><span>{labels.faq1Email}</span></div>
+                </div>
+              </FaqItem>
+              <FaqItem q={labels.faq2Q}>{labels.faq2A}</FaqItem>
+              <FaqItem q={labels.faq3Q}>{labels.faq3A}</FaqItem>
+              <FaqItem q={labels.faq4Q} open accent="gold">{labels.faq4A}</FaqItem>
+              <FaqItem q={labels.faq5Q}><div className="flex items-start gap-2"><Smartphone className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-teal" /><span>{labels.faq5A}</span></div></FaqItem>
+              <FaqItem q={labels.faq6Q}><div className="flex items-start gap-2"><RefreshCw className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-teal" /><span>{labels.faq6A}</span></div></FaqItem>
+              <FaqItem q={labels.faq7Q} accent="red">{labels.faq7A}</FaqItem>
+            </div>
+
+            {/* Share + WhatsApp help */}
+            <div className="space-y-3">
+              <ShareButtons title={ebook.title} text={`Check out this book: ${ebook.title}`} />
+              <a
+                href={`https://wa.me/918149319058?text=${encodeURIComponent(`${labels.waMessage} ${ebook.title}\nLink: https://www.vakilianikayde.in/ebooks/${ebook.id}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between rounded-xl border border-brand-gold/20 bg-brand-cream px-4 py-3 transition-colors hover:border-brand-gold/40"
+              >
+                <div>
+                  <p className="text-xs font-bold text-brand-teal">{labels.helpDesktop}</p>
+                  <p className="text-[10px] text-gray-400">{labels.helpDesktopSub}</p>
+                </div>
+                <span className="flex items-center gap-1.5 rounded-full bg-[#25D366] px-3 py-1.5 text-xs font-bold text-white">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.696c1.001.572 2.135.882 3.807.882 3.123 0 5.669-2.52 5.669-5.765 0-3.186-2.586-5.786-5.669-5.786zm0 10.428c-1.353 0-2.617-.464-3.56-1.115l-.25-.173-1.637.428.44-1.593-.163-.261c-3.132-5.004.286-9.853 5.166-9.853 2.593 0 4.703 2.109 4.703 4.786 0 2.673-2.158 5.782-4.703 5.782zm2.618-4.293c-.143-.072-.857-.424-.972-.472-.143-.049-.25-.072-.321.071-.108.17-.429.525-.501.62-.107.096-.214.12-.357.049-.643-.287-1.401-.762-2.008-1.554-.25-.333.178-.309.606-1.164.072-.143.036-.262-.018-.381-.053-.12-.464-1.119-.643-1.524-.16-.381-.321-.334-.446-.334-.107-.001-.25-.001-.393-.001-.143 0-.393.048-.607.286-.214.238-.821.81-0.821 1.977 0 1.166.857 2.285.964 2.452.107.166 1.678 2.57 4.07 3.665.572.263 1.016.418 1.361.525.572.179 1.18.155 1.666.084.535-.072 1.392-.572 1.589-1.119.196-.548.196-1.024.143-1.119-.054-.096-.197-.144-.34-.215z" /></svg>
+                  WhatsApp
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Recommended */}
+        {recommendedBooks.length > 0 && (
+          <div className="mt-14 md:mt-20">
+            <div className="mb-5 flex items-end justify-between">
+              <div>
+                <h2 className="flex items-center gap-2 text-xl font-black text-brand-teal md:text-2xl">
+                  <span className="h-6 w-1.5 rounded-full bg-brand-gold" />
+                  {labels.recommendedTitle}
+                </h2>
+                <p className="mt-0.5 pl-3.5 text-xs text-gray-400 md:text-sm">{labels.recommendedSub}</p>
+              </div>
+            </div>
+            <RecommendedCarousel books={recommendedBooks} />
+          </div>
+        )}
+      </div>
+
+      {/* Mobile Sticky Buy Bar */}
+      <div className="fixed right-0 bottom-(--sticky-bar-bottom) left-0 z-40 border-t border-brand-gold/20 bg-brand-teal px-3 py-2.5 shadow-[0_-4px_20px_rgba(10,31,61,0.15)] md:hidden">
+        <div className="flex items-center gap-3">
+          <div className="flex shrink-0 flex-col leading-none">
+            <span className="text-[10px] text-white/30 line-through">₹{crossedPrice}</span>
+            <span className={`text-lg font-black ${isSaleActive ? "text-red-300" : "text-brand-gold"}`}>₹{finalPrice}</span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <BuyButton ebookId={ebook.id} price={finalPrice} title={ebook.title} customLabel={labels.downloadBtn} language={ebook.language} />
+          </div>
+        </div>
+      </div>
+
+      <ScrollToTop />
+    </div>
+  );
 }

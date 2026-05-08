@@ -22,17 +22,6 @@ const TestimonialsSection = dynamic(
   }
 );
 
-const CommunitySection = dynamic(
-  () =>
-    import("@/components/marketing/community-section").then(
-      (mod) => mod.CommunitySection
-    ),
-  {
-    loading: () => <div className="h-75 bg-teal-900/10" />,
-    ssr: true,
-  }
-);
-
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-background font-sans">
@@ -52,7 +41,6 @@ export default function Home() {
 
       <FeaturesSection />
       <TestimonialsSection />
-      <CommunitySection />
       {/* LeadMagnet hidden as it is email-based
       <div className="container mx-auto px-4 py-16">
         <LeadMagnet />

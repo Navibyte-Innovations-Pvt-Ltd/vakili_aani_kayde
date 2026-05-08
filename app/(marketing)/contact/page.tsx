@@ -1,100 +1,110 @@
 import type { Metadata } from "next";
-import { Mail, MapPin, Phone, MessageCircle } from "lucide-react";
+import { Mail, MapPin, Phone, MessageCircle, Clock, Scale } from "lucide-react";
 import { ContactForm } from "./_components/contact-form";
 
 export const metadata: Metadata = {
-  title: "Contact Us | वकिली आणि कायदे",
-  description:
-    "Get in touch with AS Consultancy Services (Vakili Aani Kayde) for support, inquiries, or feedback regarding our digital legal ebooks.",
+  title: "संपर्क करा | वकिली आणि कायदे",
+  description: "वकिली आणि कायदे शी संपर्क करा — ई-बुक सपोर्ट, ऑर्डर मदत किंवा कोणत्याही प्रश्नासाठी.",
 };
+
+const CONTACT_ITEMS = [
+  {
+    icon: Mail,
+    label: "Email",
+    value: "vakilianikayde@gmail.com",
+    sub: "48 तासांत उत्तर",
+    href: "mailto:vakilianikayde@gmail.com",
+  },
+  {
+    icon: MessageCircle,
+    label: "WhatsApp",
+    value: "+91 8149319058",
+    sub: "जलद मदतीसाठी",
+    href: "https://wa.me/918149319058",
+  },
+  {
+    icon: Phone,
+    label: "Phone",
+    value: "+91 8149319058",
+    sub: "सोम–शनि, सकाळी ९ – संध्या ६",
+    href: "tel:+918149319058",
+  },
+  {
+    icon: MapPin,
+    label: "Address",
+    value: "Pune, Maharashtra",
+    sub: "India",
+    href: null,
+  },
+];
 
 export default function ContactPage() {
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-12 md:py-16">
-      <h1 className="mb-8 bg-linear-to-r from-brand-teal to-teal-600 bg-clip-text text-center text-3xl font-bold text-transparent md:text-4xl">
-        Contact Us / संपर्क करा
-      </h1>
+    <div className="min-h-screen bg-white">
 
-      <div className="grid gap-12 md:grid-cols-2">
-        {/* Contact Info */}
-        <div className="space-y-8">
-          <div className="prose prose-slate">
-            <p className="text-lg text-gray-700">
-              ई-बुक्सबद्दल प्रश्न आहेत किंवा ऑर्डर सपोर्ट हवे आहे? आम्ही मदत करायला तत्पर आहोत.
-            </p>
-            <p className="text-sm text-gray-500">
-              (Questions about our digital ebooks or need order support? We&apos;re here to help.)
-            </p>
+      {/* Split hero */}
+      <div className="grid md:grid-cols-2">
+
+        {/* Left — dark navy info panel */}
+        <div className="flex flex-col bg-brand-teal px-6 py-12 md:min-h-[70vh] md:px-12 md:py-16">
+          <div className="flex items-center gap-2 mb-8">
+            <Scale className="h-4 w-4 text-brand-gold" />
+            <span className="text-xs font-black tracking-widest text-brand-gold uppercase">संपर्क</span>
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-start gap-4 rounded-lg border border-gray-100 bg-gray-50 p-4">
-              <div className="rounded-full bg-white p-3 text-brand-teal shadow-sm">
-                <Mail className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="mb-1 font-semibold text-gray-900">Email Support</h3>
-                <p className="mb-1 text-sm text-gray-500">For general inquiries and order support:</p>
-                <a href="mailto:vakilianikayde@gmail.com" className="text-lg font-medium text-brand-teal hover:underline">
-                  vakilianikayde@gmail.com
-                </a>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 rounded-lg border border-gray-100 bg-gray-50 p-4">
-              <div className="rounded-full bg-white p-3 text-brand-teal shadow-sm">
-                <Phone className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="mb-1 font-semibold text-gray-900">Call Us</h3>
-                <p className="mb-1 text-sm text-gray-500">Mon – Sat, 9:00 AM – 6:00 PM IST</p>
-                <a href="tel:+918149319058" className="text-lg font-medium text-brand-teal hover:underline">
-                  +91 8149319058
-                </a>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 rounded-lg border border-gray-100 bg-gray-50 p-4">
-              <div className="rounded-full bg-white p-3 text-brand-teal shadow-sm">
-                <MessageCircle className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="mb-1 font-semibold text-gray-900">WhatsApp Support</h3>
-                <p className="mb-1 text-sm text-gray-500">Chat with us for quick help</p>
-                <a
-                  href="https://wa.me/918149319058"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-lg font-medium text-brand-teal hover:underline"
-                >
-                  +91 8149319058
-                </a>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 rounded-lg border border-gray-100 bg-gray-50 p-4">
-              <div className="rounded-full bg-white p-3 text-brand-teal shadow-sm">
-                <MapPin className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="mb-1 font-semibold text-gray-900">Office Address</h3>
-                <p className="text-gray-700">
-                  <strong>AS Consultancy Services</strong>
-                  <br />
-                  (Brand: वकिली आणि कायदे)
-                  <br />
-                  Pune, Maharashtra, India
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <p className="text-xs text-gray-400">
-            Response time: 48 hours | Resolution: within 7 working days
+          <h1 className="mb-4 text-3xl font-black leading-tight text-white md:text-4xl">
+            काही मदत<br />हवी आहे?
+          </h1>
+          <p className="mb-10 text-sm leading-relaxed text-white/50 md:text-base">
+            ई-बुकबद्दल प्रश्न असो किंवा ऑर्डर सपोर्ट — आम्ही लवकरात लवकर प्रतिसाद देतो.
           </p>
+
+          <div className="flex flex-col gap-5">
+            {CONTACT_ITEMS.map(({ icon: Icon, label, value, sub, href }) => (
+              <div key={label} className="flex items-start gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/8">
+                  <Icon className="h-5 w-5 text-brand-gold" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold tracking-widest text-white/30 uppercase">{label}</p>
+                  {href ? (
+                    <a href={href} target={href.startsWith("https") ? "_blank" : undefined} rel="noopener noreferrer"
+                      className="text-sm font-bold text-white transition-colors hover:text-brand-gold">
+                      {value}
+                    </a>
+                  ) : (
+                    <p className="text-sm font-bold text-white">{value}</p>
+                  )}
+                  <p className="text-[11px] text-white/35">{sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Response time note */}
+          <div className="mt-auto flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 mt-10">
+            <Clock className="mt-0.5 h-4 w-4 shrink-0 text-brand-gold" />
+            <p className="text-xs leading-relaxed text-white/40">
+              सामान्यतः <strong className="text-white/60">48 तासांत</strong> प्रतिसाद आणि <strong className="text-white/60">7 कार्यालयीन दिवसांत</strong> निराकरण.
+            </p>
+          </div>
         </div>
 
-        <ContactForm />
+        {/* Right — form on cream */}
+        <div className="flex flex-col justify-center bg-brand-cream px-6 py-12 md:px-12 md:py-16">
+          <h2 className="mb-1 text-xl font-black text-brand-teal">संदेश पाठवा</h2>
+          <p className="mb-7 text-sm text-gray-400">Send us a message</p>
+          <ContactForm />
+        </div>
+      </div>
+
+      {/* Bottom strip */}
+      <div className="border-t border-gray-100 bg-white px-4 py-6 text-center">
+        <p className="text-xs text-gray-400">
+          वकिली आणि कायदे · vakilianikayde.in · Pune, Maharashtra, India
+          <span className="mx-2 text-gray-200">|</span>
+          Digital ebooks for educational purposes only — not legal advice.
+        </p>
       </div>
     </div>
   );

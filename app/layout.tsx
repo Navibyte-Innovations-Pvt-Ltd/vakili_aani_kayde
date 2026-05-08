@@ -53,8 +53,8 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   keywords: ["वकिली", "कायदे", "हक्क", "वकील सल्ला", "ई-बुक्स", "Legal Advice Marathi", "Marathi Law Books", "कायदेशीर माहिती"],
-  authors: [{ name: "Adv. Ajay Mane", url: SITE_URL }],
-  creator: "Adv. Ajay Mane",
+  authors: [{ name: "Adv. Omkar Shinde", url: SITE_URL }],
+  creator: "Adv. Omkar Shinde",
   publisher: SITE_NAME,
   appleWebApp: {
     capable: true,
