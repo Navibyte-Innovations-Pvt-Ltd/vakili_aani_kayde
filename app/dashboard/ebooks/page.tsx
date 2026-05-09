@@ -15,6 +15,9 @@ export default async function EbooksPage() {
             price: true,
             coverImage: true,
             isEnabled: true,
+            isCombo: true,
+            language: true,
+            category: true,
             createdAt: true,
             _count: { select: { orderItems: true } },
             includedIn: {

@@ -1,6 +1,6 @@
 "use client";
 
-import { IndianRupee, CheckCircle2, TrendingUp, TrendingDown, ShoppingBag, Target } from "lucide-react";
+import { IndianRupee, CheckCircle2, TrendingUp, TrendingDown, ShoppingBag, Target, AlertCircle } from "lucide-react";
 
 const COMPARISON_LABELS: Record<string, string> = {
     today: 'vs yesterday',
@@ -17,6 +17,8 @@ interface StatsCardsProps {
     previousRevenue: number;
     previousOrders: number;
     conversionRate: number;
+    failedRevenue: number;
+    failedOrders: number;
     dateFilter: string;
 }
 
@@ -38,12 +40,12 @@ function GrowthBadge({ current, previous, label }: { current: number; previous: 
     );
 }
 
-export function StatsCards({ totalRevenue, paidOrders, previousRevenue, previousOrders, conversionRate, dateFilter }: StatsCardsProps) {
+export function StatsCards({ totalRevenue, paidOrders, previousRevenue, previousOrders, conversionRate, failedRevenue, failedOrders, dateFilter }: StatsCardsProps) {
     const avgOrderValue = paidOrders > 0 ? totalRevenue / paidOrders : 0;
     const compLabel = COMPARISON_LABELS[dateFilter] ?? '';
 
     return (
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
             {/* Revenue */}
             <div className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-linear-to-br from-white to-green-50/50 shadow-sm">
                 <div className="absolute top-0 right-0 p-3 opacity-5 transition-opacity group-hover:opacity-10">
@@ -117,6 +119,27 @@ export function StatsCards({ totalRevenue, paidOrders, previousRevenue, previous
                         {conversionRate > 0 ? `${conversionRate.toFixed(1)}%` : '—'}
                     </div>
                     <p className="mt-1 text-[10px] font-medium text-muted-foreground md:text-xs">Paid / all attempts</p>
+                </div>
+            </div>
+
+            {/* Recovery Opportunity */}
+            <div className="group relative col-span-2 overflow-hidden rounded-2xl border border-red-100 bg-linear-to-br from-white to-red-50/50 shadow-sm lg:col-span-1">
+                <div className="absolute top-0 right-0 p-3 opacity-5 transition-opacity group-hover:opacity-10">
+                    <AlertCircle className="h-16 w-16 text-red-500" />
+                </div>
+                <div className="flex flex-row items-center justify-between p-4 pb-1">
+                    <h3 className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase md:text-xs">Recovery Opp.</h3>
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100/50">
+                        <AlertCircle className="h-4 w-4 text-red-500" />
+                    </div>
+                </div>
+                <div className="p-4 pt-1">
+                    <div className={`text-xl font-bold md:text-2xl ${failedRevenue > 0 ? 'text-red-600' : 'text-gray-400'}`}>
+                        {failedRevenue > 0 ? `₹${failedRevenue.toLocaleString()}` : '—'}
+                    </div>
+                    <p className="mt-1 text-[10px] font-medium text-muted-foreground md:text-xs">
+                        {failedOrders > 0 ? `${failedOrders} failed/pending` : 'No lost orders'}
+                    </p>
                 </div>
             </div>
         </div>

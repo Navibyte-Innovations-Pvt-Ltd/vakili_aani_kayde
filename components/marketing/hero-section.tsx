@@ -1,8 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Scale, ShieldCheck, Star, Users } from "lucide-react";
-import { GlobalSearch } from "../global-search";
+import { Scale, ShieldCheck, Star, Users } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
+import { HeroSearch } from "./hero-search";
 
 export function HeroSection() {
     return (
@@ -54,27 +55,7 @@ export function HeroSection() {
                 </p>
 
                 {/* Search */}
-                <div className="mx-auto mb-8 max-w-lg">
-                    <div className="group relative">
-                        <div className="absolute -inset-0.5 rounded-xl bg-linear-to-r from-brand-gold/20 to-brand-teal/10 opacity-0 blur transition duration-300 group-hover:opacity-100" />
-                        <GlobalSearch
-                            className="relative w-full"
-                            triggerClassName="h-13 text-sm rounded-xl border-2 border-gray-200 bg-white text-gray-700 hover:border-brand-gold/50 transition-all duration-200 shadow-sm"
-                        />
-                    </div>
-                    {/* Popular tags */}
-                    <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
-                        <span className="text-[10px] font-bold tracking-wider text-brand-gold uppercase">लोकप्रिय:</span>
-                        {["वारसा हक्क", "शेतकरी कायदा", "घर खरेदी", "ग्राहक हक्क"].map((tag) => (
-                            <button
-                                key={tag}
-                                className="rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold text-slate-600 transition-colors hover:border-brand-gold/40 hover:bg-brand-gold-light hover:text-brand-teal md:text-xs"
-                            >
-                                {tag}
-                            </button>
-                        ))}
-                    </div>
-                </div>
+                <HeroSearch />
 
                 {/* CTA buttons */}
                 <div className="mb-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -99,7 +80,7 @@ export function HeroSection() {
                             rel="noopener noreferrer"
                             className="flex items-center gap-2"
                         >
-                            <MessageCircle className="h-4 w-4" />
+                            <FaWhatsapp className="h-4 w-4" />
                             Support साठी WhatsApp
                         </Link>
                     </Button>

@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
-interface Ebook {
+export interface Ebook {
     id: string;
     displayId: number;
     title: string;
@@ -125,7 +125,7 @@ export function GlobalSearch({
     );
 }
 
-function DialogContentWrapper({
+export function DialogContentWrapper({
     open,
     setOpen,
     search,

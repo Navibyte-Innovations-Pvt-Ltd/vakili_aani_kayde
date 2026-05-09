@@ -37,7 +37,7 @@ export default async function OrdersPage({ searchParams }: { searchParams?: Prom
     const nowIST = getNowIST();
     const comparisonQuery = getComparisonQuery(dateFilter, nowIST);
 
-    const [orders, currentStats, previousStats, statusCounts] = await Promise.all([
+    const [orders, currentStats, previousStats, statusCounts, failedStats] = await Promise.all([
         prisma_db.order.findMany({
             where: { createdAt: dateQuery },
             select: {
@@ -79,12 +79,19 @@ export default async function OrdersPage({ searchParams }: { searchParams?: Prom
             where: { createdAt: dateQuery },
             _count: { id: true },
         }),
+        prisma_db.order.aggregate({
+            where: { createdAt: dateQuery, status: { in: ["FAILED", "PENDING"] } },
+            _sum: { amount: true },
+            _count: { id: true },
+        }),
     ]);
 
     const totalRevenue = Number(currentStats._sum.amount || 0);
     const paidOrders = currentStats._count.id || 0;
     const previousRevenue = Number(previousStats._sum.amount || 0);
     const previousOrders = previousStats._count.id || 0;
+    const failedRevenue = Number(failedStats._sum?.amount || 0);
+    const failedOrders = (failedStats._count as { id?: number })?.id || 0;
 
     const statusMap: Record<string, number> = {};
     for (const s of statusCounts) statusMap[s.status] = s._count.id;
@@ -123,6 +130,8 @@ export default async function OrdersPage({ searchParams }: { searchParams?: Prom
                 previousRevenue={previousRevenue}
                 previousOrders={previousOrders}
                 conversionRate={conversionRate}
+                failedRevenue={failedRevenue}
+                failedOrders={failedOrders}
                 dateFilter={dateFilter}
             />
 

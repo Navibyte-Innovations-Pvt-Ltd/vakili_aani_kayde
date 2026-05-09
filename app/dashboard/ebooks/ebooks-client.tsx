@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { BookOpen, Edit, Eye, Trash2, Plus, Search, Filter, Loader2 } from "lucide-react";
+import { BookOpen, Edit, Eye, Trash2, Plus, Search, Filter, Loader2, ArrowUpDown, Package2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,13 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 
+const LANG_LABEL: Record<string, string> = { MARATHI: "मराठी", HINDI: "हिंदी", ENGLISH: "EN" };
+const LANG_COLOR: Record<string, string> = {
+    MARATHI: "bg-orange-50 text-orange-700 border-orange-200",
+    HINDI: "bg-blue-50 text-blue-700 border-blue-200",
+    ENGLISH: "bg-green-50 text-green-700 border-green-200",
+};
+
 interface Ebook {
     id: string;
     displayId: number;
@@ -29,6 +36,9 @@ interface Ebook {
     price: number;
     coverImage: string | null;
     isEnabled: boolean;
+    isCombo: boolean;
+    language: string;
+    category: string | null;
     _count: {
         orderItems: number;
     };
@@ -44,6 +54,10 @@ export function EbooksClient({ ebooks }: EbooksClientProps) {
     const [togglingId, setTogglingId] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState<"all" | "active" | "disabled">("all");
+    const [categoryFilter, setCategoryFilter] = useState<string>("all");
+    const [sortBy, setSortBy] = useState<"recent" | "sales" | "price_asc" | "price_desc">("recent");
+
+    const categories = ["all", ...Array.from(new Set(ebooks.map(e => e.category).filter(Boolean) as string[]))].sort();
 
     const handleToggleStatus = async (id: string, currentStatus: boolean, title: string) => {
         setTogglingId(id);
@@ -101,14 +115,22 @@ export function EbooksClient({ ebooks }: EbooksClientProps) {
         return html.replace(/<[^>]*>?/gm, '');
     };
 
-    const filteredEbooks = ebooks.filter(ebook => {
-        const matchesSearch = ebook.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            ebook.displayId.toString().includes(searchQuery);
-        const matchesStatus = statusFilter === "all" ||
-            (statusFilter === "active" && ebook.isEnabled) ||
-            (statusFilter === "disabled" && !ebook.isEnabled);
-        return matchesSearch && matchesStatus;
-    });
+    const filteredEbooks = ebooks
+        .filter(ebook => {
+            const matchesSearch = ebook.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                ebook.displayId.toString().includes(searchQuery);
+            const matchesStatus = statusFilter === "all" ||
+                (statusFilter === "active" && ebook.isEnabled) ||
+                (statusFilter === "disabled" && !ebook.isEnabled);
+            const matchesCategory = categoryFilter === "all" || ebook.category === categoryFilter;
+            return matchesSearch && matchesStatus && matchesCategory;
+        })
+        .sort((a, b) => {
+            if (sortBy === "sales") return b._count.orderItems - a._count.orderItems;
+            if (sortBy === "price_asc") return a.price - b.price;
+            if (sortBy === "price_desc") return b.price - a.price;
+            return 0; // "recent" — already sorted from server
+        });
 
     return (
         <div className="space-y-6">
@@ -125,11 +147,32 @@ export function EbooksClient({ ebooks }: EbooksClientProps) {
                 </div>
 
                 <div className="flex w-full items-center gap-2 sm:w-auto">
+                    {/* Category filter */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="ml-auto h-10 w-full gap-2 rounded-xl border-gray-200 bg-white shadow-sm sm:w-auto">
+                            <Button variant="outline" className="h-10 gap-2 rounded-xl border-gray-200 bg-white shadow-sm">
                                 <Filter className="h-4 w-4" />
-                                <span className="capitalize">{statusFilter === 'all' ? 'All Status' : statusFilter}</span>
+                                <span>{categoryFilter === "all" ? "Category" : categoryFilter}</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="rounded-xl">
+                            <DropdownMenuLabel>Filter by Category</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuRadioGroup value={categoryFilter} onValueChange={setCategoryFilter}>
+                                {categories.map(c => (
+                                    <DropdownMenuRadioItem key={c} value={c} className="capitalize">
+                                        {c === "all" ? "All Categories" : c}
+                                    </DropdownMenuRadioItem>
+                                ))}
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    {/* Status filter */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="h-10 gap-2 rounded-xl border-gray-200 bg-white shadow-sm">
+                                <span className="capitalize">{statusFilter === "all" ? "Status" : statusFilter}</span>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="rounded-xl">
@@ -139,6 +182,25 @@ export function EbooksClient({ ebooks }: EbooksClientProps) {
                                 <DropdownMenuRadioItem value="all">All Ebooks</DropdownMenuRadioItem>
                                 <DropdownMenuRadioItem value="active">Active Only</DropdownMenuRadioItem>
                                 <DropdownMenuRadioItem value="disabled">Disabled Only</DropdownMenuRadioItem>
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    {/* Sort */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="h-10 gap-2 rounded-xl border-gray-200 bg-white shadow-sm">
+                                <ArrowUpDown className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="rounded-xl">
+                            <DropdownMenuLabel>Sort By</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuRadioGroup value={sortBy} onValueChange={(v) => setSortBy(v as typeof sortBy)}>
+                                <DropdownMenuRadioItem value="recent">Most Recent</DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="sales">Most Sold</DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="price_desc">Price: High → Low</DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="price_asc">Price: Low → High</DropdownMenuRadioItem>
                             </DropdownMenuRadioGroup>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -200,7 +262,7 @@ export function EbooksClient({ ebooks }: EbooksClientProps) {
                         <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-5">
                             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                                 <div className="min-w-0 flex-1 space-y-1.5">
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex flex-wrap items-center gap-2">
                                         <Link
                                             href={`/dashboard/ebooks/${ebook.id}`}
                                             className={cn(
@@ -211,7 +273,17 @@ export function EbooksClient({ ebooks }: EbooksClientProps) {
                                         >
                                             {ebook.title}
                                         </Link>
-                                        {/* Status Badge - Desktop */}
+                                        {/* Language badge */}
+                                        <span className={cn("hidden shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-bold sm:inline", LANG_COLOR[ebook.language] ?? "bg-gray-50 text-gray-500 border-gray-200")}>
+                                            {LANG_LABEL[ebook.language] ?? ebook.language}
+                                        </span>
+                                        {/* Combo badge */}
+                                        {ebook.isCombo && (
+                                            <span className="hidden shrink-0 items-center gap-1 rounded-full border border-purple-200 bg-purple-50 px-2 py-0.5 text-[10px] font-bold text-purple-700 sm:inline-flex">
+                                                <Package2 className="h-2.5 w-2.5" /> Combo
+                                            </span>
+                                        )}
+                                        {/* Disabled badge */}
                                         <div className="hidden sm:block">
                                             {!ebook.isEnabled && (
                                                 <Badge variant="outline" className="h-5 border-gray-200 bg-gray-50 px-1.5 text-[10px] text-gray-500">
@@ -254,6 +326,15 @@ export function EbooksClient({ ebooks }: EbooksClientProps) {
                                             <span className="text-xs font-medium text-muted-foreground">copies</span>
                                         </div>
                                     </div>
+                                    {ebook._count.orderItems > 0 && (
+                                        <>
+                                            <div className="hidden h-8 w-px bg-gray-100 sm:block" />
+                                            <div className="hidden flex-col sm:flex">
+                                                <span className="mb-0.5 text-[10px] font-bold tracking-wider text-muted-foreground uppercase">Revenue</span>
+                                                <span className="text-lg font-bold text-green-700">₹{(Number(ebook.price) * ebook._count.orderItems).toLocaleString()}</span>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
 
                                 {/* Actions */}

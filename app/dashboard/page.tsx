@@ -2,13 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-import { IndianRupee, ShoppingCart, TrendingUp, RefreshCcw, ArrowRight, BarChart as BarChartIcon } from "lucide-react";
+import { IndianRupee, ShoppingCart, TrendingUp, RefreshCcw, ArrowRight, BarChart as BarChartIcon, Users, BookOpen, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { PremiumLoader } from "@/components/premium-loader";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
+}
 
 interface DashboardData {
   totalRevenue: number;
@@ -79,38 +86,52 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4 border-b border-gray-100 pb-2 md:pb-6">
         <div>
+          <p className="text-xs font-medium text-brand-gold">{getGreeting()} 👋</p>
           <h1 className="text-xl font-bold tracking-tight text-[#0A2342] md:text-3xl">
-            Overview
+            Dashboard Overview
           </h1>
           <p className="mt-1 hidden text-xs text-muted-foreground md:block md:text-sm">
-            Snapshot of your store performance and sales.
-            <br />
-            <span className="opacity-80">तुमच्या स्टोअरच्या प्रगतीचा आढावा.</span>
+            {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
           </p>
         </div>
         <Button onClick={fetchData} variant="outline" size="sm" disabled={loading} className="h-8 gap-2 border-gray-200 shadow-sm transition-all hover:bg-gray-100 hover:text-[#0A2342] active:scale-[0.98] md:h-9">
           <RefreshCcw className={cn("h-3.5 w-3.5 md:h-4 md:w-4", loading && "animate-spin")} />
-          <span className="hidden md:inline">{loading ? "Refreshing..." : "Refresh Data"}</span>
+          <span className="hidden md:inline">{loading ? "Refreshing..." : "Refresh"}</span>
         </Button>
       </div>
 
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {[
+          { href: "/dashboard/ebooks/new", icon: Plus, label: "Add Ebook", color: "bg-brand-teal text-white" },
+          { href: "/dashboard/orders", icon: ShoppingCart, label: "View Orders", color: "bg-blue-50 text-blue-700" },
+          { href: "/dashboard/ebooks", icon: BookOpen, label: "Manage Ebooks", color: "bg-amber-50 text-amber-700" },
+          { href: "/dashboard/users", icon: Users, label: "Users", color: "bg-purple-50 text-purple-700" },
+        ].map(({ href, icon: Icon, label, color }) => (
+          <Link key={href} href={href} className={cn("flex items-center gap-2.5 rounded-xl px-4 py-3 text-sm font-bold transition-all hover:opacity-90 active:scale-[0.98]", color)}>
+            <Icon className="h-4 w-4 shrink-0" />
+            <span className="truncate">{label}</span>
+          </Link>
+        ))}
+      </div>
+
       {/* Metrics Cards */}
-      <div className="grid grid-cols-2 gap-3 md:gap-6 lg:grid-cols-3">
-        {/* Total Revenue - Spans 2 cols on mobile for emphasis */}
+      <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
+        {/* Total Revenue */}
         <div className="group relative col-span-2 overflow-hidden rounded-2xl border border-gray-100 bg-linear-to-br from-white to-green-50/30 shadow-sm lg:col-span-1">
           <div className="absolute top-0 right-0 p-3 opacity-10 transition-opacity group-hover:opacity-20">
             <IndianRupee className="h-16 w-16 text-green-600" />
           </div>
           <div className="flex flex-row items-center justify-between p-4 pb-1">
-            <h3 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Total Revenue</h3>
+            <h3 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Revenue</h3>
             <div className="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 text-green-600">
               <IndianRupee className="h-3.5 w-3.5" />
             </div>
           </div>
           <div className="p-4 pt-1">
             <div className="text-2xl font-bold text-[#0A2342] md:text-3xl">₹{data.totalRevenue.toLocaleString()}</div>
-            <p className="mt-1 flex items-center gap-1 text-[10px] font-medium text-muted-foreground md:text-xs">
-              <span className="text-green-600">Lifetime</span> earnings
+            <p className="mt-1 text-[10px] text-muted-foreground md:text-xs">
+              Avg ₹{data.totalOrders > 0 ? Math.round(data.totalRevenue / data.totalOrders).toLocaleString() : 0} / order
             </p>
           </div>
         </div>
@@ -125,9 +146,21 @@ export default function DashboardPage() {
           </div>
           <div className="p-3 pt-1 md:p-4">
             <div className="text-xl font-bold text-[#0A2342] md:text-3xl">{data.totalOrders}</div>
-            <p className="mt-1 truncate text-[10px] text-muted-foreground md:text-xs">
-              Completed
-            </p>
+            <p className="mt-1 truncate text-[10px] text-muted-foreground md:text-xs">Completed</p>
+          </div>
+        </div>
+
+        {/* Customers */}
+        <div className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-linear-to-br from-white to-orange-50/30 shadow-sm">
+          <div className="flex flex-row items-center justify-between p-3 pb-1 md:p-4">
+            <h3 className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase md:text-xs">Customers</h3>
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-orange-100 text-orange-600">
+              <Users className="h-3.5 w-3.5" />
+            </div>
+          </div>
+          <div className="p-3 pt-1 md:p-4">
+            <div className="text-xl font-bold text-[#0A2342] md:text-3xl">{data.totalCustomers}</div>
+            <p className="mt-1 truncate text-[10px] text-muted-foreground md:text-xs">Unique buyers</p>
           </div>
         </div>
 
@@ -141,9 +174,7 @@ export default function DashboardPage() {
           </div>
           <div className="p-3 pt-1 md:p-4">
             <div className="text-xl font-bold text-[#0A2342] md:text-3xl">{data.conversionRate.toFixed(1)}%</div>
-            <p className="mt-1 truncate text-[10px] text-muted-foreground md:text-xs">
-              Success Rate
-            </p>
+            <p className="mt-1 truncate text-[10px] text-muted-foreground md:text-xs">Success rate</p>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { MessageCircle } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 
 export function WhatsAppFAB() {
   const [isVisible, setIsVisible] = useState(false);
@@ -25,7 +25,7 @@ export function WhatsAppFAB() {
         aria-label="WhatsApp वर संपर्क करा"
         className="flex items-center gap-2.5 rounded-full border border-white/20 bg-brand-teal px-4 py-3 text-sm font-bold text-white shadow-lg transition-all hover:bg-[#25D366] hover:shadow-[0_4px_20px_rgb(37,211,102,0.35)] active:scale-95 md:px-5"
       >
-        <MessageCircle className="h-5 w-5 shrink-0" />
+        <FaWhatsapp className="h-5 w-5 shrink-0" />
         <span className="hidden sm:inline">WhatsApp</span>
       </a>
     </div>

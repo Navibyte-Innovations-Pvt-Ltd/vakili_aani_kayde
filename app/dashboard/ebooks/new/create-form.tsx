@@ -56,6 +56,8 @@ const formSchema = z.object({
     language: z.enum(["MARATHI", "HINDI", "ENGLISH"]).default("MARATHI"),
     price: z.coerce.number().min(0, "Price must be a valid number"),
     pages: z.coerce.number().min(0, "Pages must be a valid number").optional(),
+    shortCode: z.string().regex(/^[a-z0-9-]*$/, "Only lowercase letters, numbers, hyphens").optional().or(z.literal("")),
+    isEnabled: z.boolean().default(true),
     isCombo: z.boolean().default(false),
     includedEbooks: z.array(z.string()).optional(),
 });
@@ -65,6 +67,7 @@ type FormValues = z.infer<typeof formSchema>;
 export default function CreateEbookForm() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState<{ stage: string; pct: number } | null>(null);
 
     // Crop State
     const [imgSrc, setImgSrc] = useState('');
@@ -95,6 +98,8 @@ export default function CreateEbookForm() {
             category: "Property Law",
             language: "MARATHI" as const,
             price: 0,
+            shortCode: "",
+            isEnabled: true,
             isCombo: false,
             includedEbooks: [],
         },
@@ -290,25 +295,29 @@ export default function CreateEbookForm() {
             // 1) Upload cover (if any) directly to S3
             let coverImageUrl: string | null = null;
             if (croppedBlob) {
+                setUploadProgress({ stage: "Uploading cover image...", pct: 10 });
                 const r = await uploadDirectToS3(croppedBlob, "cover", "cover-image.jpg");
                 coverImageUrl = r.publicUrl;
             }
 
             // 2) Upload sample images
             const sampleImageUrls: string[] = [];
-            for (const file of sampleImages) {
-                const r = await uploadDirectToS3(file, "sample", file.name);
+            for (let i = 0; i < sampleImages.length; i++) {
+                setUploadProgress({ stage: `Uploading sample image ${i + 1}/${sampleImages.length}...`, pct: 20 + Math.round((i / sampleImages.length) * 30) });
+                const r = await uploadDirectToS3(sampleImages[i], "sample", sampleImages[i].name);
                 if (r.publicUrl) sampleImageUrls.push(r.publicUrl);
             }
 
             // 3) Upload main PDF (if provided)
             let fileKey: string | null = null;
             if (ebookFile) {
+                setUploadProgress({ stage: "Uploading PDF (this may take a moment)...", pct: 55 });
                 const r = await uploadDirectToS3(ebookFile, "ebook", ebookFile.name);
                 fileKey = r.key;
             }
 
             // 4) POST metadata JSON
+            setUploadProgress({ stage: "Saving ebook details...", pct: 90 });
             const response = await fetch("/api/admin/ebooks", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -319,6 +328,8 @@ export default function CreateEbookForm() {
                     pages: values.pages,
                     category: values.category,
                     language: values.language,
+                    shortCode: values.shortCode || undefined,
+                    isEnabled: values.isEnabled,
                     isCombo: values.isCombo,
                     includedEbooks: values.includedEbooks ?? [],
                     coverImageUrl,
@@ -332,12 +343,14 @@ export default function CreateEbookForm() {
                 throw new Error(txt || "Failed to create ebook");
             }
 
+            setUploadProgress({ stage: "Done!", pct: 100 });
             toast.success("Ebook created successfully / नवीन पुस्तक तयार झाले");
             router.push("/dashboard/ebooks");
             router.refresh();
         } catch (error) {
             console.error(error);
             toast.error(error instanceof Error ? error.message : "Something went wrong");
+            setUploadProgress(null);
         } finally {
             setLoading(false);
         }
@@ -379,6 +392,20 @@ export default function CreateEbookForm() {
                                         generationPrompt="Write a compelling description for this legal ebook"
                                         context={watchedTitle} // Pass title as context for AI
                                     />
+
+                                    {/* Publish toggle */}
+                                    <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-4 py-3">
+                                        <div>
+                                            <p className="text-sm font-bold text-gray-800">Publish Immediately</p>
+                                            <p className="text-xs text-gray-400">Visible to customers on save</p>
+                                        </div>
+                                        <InputField
+                                            name="isEnabled"
+                                            type="switch"
+                                            label=""
+                                            className="space-y-0"
+                                        />
+                                    </div>
 
                                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                         <InputField
@@ -425,10 +452,20 @@ export default function CreateEbookForm() {
                                             label="No. of Pages"
                                             placeholder="e.g. 150"
                                             type="number"
-                                            required // Added required for pages
-                                            min={1} // Added min for pages
+                                            required
+                                            min={1}
                                         />
                                     </div>
+
+                                    <InputField
+                                        name="shortCode"
+                                        label="Short URL Code (optional)"
+                                        placeholder="e.g. rti-guide (auto-generated if empty)"
+                                        type="text"
+                                    />
+                                    <p className="mt-1 text-[10px] text-muted-foreground">
+                                        Used for short links like <span className="font-mono text-brand-teal">/d/rti-guide</span>. Only lowercase, numbers, hyphens.
+                                    </p>
                                 </CardContent>
                             </Card>
 
@@ -699,19 +736,34 @@ export default function CreateEbookForm() {
                     </div>
 
                     {/* Sticky Actions Footer */}
-                    <div className="shadow-negative fixed right-0 bottom-0 left-0 z-50 flex items-center justify-between border-t border-gray-200 bg-white p-4 md:left-64">
-                        <Button type="button" variant="outline" onClick={() => router.back()} className="text-muted-foreground">
-                            <ArrowLeft className="mr-2 h-4 w-4" /> Cancel / मागे जा
-                        </Button>
-
-                        <div className="flex gap-3">
-                            <Button type="submit" disabled={loading} className="min-w-50 bg-brand-teal shadow-md hover:bg-brand-teal/90">
-                                {loading ? "Creating..." : (
-                                    <>
-                                        <Save className="mr-2 h-4 w-4" /> Create Ebook / पु तक तयार करा
-                                    </>
-                                )}
+                    <div className="shadow-negative fixed right-0 bottom-0 left-0 z-50 border-t border-gray-200 bg-white md:left-64">
+                        {uploadProgress && (
+                            <div className="px-4 pt-2">
+                                <div className="flex items-center justify-between mb-1">
+                                    <span className="text-[10px] font-medium text-brand-teal">{uploadProgress.stage}</span>
+                                    <span className="text-[10px] text-gray-400">{uploadProgress.pct}%</span>
+                                </div>
+                                <div className="h-1 w-full overflow-hidden rounded-full bg-gray-100">
+                                    <div
+                                        className="h-full rounded-full bg-brand-teal transition-all duration-300"
+                                        style={{ width: `${uploadProgress.pct}%` }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                        <div className="flex items-center justify-between p-4">
+                            <Button type="button" variant="outline" onClick={() => router.back()} className="text-muted-foreground">
+                                <ArrowLeft className="mr-2 h-4 w-4" /> Cancel / मागे जा
                             </Button>
+                            <div className="flex gap-3">
+                                <Button type="submit" disabled={loading} className="min-w-50 bg-brand-teal shadow-md hover:bg-brand-teal/90">
+                                    {loading ? "Uploading..." : (
+                                        <>
+                                            <Save className="mr-2 h-4 w-4" /> Create Ebook / पुस्तक तयार करा
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </form>
