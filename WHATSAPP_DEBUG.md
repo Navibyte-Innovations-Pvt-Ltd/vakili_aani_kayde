@@ -36,7 +36,7 @@
 
    ```
    Test in incognito browser:
-   https://kaydyach-ani-faydyach.s3.ap-south-1.amazonaws.com/RTI%20...pdf
+   https://nirmantestbucket.s3.ap-south-1.amazonaws.com/RTI%20...pdf
 
    Should: Download PDF immediately
    Should NOT: Show "Access Denied"

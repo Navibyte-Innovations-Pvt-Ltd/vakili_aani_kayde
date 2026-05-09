@@ -19,7 +19,7 @@ bun run prisma:reset     # Reset database (destructive)
 
 ## Architecture
 
-This is a **Next.js 16 App Router** e-commerce platform for selling Marathi-language ebooks (kaydyach_ani_faydyach = "What to Buy and What to Benefit"). The site is bilingual (English + Marathi).
+This is a **Next.js 16 App Router** e-commerce platform for selling Marathi-language ebooks. The site is bilingual (English + Marathi).
 
 ### Route Groups
 - `app/(auth)/` — Login, signup, OTP verification, forgot/reset password

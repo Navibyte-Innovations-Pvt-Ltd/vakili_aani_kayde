@@ -16,7 +16,7 @@ export function getBaseUrl() {
     }
 
     if (envUrl && !envUrl.includes("localhost")) {
-        return "https://www.kaydyachaanifaydyach.com";
+        return "https://www.vakilianikayde.in";
     }
 
     return "http://127.0.0.1:2222";
