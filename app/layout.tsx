@@ -83,7 +83,7 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     images: [
       {
-        url: "/opengraph/home.png",
+        url: "/image.png",
         width: 1200,
         height: 630,
         alt: "वकिली आणि कायदे",
@@ -94,7 +94,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE_TITLE,
     description: "हक्क समजून घ्या, योग्य निर्णय घ्या. दररोज उपयोगी पडणारी कायदेशीर माहिती — थेट आणि स्पष्ट.",
-    images: ["/logo.png"],
+    images: ["/image.png"],
     creator: TWITTER_HANDLE,
   },
   alternates: {

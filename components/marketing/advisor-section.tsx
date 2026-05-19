@@ -20,7 +20,7 @@ export function AdvisorSection() {
                                     className="object-cover object-top"
                                 />
                             </div>
-                            <div className="absolute right-4 bottom-4 rounded-full border-4 border-white bg-brand-gold p-2.5 text-white shadow-lg" title="Verified Advocate">
+                            <div className="absolute right-4 bottom-4 rounded-full border-4 border-white bg-brand-gold p-2.5 text-white shadow-lg" title="Verified Lawyer">
                                 <Scale className="h-5 w-5 shrink-0" />
                             </div>
                         </div>

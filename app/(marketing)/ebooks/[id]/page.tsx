@@ -129,7 +129,7 @@ const PAGE_LABELS = {
     faq6Q: "Will I get future updates?",
     faq6A: "We publish an updated edition when significant legal changes occur. The current version details are mentioned on the product page.",
     faq7Q: "Does this book provide legal advice?",
-    faq7A: "No. This book is for reference and educational purposes only. It does not constitute legal advice of any kind. For your specific legal issue, always consult a qualified advocate.",
+    faq7A: "No. This book is for reference and educational purposes only. It does not constitute legal advice of any kind. For your specific legal issue, always consult a qualified lawyer.",
     helpMobile: "Need Help?",
     helpMobileSub: "Chat on WhatsApp",
     helpDesktop: "Need Help?",
@@ -138,7 +138,7 @@ const PAGE_LABELS = {
     recommendedTitle: "You May Also Like",
     recommendedSub: "Explore more important books",
     authorLabel: "About the Author",
-    authorBio: "Adv. Omkar Shinde is a practising advocate. He founded 'Vakili Aani Kayde' to make legal knowledge accessible to every citizen in simple, everyday language.",
+    authorBio: "Adv. Omkar Shinde is a practising lawyer. He founded 'Vakili Aani Kayde' to make legal knowledge accessible to every citizen in simple, everyday language.",
     socialProof: "Trusted by readers",
   },
 } as const;

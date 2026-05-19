@@ -204,7 +204,7 @@ export function Footer() {
           {/* Disclaimer */}
           <div className="rounded-xl border border-white/8 bg-white/5 p-4 text-center">
             <p className="text-[10px] leading-relaxed text-white/30 md:text-xs">
-              <strong className="text-white/50">DISCLAIMER:</strong> Information on this site is for educational purposes only and does not constitute legal advice. No attorney-client relationship is created. Consult a qualified advocate for specific legal issues.{" "}
+              <strong className="text-white/50">DISCLAIMER:</strong> Information on this site is for educational purposes only and does not constitute legal advice. No attorney-client relationship is created. Consult a qualified lawyer for specific legal issues.{" "}
               <span className="mt-1 block text-[9px] md:mt-0 md:inline md:text-[10px]">
                 | या वेबसाइटवरील माहिती केवळ शैक्षणिक उद्देशाने आहे. हा कायदेशीर सल्ला नाही.
               </span>
