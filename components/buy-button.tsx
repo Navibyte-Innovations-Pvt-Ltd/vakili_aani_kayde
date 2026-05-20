@@ -911,11 +911,11 @@ function CheckoutForm({
                 )}
               />
 
-              {/* WhatsApp delivery notice */}
-              <div className="flex items-center gap-2.5 rounded-2xl border border-green-100 bg-green-50 px-3.5 py-2.5">
+              {/* WhatsApp delivery notice — hidden temporarily */}
+              {/* <div className="flex items-center gap-2.5 rounded-2xl border border-green-100 bg-green-50 px-3.5 py-2.5">
                 <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#25D366] text-white">{WA_SVG}</div>
                 <p className="text-[10px] font-semibold leading-tight text-green-800">PDF delivered to this WhatsApp number instantly after payment</p>
-              </div>
+              </div> */}
 
               <Button
                 type="button"
@@ -984,11 +984,12 @@ function CheckoutForm({
                 </div>
               </div>
 
-              {/* What you get */}
-              <div className="flex items-start gap-2.5 rounded-2xl border border-brand-gold/20 bg-brand-gold/5 px-3.5 py-3">
+
+              {/* What you get — hidden temporarily */}
+              {/* <div className="flex items-start gap-2.5 rounded-2xl border border-brand-gold/20 bg-brand-gold/5 px-3.5 py-3">
                 <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-gold" />
                 <p className="text-[10px] leading-relaxed text-gray-600">{labels.pdfNotice}</p>
-              </div>
+              </div> */}
 
               {/* IAB warning */}
               {isIAB && (
