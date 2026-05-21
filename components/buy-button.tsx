@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { toast } from "sonner";
-import { Pointer, Loader2, ShieldCheck, Zap, Info, X, User, Phone, ArrowRight, Lock } from "lucide-react";
+import { Pointer, Loader2, ShieldCheck, Zap, X, User, Phone, ArrowRight, Lock } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Sheet,

@@ -168,7 +168,7 @@ export default function MyBooksPage() {
     <div className="flex min-h-screen flex-col bg-[#F5F5F0]">
 
       {/* Header */}
-      <header className="sticky top-[6.25rem] z-40 bg-brand-teal shadow-md">
+      <header className="sticky top-25 z-40 bg-brand-teal shadow-md">
         <div className="mx-auto flex max-w-2xl items-center gap-3 px-4 py-3.5">
           <Link href="/" className="rounded-lg p-1.5 text-white/50 transition-colors hover:bg-white/10 hover:text-white active:scale-95">
             <ArrowLeft className="h-5 w-5" />
