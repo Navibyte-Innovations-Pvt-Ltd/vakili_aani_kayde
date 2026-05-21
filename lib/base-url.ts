@@ -1,23 +1,24 @@
-/**
- * Get the base URL for the application
- * Automatically handles localhost vs production
- */
 export function getBaseUrl() {
     if (typeof window !== "undefined") {
-        // Client-side
         return window.location.origin;
     }
 
-    // Server-side
+    // Server-side: check explicit env first
     const envUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL;
 
-    if (envUrl && envUrl.includes("localhost")) {
-        return envUrl.replace("https://", "http://").replace("localhost", "127.0.0.1");
+    if (envUrl) {
+        // Local dev: Turbopack binds to 127.0.0.1 not localhost
+        if (envUrl.includes("localhost")) {
+            return envUrl.replace("https://", "http://").replace("localhost", "127.0.0.1");
+        }
+        return envUrl;
     }
 
-    if (envUrl && !envUrl.includes("localhost")) {
-        return "https://www.vakilianikayde.in";
+    // Vercel auto-injects VERCEL_URL (no protocol, no trailing slash)
+    if (process.env.VERCEL_URL) {
+        return `https://${process.env.VERCEL_URL}`;
     }
 
+    // Local fallback
     return "http://127.0.0.1:2222";
 }
