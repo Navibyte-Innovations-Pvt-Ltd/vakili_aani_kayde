@@ -97,29 +97,42 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen bg-brand-cream">
       {/* Left panel — desktop only */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-brand-teal px-12 py-10">
+      <div className="relative hidden overflow-hidden bg-brand-teal px-12 py-10 lg:flex lg:w-1/2 lg:flex-col lg:justify-between">
+        {/* Decorative gradient orbs */}
+        <div className="pointer-events-none absolute -top-24 -right-24 h-80 w-80 rounded-full bg-brand-gold/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-brand-gold/5 blur-3xl" />
+        {/* Subtle grid texture */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-4"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+
         {/* Logo */}
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-gold">
+        <div className="relative flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-gold shadow-lg shadow-brand-gold/20">
             <Scale className="h-5 w-5 text-brand-teal" />
           </div>
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-gold/70">वकिली आणि कायदे</p>
+            <p className="text-xs font-bold tracking-widest text-brand-gold/70 uppercase">वकिली आणि कायदे</p>
             <p className="text-sm font-black text-white">Vakili Aani Kayde</p>
           </div>
         </div>
 
         {/* Hero text */}
-        <div className="space-y-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-brand-gold/20 bg-brand-gold/10 px-3 py-1.5">
+        <div className="relative space-y-6">
+          <div className="inline-flex items-center gap-2 rounded-full border border-brand-gold/20 bg-brand-gold/10 px-3 py-1.5 backdrop-blur-sm">
             <BookOpen className="h-3.5 w-3.5 text-brand-gold" />
             <span className="text-xs font-bold text-brand-gold">Legal Knowledge in Marathi</span>
           </div>
-          <h1 className="text-4xl font-black leading-tight text-white">
+          <h1 className="text-4xl leading-tight font-black text-white xl:text-5xl">
             कायद्याचे ज्ञान<br />
             <span className="text-brand-gold">सोप्या भाषेत</span>
           </h1>
-          <p className="text-base leading-relaxed text-white/60">
+          <p className="max-w-md text-base leading-relaxed text-white/60">
             Property law, consumer rights, cyber fraud — simplified legal guides for every Marathi-speaking citizen.
           </p>
 
@@ -130,7 +143,7 @@ export default function LoginPage() {
               { label: "वाचक", value: "5K+" },
               { label: "विषय", value: "10+" },
             ].map(({ label, value }) => (
-              <div key={label}>
+              <div key={label} className="rounded-2xl border border-white/5 bg-white/3 px-4 py-3 backdrop-blur-sm">
                 <p className="text-2xl font-black text-brand-gold">{value}</p>
                 <p className="text-xs text-white/50">{label}</p>
               </div>
@@ -139,31 +152,35 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-xs text-white/30">
-          © 2025 Vakili Aani Kayde · Pune, Maharashtra
+        <p className="relative text-xs text-white/30">
+          © {new Date().getFullYear()} Vakili Aani Kayde
         </p>
       </div>
 
       {/* Right panel — form */}
-      <div className="flex flex-1 flex-col items-center justify-center px-6 py-12">
+      <div className="relative flex flex-1 flex-col items-center justify-center px-6 py-12">
+        {/* Soft background accents */}
+        <div className="pointer-events-none absolute -top-20 right-0 h-72 w-72 rounded-full bg-brand-teal/4 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 left-0 h-72 w-72 rounded-full bg-brand-gold/6 blur-3xl" />
+
         {/* Mobile logo */}
-        <div className="mb-8 flex items-center gap-2 lg:hidden">
+        <div className="relative mb-8 flex items-center gap-2 lg:hidden">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-teal">
             <Scale className="h-4.5 w-4.5 text-brand-gold" />
           </div>
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-brand-teal/50">वकिली आणि कायदे</p>
+            <p className="text-[10px] font-bold tracking-widest text-brand-teal/50 uppercase">वकिली आणि कायदे</p>
             <p className="text-sm font-black text-brand-teal">Vakili Aani Kayde</p>
           </div>
         </div>
 
-        <div className="w-full max-w-sm">
+        <div className="relative w-full max-w-sm rounded-3xl border border-gray-100 bg-white/80 p-8 shadow-xl shadow-brand-teal/5 backdrop-blur-sm sm:p-9">
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-7">
             <h2 className="text-2xl font-black text-brand-teal">Welcome back</h2>
-            <p className="mt-1 text-sm text-gray-400">
+            <p className="mt-2 text-sm text-gray-400">
               {isDev ? (
-                <span className="inline-flex items-center gap-1 rounded-md bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700">
+                <span className="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">
                   ⚠ Dev mode — password bypass active
                 </span>
               ) : (
@@ -176,14 +193,14 @@ export default function LoginPage() {
             <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
               {isDev ? (
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wide text-gray-500">
+                  <label className="text-xs font-bold tracking-wide text-gray-500 uppercase">
                     Select User <span className="text-red-500">*</span>
                   </label>
                   <Select
                     value={selectedEmail}
                     onValueChange={(val) => methods.setValue("email", val)}
                   >
-                    <SelectTrigger className="h-11 w-full rounded-xl border-gray-200 bg-white">
+                    <SelectTrigger className="h-11 w-full rounded-xl border-2 border-gray-200 bg-white shadow-sm transition-colors hover:border-brand-teal/40 focus:border-brand-teal focus:ring-2 focus:ring-brand-teal/15">
                       <SelectValue placeholder="Pick a user..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -217,26 +234,18 @@ export default function LoginPage() {
               />
 
               {!isDev && (
-                <div className="flex items-center justify-between">
-                  <InputField
-                    name="rememberMe"
-                    type="checkbox"
-                    label="Remember me"
-                    className="flex-row items-center gap-2 space-y-0"
-                  />
-                  <Link
-                    href="/auth/forgot-password"
-                    className="text-xs font-bold text-brand-teal hover:text-brand-gold transition-colors"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
+                <InputField
+                  name="rememberMe"
+                  type="checkbox"
+                  label="Remember me"
+                  className="flex-row items-center gap-2 space-y-0"
+                />
               )}
 
               <button
                 type="submit"
                 disabled={isLoading}
-                className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-teal text-sm font-black text-white transition-all active:scale-[0.98] disabled:opacity-60"
+                className="group mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-teal text-sm font-black text-white shadow-lg shadow-brand-teal/20 transition-all hover:bg-brand-teal/90 hover:shadow-brand-teal/30 active:scale-[0.98] disabled:opacity-60"
               >
                 {isLoading ? (
                   <>
@@ -246,36 +255,18 @@ export default function LoginPage() {
                 ) : (
                   <>
                     Sign In
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   </>
                 )}
               </button>
             </form>
           </Form>
 
-          {/* Divider */}
-          <div className="my-6 flex items-center gap-3">
-            <div className="h-px flex-1 bg-gray-100" />
-            <span className="text-xs text-gray-300">OR</span>
-            <div className="h-px flex-1 bg-gray-100" />
-          </div>
-
-          {/* Sign up */}
-          <p className="text-center text-sm text-gray-400">
-            Don&apos;t have an account?{" "}
-            <Link
-              href="/auth/signup"
-              className="font-bold text-brand-teal hover:text-brand-gold transition-colors"
-            >
-              Create account
-            </Link>
-          </p>
-
           {/* Browse without login */}
-          <div className="mt-4 text-center">
+          <div className="mt-7 border-t border-gray-100 pt-5 text-center">
             <Link
               href="/ebooks"
-              className="text-xs text-gray-300 hover:text-brand-teal transition-colors"
+              className="text-xs font-medium text-gray-400 transition-colors hover:text-brand-teal"
             >
               Browse ebooks without signing in →
             </Link>
