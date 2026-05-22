@@ -62,34 +62,80 @@ export async function generateOgImage(options: OgImageOptions) {
     coverImageUrl ? fetchImageAsBase64(coverImageUrl) : Promise.resolve(null),
   ]);
 
-  const displayTitle = title.length > 60 ? title.substring(0, 60) + "..." : title;
-  const titleFontSize = displayTitle.length > 40 ? "48px" : "64px";
+  const displayTitle = title.length > 70 ? title.substring(0, 70) + "..." : title;
+  const titleFontSize = displayTitle.length > 45 ? "46px" : displayTitle.length > 28 ? "56px" : "66px";
+
+  const NAVY = "#0A1F3D";
+  const GOLD = "#C9962A";
+  const GOLD_LIGHT = "#F5E6C8";
 
   return new ImageResponse(
     <div
       style={{
-        backgroundColor: "#0A2342",
-        backgroundImage: "linear-gradient(135deg, #0A2342 0%, #153a63 100%)",
+        position: "relative",
         width: "1200px",
         height: "630px",
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        padding: "60px",
+        padding: "64px",
+        backgroundColor: NAVY,
+        backgroundImage: `linear-gradient(135deg, ${NAVY} 0%, #112a52 60%, #0c2547 100%)`,
         color: "white",
         fontFamily: "Noto Sans Devanagari, Inter",
+        overflow: "hidden",
       }}
     >
-      <div style={{ display: "flex", marginRight: "60px" }}>
+      {/* Decorative gold glows */}
+      <div
+        style={{
+          position: "absolute",
+          top: "-160px",
+          right: "-120px",
+          width: "480px",
+          height: "480px",
+          borderRadius: "9999px",
+          backgroundImage: `radial-gradient(circle, ${GOLD}33 0%, ${GOLD}00 70%)`,
+          display: "flex",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          bottom: "-200px",
+          left: "200px",
+          width: "520px",
+          height: "520px",
+          borderRadius: "9999px",
+          backgroundImage: `radial-gradient(circle, ${GOLD}1f 0%, ${GOLD}00 70%)`,
+          display: "flex",
+        }}
+      />
+      {/* Top gold accent bar */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "1200px",
+          height: "8px",
+          backgroundImage: `linear-gradient(90deg, ${GOLD} 0%, ${GOLD_LIGHT} 50%, ${GOLD} 100%)`,
+          display: "flex",
+        }}
+      />
+
+      {/* Book cover */}
+      <div style={{ position: "relative", display: "flex", marginRight: "64px" }}>
         <div
           style={{
-            width: "360px",
-            height: "510px",
-            backgroundColor: "#111827",
+            width: "346px",
+            height: "500px",
+            backgroundColor: "#0d1b30",
             display: "flex",
-            borderRadius: "16px",
+            borderRadius: "20px",
             overflow: "hidden",
-            border: "2px solid rgba(255,255,255,0.1)",
+            border: `3px solid ${GOLD}`,
+            boxShadow: "0 30px 60px rgba(0,0,0,0.45)",
             alignItems: "center",
             justifyContent: "center",
           }}
@@ -108,19 +154,39 @@ export async function generateOgImage(options: OgImageOptions) {
           ) : (
             <div
               style={{
-                fontSize: "100px",
-                opacity: 0.2,
+                fontSize: "150px",
                 fontWeight: 900,
-                color: "white",
+                color: `${GOLD}55`,
                 display: "flex",
               }}
             >
-              K
+              वा
             </div>
           )}
         </div>
+        {/* Tag ribbon on cover */}
+        {tag ? (
+          <div
+            style={{
+              position: "absolute",
+              top: "20px",
+              left: "-14px",
+              backgroundColor: GOLD,
+              color: NAVY,
+              padding: "8px 18px",
+              borderRadius: "8px",
+              fontSize: "20px",
+              fontWeight: 800,
+              boxShadow: "0 8px 20px rgba(0,0,0,0.35)",
+              display: "flex",
+            }}
+          >
+            {tag}
+          </div>
+        ) : null}
       </div>
 
+      {/* Right content */}
       <div
         style={{
           display: "flex",
@@ -129,57 +195,86 @@ export async function generateOgImage(options: OgImageOptions) {
           justifyContent: "center",
         }}
       >
+        {/* Brand lockup */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "12px",
-            marginBottom: "32px",
+            gap: "16px",
+            marginBottom: "36px",
           }}
         >
           <div
             style={{
-              width: "42px",
-              height: "42px",
-              background: "#FFD301",
-              borderRadius: "10px",
+              width: "56px",
+              height: "56px",
+              backgroundImage: `linear-gradient(135deg, ${GOLD} 0%, #b07f1f 100%)`,
+              borderRadius: "14px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: "#0A2342",
+              color: NAVY,
               fontWeight: 900,
-              fontSize: "24px",
+              fontSize: "30px",
             }}
           >
-            K
+            वा
           </div>
-          <div style={{ fontSize: "28px", color: "#FFD301", fontWeight: 800, display: "flex" }}>
-            Vakili Aani Kayde
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <div style={{ fontSize: "30px", color: GOLD, fontWeight: 800, display: "flex" }}>
+              वकिली आणि कायदे
+            </div>
+            <div
+              style={{
+                fontSize: "15px",
+                color: "#94a3b8",
+                fontWeight: 700,
+                letterSpacing: "2px",
+                display: "flex",
+              }}
+            >
+              VAKILIANIKAYDE.IN
+            </div>
           </div>
         </div>
 
+        {/* Title */}
         <div
           style={{
             fontSize: titleFontSize,
             fontWeight: 900,
-            lineHeight: 1.1,
-            marginBottom: "40px",
+            lineHeight: 1.12,
+            marginBottom: "28px",
             display: "flex",
           }}
         >
           {displayTitle}
         </div>
 
+        {/* Gold divider */}
+        <div
+          style={{
+            width: "90px",
+            height: "5px",
+            backgroundColor: GOLD,
+            borderRadius: "9999px",
+            marginBottom: "32px",
+            display: "flex",
+          }}
+        />
+
+        {/* Price + subtitle */}
         <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
           {price ? (
             <div
               style={{
-                backgroundColor: "#FFD301",
-                color: "#0A2342",
-                padding: "12px 30px",
+                backgroundImage: `linear-gradient(135deg, ${GOLD} 0%, #b07f1f 100%)`,
+                color: NAVY,
+                padding: "14px 32px",
                 borderRadius: "16px",
-                fontSize: "42px",
+                fontSize: "44px",
                 fontWeight: 900,
+                boxShadow: `0 12px 28px ${GOLD}44`,
                 display: "flex",
               }}
             >
@@ -187,16 +282,10 @@ export async function generateOgImage(options: OgImageOptions) {
             </div>
           ) : null}
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-            }}
-          >
+          <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
             <div
               style={{
-                fontSize: "24px",
+                fontSize: "26px",
                 fontWeight: 800,
                 color: "white",
                 marginBottom: "4px",
@@ -205,10 +294,8 @@ export async function generateOgImage(options: OgImageOptions) {
             >
               {subtitle || "Premium Content"}
             </div>
-            <div
-              style={{ fontSize: "16px", color: "#94a3b8", fontWeight: 700, display: "flex" }}
-            >
-              {tag || "Marathi Edition • Instant Download"}
+            <div style={{ fontSize: "17px", color: "#94a3b8", fontWeight: 700, display: "flex" }}>
+              Marathi Edition • Instant PDF Download
             </div>
           </div>
         </div>
