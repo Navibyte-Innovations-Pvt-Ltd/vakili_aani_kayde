@@ -532,7 +532,7 @@ export function BuyButton({
             // Redirect to My Books with enough context for recovery on slower networks.
             const params = new URLSearchParams({
               orderId: verifyData.orderId || order.orderId,
-              amount: order.amount.toString(),
+              amount: (order.amount / 100).toString(), // order.amount is in paise → rupees
               title: title,
               ebook_id: ebookId,
               currency: order.currency,
