@@ -27,7 +27,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
 
     if (!ebook) {
         return generateOgImage({
-            title: 'Kaydyanch Ani Faydyach',
+            title: 'Vakili aani kayde',
             subtitle: 'Legal Knowledge Center',
             tag: 'Learn & Grow'
         });

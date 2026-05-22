@@ -71,10 +71,7 @@ export default function DashboardPage() {
   if (loading && !data) {
     return (
       <div className="flex min-h-100 flex-col items-center justify-center p-8">
-        <PremiumLoader
-          marathiText="माहिती गोळा केली जात आहे..."
-          englishText="Gathering Analytics"
-        />
+        <PremiumLoader englishText="Gathering Analytics" />
       </div>
     );
   }
