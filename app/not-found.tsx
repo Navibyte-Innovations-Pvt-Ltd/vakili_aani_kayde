@@ -23,7 +23,7 @@ export default function NotFound() {
   const whatsappMessage = encodeURIComponent(
     `नमस्कार 🙏 वकिली आणि कायदे टीम,\nमला तुमच्या वेबसाईटवर एक तुटलेली लिंक आढळली.\n\n🔗 पान: ${currentUrl || pathname}\n\nकृपया हे तपासा. धन्यवाद!`,
   );
-  const whatsappLink = `https://wa.me/918149319058?text=${whatsappMessage}`;
+  const whatsappLink = process.env.NEXT_PUBLIC_WA_NUMBER ? `https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}?text=${whatsappMessage}` : '#';
 
   return (
     <div className="flex min-h-screen flex-col bg-brand-cream">
@@ -104,7 +104,7 @@ export default function NotFound() {
               size="lg"
               className="gap-2 rounded-xl bg-[#25D366] font-bold text-white shadow-lg shadow-[#25D366]/25 transition-all hover:bg-[#1da851] hover:shadow-[#25D366]/35 active:scale-[0.98]"
             >
-              <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+              <a href={whatsappLink} target={process.env.NEXT_PUBLIC_WA_NUMBER ? "_blank" : undefined} rel={process.env.NEXT_PUBLIC_WA_NUMBER ? "noopener noreferrer" : undefined}>
                 <svg
                   viewBox="0 0 24 24"
                   width="24"

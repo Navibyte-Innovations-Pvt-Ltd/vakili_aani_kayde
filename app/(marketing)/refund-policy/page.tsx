@@ -84,9 +84,13 @@ export default function RefundPolicyPage() {
             </div>
             <div>
               <p className="text-xs font-bold text-gray-500 uppercase">WhatsApp / Phone</p>
-              <a href="tel:+918149319058" className="font-bold text-brand-gold hover:underline">
-                +91 8149319058
-              </a>
+              {process.env.NEXT_PUBLIC_WA_NUMBER ? (
+                <a href={`tel:+${process.env.NEXT_PUBLIC_WA_NUMBER}`} className="font-bold text-brand-gold hover:underline">
+                  +{process.env.NEXT_PUBLIC_WA_NUMBER.replace(/^91/, "")}
+                </a>
+              ) : (
+                <span className="font-bold text-gray-400">Support unavailable</span>
+              )}
             </div>
           </div>
         </div>

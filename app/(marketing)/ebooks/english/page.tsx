@@ -4,6 +4,8 @@ import { BookOpen } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "English Legal Ebooks | Vakili Aani Kayde",
   description: "Browse simplified legal guides and ebooks in English. Property law, consumer rights, cyber fraud and more.",

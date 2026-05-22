@@ -19,6 +19,12 @@ export function getBaseUrl() {
         return `https://${process.env.VERCEL_URL}`;
     }
 
+    // Production canonical domain — never leak localhost in user-facing links
+    // (emails, WhatsApp) when env vars are missing.
+    if (process.env.NODE_ENV === "production") {
+        return "https://www.vakilianikayde.in";
+    }
+
     // Local fallback
     return "http://127.0.0.1:2222";
 }

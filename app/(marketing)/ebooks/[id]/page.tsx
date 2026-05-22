@@ -16,7 +16,7 @@ import { getEbookById, getComboEbooks } from "@/lib/data-access";
 import { SALE_CONFIG, getInflatedOriginalPrice } from "@/lib/sale-config";
 import { SaleTimer } from "@/components/marketing/sale-timer";
 
-export const revalidate = 86400;
+export const revalidate = 0;
 
 const LANGUAGE_LABELS: Record<string, string> = {
   MARATHI: "मराठी",
@@ -254,7 +254,7 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
     ],
   };
 
-  const waHelpUrl = `https://wa.me/918149319058?text=${encodeURIComponent(`${labels.waMessage} ${ebook.title}\nLink: https://www.vakilianikayde.in/ebooks/${ebook.id}`)}`;
+  const waHelpUrl = process.env.NEXT_PUBLIC_WA_NUMBER ? `https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}?text=${encodeURIComponent(`${labels.waMessage} ${ebook.title}\nLink: https://www.vakilianikayde.in/ebooks/${ebook.id}`)}` : '#';
 
   const ComboSection = ebook.isCombo && ebook.includedEbooks.length > 0 ? (() => {
     const individualTotal = ebook.includedEbooks.reduce((sum, b) => sum + Number(b.price), 0);

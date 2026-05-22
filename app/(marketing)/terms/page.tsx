@@ -24,7 +24,7 @@ export default function TermsPage() {
         <p><strong>Business Type:</strong> Digital Goods — Educational Ebooks (PDF only)</p>
         <p><strong>Address:</strong> Pune, Maharashtra, India</p>
         <p><strong>Email:</strong> vakilianikayde@gmail.com</p>
-        <p><strong>Phone:</strong> +91 8149319058</p>
+  <p><strong>Phone:</strong> {process.env.NEXT_PUBLIC_WA_NUMBER ? `+${process.env.NEXT_PUBLIC_WA_NUMBER.replace(/^91/, "")}` : "Support unavailable"}</p>
       </LegalInfoCard>
 
       <LegalSection number="१" title="अटींचा स्वीकार (Agreement to Terms)">
@@ -84,7 +84,7 @@ export default function TermsPage() {
         <div className="rounded-lg border border-gray-100 bg-gray-50 p-4 text-sm space-y-1">
           <p><strong>Platform:</strong> वकिली आणि कायदे (vakilianikayde.in)</p>
           <p><strong>Email:</strong> <a href="mailto:vakilianikayde@gmail.com" className="text-brand-gold hover:underline">vakilianikayde@gmail.com</a></p>
-          <p><strong>Phone:</strong> +91 8149319058</p>
+          <p><strong>Phone:</strong> {process.env.NEXT_PUBLIC_WA_NUMBER ? `+${process.env.NEXT_PUBLIC_WA_NUMBER.replace(/^91/, "")}` : "Support unavailable"}</p>
           <p><strong>Response:</strong> 48 तासांत (Within 48 hours)</p>
           <p><strong>Resolution:</strong> 30 दिवसांत (Within 30 days)</p>
         </div>
@@ -94,7 +94,7 @@ export default function TermsPage() {
         <address className="rounded-lg border border-gray-100 bg-gray-50 p-4 not-italic text-sm space-y-1">
           <p><strong>वकिली आणि कायदे (Vakili Aani Kayde)</strong></p>
           <p>Email: <a href="mailto:vakilianikayde@gmail.com" className="text-brand-gold hover:underline">vakilianikayde@gmail.com</a></p>
-          <p>Phone: <a href="tel:+918149319058" className="text-brand-gold hover:underline">+91 8149319058</a></p>
+          <p>Phone: {process.env.NEXT_PUBLIC_WA_NUMBER ? (<a href={`tel:+${process.env.NEXT_PUBLIC_WA_NUMBER}`} className="text-brand-gold hover:underline">+{process.env.NEXT_PUBLIC_WA_NUMBER.replace(/^91/, "")}</a>) : "Support unavailable"}</p>
           <p>Pune, Maharashtra, India</p>
         </address>
       </LegalSection>

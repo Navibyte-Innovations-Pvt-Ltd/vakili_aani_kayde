@@ -19,24 +19,28 @@ import {
 interface DownloadInstructionsProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  showTrigger?: boolean;
 }
 
 export function DownloadInstructions({
   open,
   onOpenChange,
+  showTrigger = true,
 }: DownloadInstructionsProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 gap-1.5 rounded-lg px-3 text-xs font-bold text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-        >
-          <HelpCircle className="h-3.5 w-3.5" />
-          PDF कुठे मिळेल?
-        </Button>
-      </DialogTrigger>
+      {showTrigger && (
+        <DialogTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 gap-1.5 rounded-lg px-3 text-xs font-bold text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+          >
+            <HelpCircle className="h-3.5 w-3.5" />
+            PDF कुठे मिळेल?
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="w-100 max-w-[90%] overflow-hidden rounded-2xl border-none p-0 outline-none sm:max-w-md">
         {/* Header with colored background */}
         <div className="bg-brand-teal/10 px-6 py-6 text-center">

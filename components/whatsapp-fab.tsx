@@ -14,12 +14,14 @@ export function WhatsAppFAB() {
   }, []);
 
   if (pathname?.startsWith("/ebooks/")) return null;
+  if (pathname === "/my-books") return null;
   if (!isVisible) return null;
+  if (!process.env.NEXT_PUBLIC_WA_NUMBER) return null;
 
   return (
     <div className="fixed right-4 bottom-(--whatsapp-bottom) z-40 md:right-6 md:bottom-8">
       <a
-        href={`https://wa.me/918149319058?text=${encodeURIComponent("नमस्कार 🙏 वकिली आणि कायदे टीम,\nमला तुमच्या ई-बुक्सबद्दल थोडी मदत हवी आहे. कृपया मार्गदर्शन करा.")}`}
+        href={`https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}?text=${encodeURIComponent("नमस्कार 🙏 वकिली आणि कायदे टीम,\nमला तुमच्या ई-बुक्सबद्दल थोडी मदत हवी आहे. कृपया मार्गदर्शन करा.")}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="WhatsApp वर संपर्क करा"

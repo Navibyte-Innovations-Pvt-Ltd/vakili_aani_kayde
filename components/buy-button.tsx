@@ -1040,7 +1040,7 @@ function CheckoutForm({
                   <span className="font-bold">Secured by Razorpay</span>
                 </div>
                 <a
-                  href={`https://wa.me/918149319058?text=${encodeURIComponent("नमस्कार 🙏 वकिली आणि कायदे टीम,\nमला ई-बुक खरेदी करताना मदत हवी आहे. कृपया मार्गदर्शन करा.")}`}
+                          href={process.env.NEXT_PUBLIC_WA_NUMBER ? `https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}?text=${encodeURIComponent("नमस्कार 🙏 वकिली आणि कायदे टीम,\nमला ई-बुक खरेदी करताना मदत हवी आहे. कृपया मार्गदर्शन करा.")}` : '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 rounded-full border border-green-100 bg-green-50 px-2.5 py-1 text-[10px] font-bold text-green-700 transition-colors hover:bg-green-100"

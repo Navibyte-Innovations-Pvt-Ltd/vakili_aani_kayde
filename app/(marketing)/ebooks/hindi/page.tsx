@@ -4,6 +4,8 @@ import { BookOpen } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "हिंदी कानूनी पुस्तकें | वकिली आणि कायदे",
   description: "हिंदी में सरल भाषा में कानूनी मार्गदर्शक ई-बुक्स.",

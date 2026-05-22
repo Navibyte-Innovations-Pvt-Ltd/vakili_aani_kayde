@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Scale, ShieldCheck, Star, Users } from "lucide-react";
+import { Scale } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 
 export function HeroSection() {
@@ -58,42 +58,15 @@ export function HeroSection() {
                         className="h-13 min-w-48 rounded-lg border-2 border-brand-teal px-8 text-base font-bold text-brand-teal transition-all duration-200 hover:bg-brand-teal hover:text-white active:scale-[0.98]"
                     >
                         <Link
-                            href="https://wa.me/918149319058"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            href={process.env.NEXT_PUBLIC_WA_NUMBER ? `https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}` : '#'}
+                            target={process.env.NEXT_PUBLIC_WA_NUMBER ? "_blank" : undefined}
+                            rel={process.env.NEXT_PUBLIC_WA_NUMBER ? "noopener noreferrer" : undefined}
                             className="flex items-center gap-2"
                         >
                             <FaWhatsapp className="h-4 w-4" />
                             Support साठी WhatsApp
                         </Link>
                     </Button>
-                </div>
-
-                {/* Trust strip */}
-                <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-2xl border border-gray-100 bg-gray-50/80 px-6 py-4 shadow-sm sm:flex-row sm:justify-around">
-                    <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-brand-gold" />
-                        <div className="text-left">
-                            <p className="text-sm font-black text-brand-teal">1000+</p>
-                            <p className="text-[10px] text-slate-500">वाचक</p>
-                        </div>
-                    </div>
-                    <div className="hidden h-8 w-px bg-gray-200 sm:block" />
-                    <div className="flex items-center gap-2">
-                        <Star className="h-4 w-4 fill-brand-gold text-brand-gold" />
-                        <div className="text-left">
-                            <p className="text-sm font-black text-brand-teal">4.8 / 5</p>
-                            <p className="text-[10px] text-slate-500">रेटिंग</p>
-                        </div>
-                    </div>
-                    <div className="hidden h-8 w-px bg-gray-200 sm:block" />
-                    <div className="flex items-center gap-2">
-                        <ShieldCheck className="h-4 w-4 text-brand-gold" />
-                        <div className="text-left">
-                            <p className="text-sm font-black text-brand-teal">100%</p>
-                            <p className="text-[10px] text-slate-500">अधिकृत माहिती</p>
-                        </div>
-                    </div>
                 </div>
 
                 {/* Instant delivery badge */}

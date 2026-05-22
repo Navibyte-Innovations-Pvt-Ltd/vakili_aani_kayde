@@ -18,16 +18,16 @@ const CONTACT_ITEMS = [
   {
     icon: MessageCircle,
     label: "WhatsApp",
-    value: "+91 8149319058",
+    value: process.env.NEXT_PUBLIC_WA_NUMBER ? `+${process.env.NEXT_PUBLIC_WA_NUMBER.replace(/^91/, "")}` : "Support unavailable",
     sub: "जलद मदतीसाठी",
-    href: "https://wa.me/918149319058",
+    href: process.env.NEXT_PUBLIC_WA_NUMBER ? `https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}` : null,
   },
   {
     icon: Phone,
     label: "Phone",
-    value: "+91 8149319058",
+    value: process.env.NEXT_PUBLIC_WA_NUMBER ? `+${process.env.NEXT_PUBLIC_WA_NUMBER.replace(/^91/, "")}` : "Support unavailable",
     sub: "सोम–शनि, सकाळी ९ – संध्या ६",
-    href: "tel:+918149319058",
+    href: process.env.NEXT_PUBLIC_WA_NUMBER ? `tel:+${process.env.NEXT_PUBLIC_WA_NUMBER}` : null,
   },
   {
     icon: MapPin,

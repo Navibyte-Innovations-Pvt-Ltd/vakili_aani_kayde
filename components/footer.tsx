@@ -67,15 +67,12 @@ export function Footer() {
               <Instagram className="h-4 w-4" />
               Instagram
             </a>
-            <a
-              href="https://wa.me/918149319058"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-[#25D366] hover:text-white"
-            >
-              <MessageCircle className="h-4 w-4" />
-              WhatsApp
-            </a>
+              {process.env.NEXT_PUBLIC_WA_NUMBER ? (
+                <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}`} className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-[#25D366] hover:text-white">
+                  <MessageCircle className="h-4 w-4" />
+                  WhatsApp
+                </a>
+              ) : null}
             <a
               href="mailto:vakilianikayde@gmail.com"
               className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-white/20"
@@ -156,24 +153,28 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a
-                  href="tel:+918149319058"
-                  className="flex items-start gap-3 text-sm text-white/60 transition-colors hover:text-white"
-                >
-                  <Phone className="mt-0.5 h-4 w-4 shrink-0 text-brand-gold/60" />
-                  +91 8149319058
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://wa.me/918149319058"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-start gap-3 text-sm text-white/60 transition-colors hover:text-white"
-                >
-                  <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-brand-gold/60" />
-                  WhatsApp Support
-                </a>
+                  {process.env.NEXT_PUBLIC_WA_NUMBER ? (
+                    <>
+                      <a
+                        href={`tel:+${process.env.NEXT_PUBLIC_WA_NUMBER}`}
+                        className="flex items-start gap-3 text-sm text-white/60 transition-colors hover:text-white"
+                      >
+                        <Phone className="mt-0.5 h-4 w-4 shrink-0 text-brand-gold/60" />
+                        कॉल करा
+                      </a>
+                      <a
+                        href={`https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}?text=${encodeURIComponent("नमस्कार 🙏 वकिली आणि कायदे टीम,\nमला माझी पुस्तके डाऊनलोड करण्यास मदत हवी आहे. कृपया मार्गदर्शन करा.")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-start gap-3 text-sm text-white/60 transition-colors hover:text-white"
+                      >
+                        <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-brand-gold/60" />
+                        WhatsApp वर मदत घ्या
+                      </a>
+                    </>
+                  ) : (
+                    <div className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-gray-100 px-8 text-sm font-bold text-gray-500">Support unavailable</div>
+                  )}
               </li>
               <li className="flex items-start gap-3 text-sm text-white/50">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-gold/60" />

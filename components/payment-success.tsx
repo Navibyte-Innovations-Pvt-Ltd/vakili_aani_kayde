@@ -179,9 +179,9 @@ export function PaymentSuccess({
                 className="group h-14 w-full rounded-2xl border-none bg-[#25D366] font-bold text-white shadow-lg shadow-green-500/20 transition-all hover:bg-[#20bd5a] active:scale-[0.98]"
               >
                 <a
-                  href={`https://wa.me/918149319058?text=${encodeURIComponent(whatsappMessage)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={process.env.NEXT_PUBLIC_WA_NUMBER ? `https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}?text=${encodeURIComponent(whatsappMessage)}` : '#'}
+                  target={process.env.NEXT_PUBLIC_WA_NUMBER ? "_blank" : undefined}
+                  rel={process.env.NEXT_PUBLIC_WA_NUMBER ? "noopener noreferrer" : undefined}
                   className="flex items-center justify-center gap-3"
                 >
                   <svg

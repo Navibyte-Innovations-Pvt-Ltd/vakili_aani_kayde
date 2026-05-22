@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma_db } from "@/lib/prisma";
-import { getBaseUrl } from "@/lib/base-url";
 
 export async function POST(req: NextRequest) {
     try {
@@ -11,7 +10,6 @@ export async function POST(req: NextRequest) {
         }
 
         const cleanedQuery = query.trim();
-        const baseUrl = getBaseUrl();
 
         // Find PAID orders matching email or phone
         const rawOrders = await prisma_db.order.findMany({
@@ -51,7 +49,9 @@ export async function POST(req: NextRequest) {
                 // Use the permanent /d/SHORTCODE URL — resolves to fresh CloudFront URL on click
                 // Use shortCode if present; fall back to ebook id (resolved by /d route)
                 const code = ebook.shortCode || ebook.id;
-                const url = `${baseUrl}/d/${code}`;
+                // Return a relative path; client builds absolute URL from window.location.origin
+                // so production links never leak the server's dev/fallback host.
+                const url = `/d/${code}`;
 
                 return {
                     title: ebook.title,

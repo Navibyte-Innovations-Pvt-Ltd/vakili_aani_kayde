@@ -11,16 +11,13 @@ import {
   Download,
   Search,
   Loader2,
-  ArrowLeft,
   FileText,
   CheckCircle2,
   ShieldCheck,
   Phone,
   RefreshCw,
-  Scale,
 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
-import Link from "next/link";
 import { format } from "date-fns";
 import { ComboCarousel } from "./combo-carousel";
 import { DownloadInstructions } from "./_components/download-instructions";
@@ -38,7 +35,21 @@ interface Order {
   }[];
 }
 
-const WA_NUMBER = "918149319058";
+const WA_NUMBER = process.env.NEXT_PUBLIC_WA_NUMBER || "";
+
+// API returns relative /d/CODE paths. Build absolute URLs from the real browser
+// origin so shared/WhatsApp links always point at the production domain.
+function withAbsoluteUrls(orders: Order[]): Order[] {
+  if (typeof window === "undefined") return orders;
+  const origin = window.location.origin;
+  return orders.map((order) => ({
+    ...order,
+    items: order.items.map((item) => ({
+      ...item,
+      url: item.url.startsWith("http") ? item.url : `${origin}${item.url}`,
+    })),
+  }));
+}
 
 export default function MyBooksPage() {
   const [query, setQuery] = useState("");
@@ -67,7 +78,7 @@ export default function MyBooksPage() {
       if (res.status === 429) throw new Error("खूप जास्त वेळा प्रयत्न केले गेले आहेत. कृपया थोड्या वेळाने प्रयत्न करा.");
       if (!res.ok) throw new Error("काहीतरी चूक झाली. कृपया पुन्हा प्रयत्न करा.");
       const data = await res.json();
-      setOrders(data.orders);
+      setOrders(withAbsoluteUrls(data.orders));
       if (data.orders.length > 0 && !justPurchasedOrder) {
         toast.success(`${data.orders.length} पुस्तके सापडली!`);
         localStorage.setItem("customer_phone", searchTerm.trim());
@@ -132,7 +143,7 @@ export default function MyBooksPage() {
                 const paidOrder = pendingOrderId ? data.orders?.find((o: Order) => o.id === pendingOrderId) : data.orders?.length > 0;
                 if (paidOrder) {
                   if (pollIntervalId !== null) clearInterval(pollIntervalId);
-                  setOrders(data.orders);
+                  setOrders(withAbsoluteUrls(data.orders));
                   toast.success("खरेदी यशस्वी! तुमचे पुस्तक तयार आहे.", { id: "pending-poll" });
                   confetti({ particleCount: 100, spread: 60, origin: { y: 0.6 } });
                 }
@@ -167,24 +178,8 @@ export default function MyBooksPage() {
   return (
     <div className="flex min-h-screen flex-col bg-[#F5F5F0]">
 
-      {/* Header */}
-      <header className="sticky top-25 z-40 bg-brand-teal shadow-md">
-        <div className="mx-auto flex max-w-2xl items-center gap-3 px-4 py-3.5">
-          <Link href="/" className="rounded-lg p-1.5 text-white/50 transition-colors hover:bg-white/10 hover:text-white active:scale-95">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-          <div className="flex items-center gap-2.5 flex-1">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-gold/20">
-              <Scale className="h-4 w-4 text-brand-gold" />
-            </div>
-            <div>
-              <h1 className="text-sm font-black leading-none text-white">My Books</h1>
-              <span className="text-[9px] font-bold tracking-widest text-white/35 uppercase">Digital Library</span>
-            </div>
-          </div>
-          <DownloadInstructions open={showInstructions} onOpenChange={setShowInstructions} />
-        </div>
-      </header>
+      {/* Help dialog kept mounted (auto-opens after purchase / on download click) */}
+      <DownloadInstructions open={showInstructions} onOpenChange={setShowInstructions} showTrigger={false} />
 
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-5 md:max-w-4xl">
 
@@ -208,7 +203,7 @@ export default function MyBooksPage() {
                 {justPurchasedItem ? (
                   <div className="flex w-full flex-col gap-2">
                     <Button asChild size="lg" className="w-full rounded-xl bg-brand-gold font-black text-white shadow-lg active:scale-95">
-                      <a href={justPurchasedItem.url} target="_blank" rel="noopener noreferrer">
+                      <a href={`${justPurchasedItem.url}?dl=1`} rel="noopener noreferrer">
                         <Download className="mr-2 h-4 w-4" />
                         Download PDF
                       </a>
@@ -249,14 +244,20 @@ export default function MyBooksPage() {
 
         {/* Quick actions */}
         <div className="mb-5 flex gap-2">
-          <a href="tel:+918149319058" className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-white py-2.5 text-xs font-bold text-brand-teal shadow-sm transition-all hover:border-brand-teal/30 active:scale-95">
-            <Phone className="h-3.5 w-3.5" />
-            Call Us
-          </a>
-          <a href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent("नमस्कार 🙏 वकिली आणि कायदे टीम,\nमला माझी पुस्तके डाऊनलोड करताना मदत हवी आहे. कृपया मार्गदर्शन करा.")}`} target="_blank" rel="noopener noreferrer" className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-green-100 bg-white py-2.5 text-xs font-bold text-green-600 shadow-sm transition-all hover:border-green-300 active:scale-95">
-            <FaWhatsapp className="h-3.5 w-3.5" />
-            WhatsApp Help
-          </a>
+          {process.env.NEXT_PUBLIC_WA_NUMBER ? (
+            <>
+              <a href={`tel:+${process.env.NEXT_PUBLIC_WA_NUMBER}`} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-white py-2.5 text-xs font-bold text-brand-teal shadow-sm transition-all hover:border-brand-teal/30 active:scale-95">
+                <Phone className="h-3.5 w-3.5" />
+                Call Us
+              </a>
+              <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}?text=${encodeURIComponent("नमस्कार 🙏 वकिली आणि कायदे टीम,\nमला माझी पुस्तके डाऊनलोड करताना मदत हवी आहे. कृपया मार्गदर्शन करा.")}`} target="_blank" rel="noopener noreferrer" className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-green-100 bg-white py-2.5 text-xs font-bold text-green-600 shadow-sm transition-all hover:border-green-300 active:scale-95">
+                <FaWhatsapp className="h-3.5 w-3.5" />
+                WhatsApp Help
+              </a>
+            </>
+          ) : (
+            <div className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-gray-100 bg-white/60 py-2.5 text-xs font-bold text-gray-500 shadow-sm">Support unavailable</div>
+          )}
         </div>
 
         {/* Finalizing */}
@@ -331,7 +332,7 @@ export default function MyBooksPage() {
                           <FaWhatsapp className="h-3.5 w-3.5" />
                           Save Link
                         </a>
-                        <a href={item.url} target="_blank" rel="noopener noreferrer"
+                        <a href={`${item.url}?dl=1`} rel="noopener noreferrer"
                           className="flex items-center justify-center gap-1.5 rounded-xl bg-brand-teal py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-brand-teal/90 active:scale-95"
                           onClick={() => setShowInstructions(true)}>
                           <Download className="h-3.5 w-3.5" />
@@ -373,15 +374,21 @@ export default function MyBooksPage() {
       {/* Support footer */}
       <footer className="border-t border-gray-100 bg-white px-4 py-8 pb-24 text-center md:pb-8">
         <p className="mb-4 text-xs font-bold text-gray-400">मदत हवी? आम्ही येथे आहोत.</p>
-        <div className="flex flex-col justify-center gap-3 sm:flex-row">
-          <a href="tel:+918149319058" className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-brand-teal px-8 text-sm font-bold text-white shadow-lg shadow-brand-teal/20 transition-transform hover:-translate-y-0.5 active:scale-95">
-            <Phone className="h-4 w-4" />
-            कॉल करा (+91 8149319058)
-          </a>
-          <a href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent("नमस्कार 🙏 वकिली आणि कायदे टीम,\nमला माझी पुस्तके डाऊनलोड करण्यास मदत हवी आहे. कृपया मार्गदर्शन करा.")}`} target="_blank" rel="noopener noreferrer" className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-[#25D366] px-8 text-sm font-bold text-white shadow-lg shadow-green-500/20 transition-transform hover:-translate-y-0.5 active:scale-95">
-            <FaWhatsapp className="h-4 w-4" />
-            WhatsApp वर मदत घ्या
-          </a>
+            <div className="flex flex-col justify-center gap-3 sm:flex-row">
+          {process.env.NEXT_PUBLIC_WA_NUMBER ? (
+            <>
+              <a href={`tel:+${process.env.NEXT_PUBLIC_WA_NUMBER}`} className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-brand-teal px-8 text-sm font-bold text-white shadow-lg shadow-brand-teal/20 transition-transform hover:-translate-y-0.5 active:scale-95">
+                <Phone className="h-4 w-4" />
+                कॉल करा
+              </a>
+              <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}?text=${encodeURIComponent("नमस्कार 🙏 वकिली आणि कायदे टीम,\nमला माझी पुस्तके डाऊनलोड करण्यास मदत हवी आहे. कृपया मार्गदर्शन करा.")}`} target="_blank" rel="noopener noreferrer" className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-[#25D366] px-8 text-sm font-bold text-white shadow-lg shadow-green-500/20 transition-transform hover:-translate-y-0.5 active:scale-95">
+                <FaWhatsapp className="h-4 w-4" />
+                WhatsApp वर मदत घ्या
+              </a>
+            </>
+          ) : (
+            <div className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-gray-100 px-8 text-sm font-bold text-gray-500">Support unavailable</div>
+          )}
         </div>
       </footer>
     </div>
