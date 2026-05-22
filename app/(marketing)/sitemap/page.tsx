@@ -11,7 +11,6 @@ const sitemapLinks = [
         category: "Main",
         links: [
             { name: "Home (मुख्य पृष्ठ)", href: "/" },
-            { name: "About Us (आमच्याबद्दल)", href: "/about" },
             { name: "Contact (संपर्क)", href: "/contact" },
         ],
     },

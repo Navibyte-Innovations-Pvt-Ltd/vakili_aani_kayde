@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Menu, Phone, Scale, X, BookOpen, Home, Info, Library, Download, ArrowRight } from "lucide-react";
+import { Menu, Phone, Scale, X, BookOpen, Home, Library, Download, ArrowRight } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { GlobalSearch } from "./global-search";
@@ -19,7 +19,6 @@ const NAV_LINKS = [
     icon: Library,
     badge: "Sale",
   },
-  { href: "/about", label: "About", sub: "About", icon: Info },
 ];
 
 export function Navbar() {
@@ -87,12 +86,6 @@ export function Navbar() {
                 <span className="absolute bottom-0 left-3 right-3 h-0.5 origin-left scale-x-0 rounded-full bg-brand-gold transition-transform duration-200 group-hover:scale-x-100" />
               </Link>
             ))}
-            <Link
-              href="/my-books"
-              className="group relative ml-1 flex items-center gap-1 rounded-lg border border-brand-teal/20 px-3 py-1.5 text-sm font-bold text-brand-teal transition-all hover:border-brand-gold/40 hover:bg-brand-gold/5 hover:text-brand-teal"
-            >
-              📚 My Books
-            </Link>
           </div>
 
           {/* Right: search + CTA */}

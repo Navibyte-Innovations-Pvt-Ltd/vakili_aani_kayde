@@ -253,7 +253,7 @@ export default function MyBooksPage() {
             <Phone className="h-3.5 w-3.5" />
             Call Us
           </a>
-          <a href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent("Hello, I need help downloading my books.")}`} target="_blank" rel="noopener noreferrer" className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-green-100 bg-white py-2.5 text-xs font-bold text-green-600 shadow-sm transition-all hover:border-green-300 active:scale-95">
+          <a href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent("नमस्कार 🙏 वकिली आणि कायदे टीम,\nमला माझी पुस्तके डाऊनलोड करताना मदत हवी आहे. कृपया मार्गदर्शन करा.")}`} target="_blank" rel="noopener noreferrer" className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-green-100 bg-white py-2.5 text-xs font-bold text-green-600 shadow-sm transition-all hover:border-green-300 active:scale-95">
             <FaWhatsapp className="h-3.5 w-3.5" />
             WhatsApp Help
           </a>
@@ -354,7 +354,7 @@ export default function MyBooksPage() {
               <p className="font-black text-gray-700">No books found</p>
               <p className="mt-1 text-xs text-gray-400">Check your number or contact support.</p>
             </div>
-            <button onClick={() => window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`Hello, I paid for a book but it's not showing. My number: ${query || "N/A"}`)}`, '_blank')}
+            <button onClick={() => window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`नमस्कार 🙏 वकिली आणि कायदे टीम,\nमी पुस्तकाचे पैसे भरले आहेत, पण ते माझ्या खात्यात दिसत नाही.\n📱 माझा नंबर: ${query || "N/A"}\nकृपया तपासा.`)}`, '_blank')}
               className="rounded-xl border border-dashed border-gray-300 px-4 py-2.5 text-xs font-bold text-gray-500 transition-colors hover:border-brand-teal hover:text-brand-teal active:scale-95">
               I paid but book is missing?
             </button>
@@ -378,7 +378,7 @@ export default function MyBooksPage() {
             <Phone className="h-4 w-4" />
             कॉल करा (+91 8149319058)
           </a>
-          <a href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent("नमस्कार, मला माझी पुस्तके डाऊनलोड करण्यास मदत हवी आहे.")}`} target="_blank" rel="noopener noreferrer" className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-[#25D366] px-8 text-sm font-bold text-white shadow-lg shadow-green-500/20 transition-transform hover:-translate-y-0.5 active:scale-95">
+          <a href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent("नमस्कार 🙏 वकिली आणि कायदे टीम,\nमला माझी पुस्तके डाऊनलोड करण्यास मदत हवी आहे. कृपया मार्गदर्शन करा.")}`} target="_blank" rel="noopener noreferrer" className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-[#25D366] px-8 text-sm font-bold text-white shadow-lg shadow-green-500/20 transition-transform hover:-translate-y-0.5 active:scale-95">
             <FaWhatsapp className="h-4 w-4" />
             WhatsApp वर मदत घ्या
           </a>

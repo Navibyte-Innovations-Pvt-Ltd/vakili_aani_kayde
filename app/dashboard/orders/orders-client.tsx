@@ -186,7 +186,7 @@ export function OrdersClient({ orders, loadedAt }: OrdersClientProps) {
 
             const data = await res.json() as { phone: string; customerName: string; downloadLink: string };
             const { phone, customerName, downloadLink } = data;
-            const text = `नमस्कार ${customerName || ""},%0Aकायद्यांच आणि फायद्यांच मधून खरेदी केल्याबद्दल धन्यवाद!%0A%0A⬇️ *डाउनलोड करा:*%0A${downloadLink}%0A%0A(या लिंक्स ७ दिवसांसाठी वैध आहेत)%0A💡 टीप: PDF तुमच्या मोबाईलच्या Downloads किंवा Documents फोल्डरमध्ये डाउनलोड होईल.%0A%0Aधन्यवाद!`;
+            const text = `नमस्कार ${customerName || ""} 🙏,%0Aवकिली आणि कायदे मधून खरेदी केल्याबद्दल मनःपूर्वक धन्यवाद!%0A%0A⬇️ *डाउनलोड करा:*%0A${downloadLink}%0A%0A(या लिंक्स ७ दिवसांसाठी वैध आहेत)%0A💡 टीप: PDF तुमच्या मोबाईलच्या Downloads किंवा Documents फोल्डरमध्ये डाउनलोड होईल.%0A%0Aधन्यवाद!`;
             window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
             toast.success("WhatsApp opened!");
         } catch (err) {

@@ -21,7 +21,7 @@ export default function NotFound() {
   }, []);
 
   const whatsappMessage = encodeURIComponent(
-    `Hello, I found a broken link on your website.\n\nPage: ${currentUrl || pathname}\n\nPlease check this.`,
+    `नमस्कार 🙏 वकिली आणि कायदे टीम,\nमला तुमच्या वेबसाईटवर एक तुटलेली लिंक आढळली.\n\n🔗 पान: ${currentUrl || pathname}\n\nकृपया हे तपासा. धन्यवाद!`,
   );
   const whatsappLink = `https://wa.me/918149319058?text=${whatsappMessage}`;
 
