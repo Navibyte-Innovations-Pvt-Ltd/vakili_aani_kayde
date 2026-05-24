@@ -3,7 +3,8 @@ import { auth } from "@/lib/auth";
 import { prisma_db } from "@/lib/prisma";
 import { uploadToS3, uploadPrivateFile, fetchPdfBuffer } from "@/lib/s3";
 import { mergePDFs } from "@/lib/pdf-watermark";
-import { revalidateTag } from "next/cache";
+import { revalidateTag, revalidatePath } from "next/cache";
+
 import { CACHE_TAGS } from "@/lib/data-access";
 
 type CreateEbookJson = {
@@ -220,7 +221,11 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        revalidateTag(CACHE_TAGS.EBOOKS, "default"); // Force-refresh all cached ebook pages
+        revalidateTag(CACHE_TAGS.EBOOKS, "default");
+        // Revalidate all public ebook listing pages so new book appears immediately
+        revalidatePath("/ebooks", "page");
+        revalidatePath("/ebooks/hindi", "page");
+        revalidatePath("/ebooks/english", "page");
         return NextResponse.json(ebook);
     } catch (error) {
         console.error("[EBOOKS_POST]", error);
