@@ -117,17 +117,19 @@ async function SuccessPageContent({ searchParams }: { searchParams: Promise<{ or
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-            {/* Meta Pixel Purchase Tracking */}
+            {/* Meta Pixel Purchase — fires once on confirmed payment */}
             <script
                 dangerouslySetInnerHTML={{
                     __html: `
                         if (window.fbq) {
                             fbq('track', 'Purchase', {
-                                value: ${order.amount},
+                                value: ${Number(order.amount)},
                                 currency: 'INR',
-                                content_name: '${title.replace(/'/g, "\\'")}',
+                                content_ids: ${JSON.stringify(order.items.map(i => i.ebookId))},
                                 content_type: 'product',
-                                content_ids: ${JSON.stringify(order.items.map(i => i.ebookId))}
+                                num_items: ${order.items.length}
+                            }, {
+                                eventID: '${order.id}'
                             });
                         }
                     `

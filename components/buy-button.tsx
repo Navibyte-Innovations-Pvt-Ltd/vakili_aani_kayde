@@ -171,6 +171,7 @@ declare global {
       command: string,
       event: string,
       params?: Record<string, unknown>,
+      options?: Record<string, unknown>,
     ) => void;
     opera?: unknown;
     MSStream?: unknown;
@@ -380,30 +381,26 @@ export function BuyButton({
   // Track when user clicks buy button (InitiateCheckout)
   function handleBuyClick() {
     if (typeof window !== "undefined" && window.fbq) {
-      window.fbq("track", "InitiateCheckout", {
-        value: price,
-        currency: "INR",
-        content_name: title,
-        content_type: "product",
-        content_ids: [ebookId],
-      });
+      const eventId = `ic_${ebookId}_${Date.now()}`;
+      window.fbq(
+        "track",
+        "InitiateCheckout",
+        {
+          value: price,
+          currency: "INR",
+          content_name: title,
+          content_type: "product",
+          content_ids: [ebookId],
+          num_items: 1,
+        },
+        { eventID: eventId },
+      );
     }
     setOpen(true);
   }
 
   async function onPaymentSubmit(data: CheckoutFormValues) {
     setLoading(true);
-
-    // Track when user submits payment form (AddPaymentInfo)
-    if (typeof window !== "undefined" && window.fbq) {
-      window.fbq("track", "AddPaymentInfo", {
-        value: price,
-        currency: "INR",
-        content_name: title,
-        content_type: "product",
-        content_ids: [ebookId],
-      });
-    }
 
     const { name = "", email = "", phone } = data;
 

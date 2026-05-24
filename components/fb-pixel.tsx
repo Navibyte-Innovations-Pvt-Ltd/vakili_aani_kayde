@@ -6,7 +6,13 @@ import { useEffect, useState } from "react";
 
 declare global {
     interface Window {
-        fbq?: (command: string, event: string, params?: Record<string, unknown>) => void;
+        fbq?: (
+            command: string,
+            event: string,
+            params?: Record<string, unknown>,
+            options?: Record<string, unknown>,
+        ) => void;
+        _fbq?: unknown;
     }
 }
 
@@ -16,6 +22,7 @@ export const FacebookPixel = () => {
     const [loaded, setLoaded] = useState(false);
     const pathname = usePathname();
 
+    // Fire PageView on every client-side navigation
     useEffect(() => {
         if (loaded && window.fbq) {
             window.fbq("track", "PageView");
@@ -37,12 +44,27 @@ export const FacebookPixel = () => {
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '${FB_PIXEL_ID}');
+
+            // Advanced Matching: pass known user data so Meta can attribute
+            // returning visitors even without 3rd-party cookies.
+            // Meta accepts raw PII here and hashes it on their end.
+            (function() {
+              var userData = {};
+              try {
+                var ph = localStorage.getItem('customer_phone');
+                var em = localStorage.getItem('customer_email');
+                if (ph) userData.ph = ph;
+                if (em) userData.em = em;
+              } catch(e) {}
+              fbq('init', '${FB_PIXEL_ID}', userData);
+            })();
+
             fbq('track', 'PageView');
           `,
                 }}
                 onLoad={() => setLoaded(true)}
             />
+            {/* Fallback for browsers with JS disabled */}
             <noscript>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img

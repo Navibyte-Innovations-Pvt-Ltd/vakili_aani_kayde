@@ -122,13 +122,11 @@ export default function MyBooksPage() {
         if (phoneToSearch) performSearch(phoneToSearch);
         if (isMobile) setTimeout(() => setShowInstructions(true), 2500);
         if (amount > 0) {
-          const trackPurchase = () => { if (window.fbq) window.fbq("track", "Purchase", { currency, value: amount, content_name: title, content_type: "product", content_ids: ebookId ? [ebookId] : undefined }); };
-          trackPurchase();
-          if (!window.fbq) setTimeout(trackPurchase, 1500);
           setIsFinalizing(true);
           setTimeout(() => setIsFinalizing(false), 3000);
           toast.success("खरेदी यशस्वी! तुमचे पुस्तक खालील आहे.");
         }
+
       } else if (params.get("payment_pending") === "true") {
         const pendingOrderId = params.get("orderId");
         const phoneToSearch = paramPhone || localStorage.getItem("customer_phone");

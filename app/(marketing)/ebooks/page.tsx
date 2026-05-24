@@ -1,6 +1,6 @@
 import { getEbooks } from "@/lib/data-access";
 import { EbookCatalog } from "@/components/marketing/ebook-catalog";
-import { PixelCatalogView } from "./_components/pixel-catalog-view";
+
 import { BookOpen } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -35,7 +35,6 @@ export default async function EbooksPage() {
   return (
     <div className="min-h-screen bg-brand-cream">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <PixelCatalogView totalCount={ebooks.length} category="all" />
 
       {/* Language tabs */}
       <div className="border-b border-gray-100 bg-white px-4">
