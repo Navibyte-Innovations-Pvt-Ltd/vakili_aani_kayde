@@ -218,4 +218,19 @@
   .animate-pulse-slow {
     animation: pulse-slow 5s ease-in-out infinite;
   }
+
+  @keyframes click-tap {
+    0%, 60%, 100% {
+      transform: scale(1) rotate(0deg);
+    }
+    70% {
+      transform: scale(0.75) rotate(-8deg);
+    }
+    80% {
+      transform: scale(1.15) rotate(0deg);
+    }
+    90% {
+      transform: scale(0.95) rotate(0deg);
+    }
+  }
 }

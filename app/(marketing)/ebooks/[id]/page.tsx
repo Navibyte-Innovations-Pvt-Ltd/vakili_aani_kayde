@@ -341,83 +341,83 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
           ════════════════════════════════ */}
       <div className="md:hidden">
 
-        {/* Hero card: cover thumbnail + title/price/buy */}
-        <div className="bg-white">
-          <div className="flex gap-4 p-4">
-            {/* Cover — fixed dimensions, not aspect-ratio stretched */}
-            <div className="relative w-30 shrink-0 self-start overflow-hidden rounded-xl shadow-lg" style={{ aspectRatio: "3/4" }}>
-              {ebook.coverImage
-                ? <Image src={ebook.coverImage} alt={ebook.title} fill unoptimized priority className="object-cover" />
-                : <div className="flex h-full w-full items-center justify-center bg-gray-100"><BookOpen className="h-8 w-8 text-gray-300" /></div>}
-              {isSaleActive && (
-                <div className="absolute top-1.5 left-1.5 rounded-md bg-red-500 px-1.5 py-0.5 text-[9px] font-black text-white">SALE</div>
-              )}
-            </div>
+        {/* Full-width image carousel */}
+        <div className="relative bg-gray-100 px-3 pt-3">
+          <EbookGallery coverImage={ebook.coverImage} sampleImages={ebook.sampleImages ?? []} title={ebook.title} />
+        </div>
 
-            {/* Info */}
-            <div className="flex min-w-0 flex-1 flex-col gap-2">
-              {/* Tags */}
-              <div className="flex flex-wrap gap-1">
-                <span className="rounded-full border border-brand-teal/15 bg-brand-teal/8 px-2 py-0.5 text-[9px] font-bold text-brand-teal">
-                  {LANGUAGE_LABELS[ebook.language ?? "MARATHI"]} PDF
-                </span>
-                {ebook.isCombo && <span className="rounded-full bg-purple-100 px-2 py-0.5 text-[9px] font-bold text-purple-700">Combo</span>}
-              </div>
+        {/* Info card below carousel */}
+        <div className="bg-white px-4 pb-3 pt-3">
+          {/* Tags */}
+          <div className="mb-2 flex flex-wrap gap-1.5">
+            <span className="rounded-full border border-brand-teal/20 bg-brand-teal/8 px-2.5 py-0.5 text-[10px] font-bold text-brand-teal">
+              {LANGUAGE_LABELS[ebook.language ?? "MARATHI"]} PDF
+            </span>
+            {ebook.isCombo && <span className="rounded-full bg-purple-100 px-2.5 py-0.5 text-[10px] font-bold text-purple-700">Combo</span>}
+            {isSaleActive && <span className="rounded-full bg-red-500 px-2.5 py-0.5 text-[10px] font-black text-white">SALE</span>}
+          </div>
 
-              {/* Title */}
-              <h1 className="text-sm font-black leading-tight text-brand-teal line-clamp-4">{ebook.title}</h1>
+          {/* Title */}
+          <h1 className="mb-2 text-base font-black leading-snug text-brand-teal">{ebook.title}</h1>
 
-              {/* Stars */}
-              <div className="flex items-center gap-1 text-[10px]">
-                {[1,2,3,4,5].map(i => <span key={i} className="text-brand-gold text-[11px]">★</span>)}
-                <span className="ml-0.5 font-bold text-gray-700">4.8</span>
-                <span className="text-gray-300">·</span>
-                <span className="text-gray-500">10k+ {labels.socialProof}</span>
-              </div>
+          {/* Stars + social proof */}
+          <div className="mb-2.5 flex items-center gap-1 text-[11px]">
+            {[1,2,3,4,5].map(i => <span key={i} className="text-brand-gold text-[12px]">★</span>)}
+            <span className="ml-0.5 font-bold text-gray-700">4.8</span>
+            <span className="text-gray-300 mx-0.5">·</span>
+            <span className="text-gray-500">10k+ {labels.socialProof}</span>
+          </div>
 
-              {/* Price */}
-              <div className="flex items-center gap-2">
-                <span className={`text-2xl font-black leading-none ${isSaleActive ? "text-red-500" : "text-brand-teal"}`}>₹{finalPrice}</span>
-                <div className="flex flex-col">
-                  <span className="text-[10px] text-gray-300 line-through">₹{crossedPrice}</span>
-                  <span className={`rounded px-1 py-0.5 text-[9px] font-black leading-none ${isSaleActive ? "bg-red-100 text-red-600" : "bg-brand-gold/15 text-brand-gold"}`}>{discountPercent}% off</span>
-                </div>
-              </div>
-
-              {/* Quick pills */}
-              <div className="flex flex-wrap gap-1">
-                {ebook.pages && ebook.pages > 0 && <span className="flex items-center gap-0.5 text-[10px] font-medium text-gray-400"><BookOpen className="h-3 w-3" />{ebook.pages}p</span>}
-                <span className="flex items-center gap-0.5 text-[10px] font-medium text-brand-teal"><Zap className="h-3 w-3" />Instant PDF</span>
-              </div>
+          {/* Price */}
+          <div className="mb-2.5 flex items-center gap-2">
+            <span className="text-3xl font-black leading-none text-red-500">₹{finalPrice}</span>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[11px] text-gray-400 line-through">₹{crossedPrice}</span>
+              <span className="rounded px-1.5 py-0.5 text-[10px] font-black leading-none bg-red-100 text-red-600">{discountPercent}% off</span>
             </div>
           </div>
 
-          {/* Buy CTA full-width below */}
-          <div className="border-t border-gray-50 px-4 pb-4 pt-3">
-            {isSaleActive && (
-              <div className="mb-2 flex items-center justify-center gap-2">
-                <SaleTimer />
-              </div>
+          {/* Quick pills */}
+          <div className="flex flex-wrap gap-1.5">
+            {ebook.pages && ebook.pages > 0 && (
+              <span className="flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-[10px] font-medium text-gray-500">
+                <BookOpen className="h-3 w-3" />{ebook.pages}p
+              </span>
             )}
-            <BuyButton ebookId={ebook.id} price={finalPrice} title={ebook.title} customLabel={labels.downloadBtn} language={ebook.language} />
-            <p className="mt-2 flex items-center justify-center gap-1 text-center text-[10px] text-gray-400">
-              <ShieldCheck className="h-3 w-3 text-brand-teal" /> {labels.securePayment}
-            </p>
+            <span className="flex items-center gap-1 rounded-full border border-brand-teal/20 bg-brand-teal/5 px-2.5 py-0.5 text-[10px] font-medium text-brand-teal">
+              <Zap className="h-3 w-3" />Instant PDF
+            </span>
           </div>
         </div>
 
-        {/* Trust strip */}
-        <div className="mt-1 grid grid-cols-3 divide-x divide-gray-100 bg-white text-center">
-          {[
-            { icon: "🔒", label: "Secure Pay" },
-            { icon: "📱", label: "WhatsApp PDF" },
-            { icon: "⚡", label: "Instant Access" },
-          ].map((t) => (
-            <div key={t.label} className="flex flex-col items-center gap-0.5 py-2.5">
-              <span className="text-sm">{t.icon}</span>
-              <span className="text-[9px] font-bold text-gray-500">{t.label}</span>
-            </div>
-          ))}
+        {/* Buy CTA card */}
+        <div className="mt-1 bg-white px-4 pb-4 pt-3">
+          <div className="mb-2.5 flex items-center justify-center">
+            {isSaleActive ? (
+              <SaleTimer />
+            ) : (
+              <span className="flex items-center gap-1.5 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-bold text-orange-700">
+                🔥 ऑफर मर्यादित वेळेसाठी फक्त
+              </span>
+            )}
+          </div>
+          <BuyButton ebookId={ebook.id} price={finalPrice} title={ebook.title} customLabel={labels.downloadBtn} language={ebook.language} />
+          <p className="mt-2 flex items-center justify-center gap-1 text-center text-[10px] text-gray-400">
+            <ShieldCheck className="h-3 w-3 text-brand-teal" /> {labels.securePayment}
+          </p>
+          {/* Trust strip */}
+          <div className="mt-3 grid grid-cols-3 divide-x divide-gray-100 rounded-xl border border-gray-100 bg-gray-50">
+            {[
+              { icon: "🔒", label: "Secure Pay" },
+              { icon: "📱", label: "WhatsApp PDF" },
+              { icon: "⚡", label: "Instant Access" },
+            ].map((t) => (
+              <div key={t.label} className="flex flex-col items-center gap-0.5 py-2.5">
+                <span className="text-sm">{t.icon}</span>
+                <span className="text-[9px] font-bold text-gray-500">{t.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Sample images horizontal scroll */}
@@ -562,7 +562,7 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
                   <div className="flex flex-col">
                     <span className="text-[11px] font-medium text-white/40 line-through">₹{crossedPrice}</span>
                     <div className="flex items-baseline gap-2">
-                      <span className={`text-4xl font-black leading-none tracking-tight ${isSaleActive ? "text-red-300" : "text-brand-gold"}`}>₹{finalPrice}</span>
+                      <span className="text-4xl font-black leading-none tracking-tight text-red-300">₹{finalPrice}</span>
                       <span className="text-xs text-white/50">{labels.onlyText}</span>
                     </div>
                   </div>
@@ -689,10 +689,6 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
             <div className="min-w-0 flex-1">
               <BuyButton ebookId={ebook.id} price={finalPrice} title={ebook.title} customLabel={labels.downloadBtn} language={ebook.language} />
             </div>
-            <a href={waHelpUrl} target="_blank" rel="noopener noreferrer"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#25D366] shadow-sm active:scale-95">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.666.084.535-.072 1.392-.572 1.589-1.119.196-.548.196-1.024.143-1.119-.054-.096-.197-.144-.34-.215z" /></svg>
-            </a>
           </div>
         </div>
       </div>

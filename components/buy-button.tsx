@@ -639,7 +639,7 @@ export function BuyButton({
             onClick={handleBuyClick}
             className="group flex w-full items-center justify-center gap-2 bg-brand-gold font-extrabold text-brand-teal shadow-lg transition-all hover:-translate-y-0.5 hover:bg-brand-gold/90"
           >
-            <Pointer className="h-5 w-5 transition-transform group-hover:scale-110" />
+            <Pointer className="h-5 w-5 animate-[click-tap_1.2s_ease-in-out_infinite]" />
             {customLabel || `आता डाउनलोड करा - ₹${price}`}
           </Button>
         )}
@@ -649,7 +649,7 @@ export function BuyButton({
             onClick={handleBuyClick}
             className="flex w-full items-center justify-center gap-2 bg-brand-gold font-extrabold text-brand-teal shadow-lg transition-all hover:bg-brand-gold/90 active:scale-95"
           >
-            <Pointer className="h-5 w-5" />
+            <Pointer className="h-5 w-5 animate-[click-tap_1.2s_ease-in-out_infinite]" />
             {customLabel || `आता डाउनलोड करा - ₹${price}`}
           </Button>
         )}
