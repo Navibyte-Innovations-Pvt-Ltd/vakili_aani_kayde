@@ -946,9 +946,6 @@ function CheckoutForm({
 
               {/* Delivery summary card */}
               <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
-                <div className="border-b border-gray-50 px-3.5 py-2.5">
-                  <p className="text-[9px] font-black tracking-widest text-gray-400 uppercase">Delivery Details</p>
-                </div>
                 <div className="space-y-0 divide-y divide-gray-50">
                   {form.getValues("name") && (
                     <div className="flex items-center gap-3 px-3.5 py-3">
