@@ -8,7 +8,7 @@ import { BackPrevention } from "@/components/back-prevention";
 import { createShortLink } from "@/lib/short-link";
 import { getBaseUrl } from "@/lib/base-url";
 import crypto from "crypto";
-import { PurchasePixelEvent } from "./_components/purchase-pixel-event";
+import { PurchasePixelEvent } from "@/components/purchase-pixel-event";
 
 export const dynamic = 'force-dynamic';
 

@@ -24,6 +24,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import { format } from "date-fns";
 import { ComboCarousel } from "./combo-carousel";
 import { DownloadInstructions } from "./_components/download-instructions";
+import { PurchasePixelEvent } from "@/components/purchase-pixel-event";
 
 interface Order {
   id: string;
@@ -66,6 +67,11 @@ export default function MyBooksPage() {
     ebookId: string;
     amount: number;
     downloadUrl?: string;
+  } | null>(null);
+  const [purchasePixel, setPurchasePixel] = useState<{
+    orderId: string;
+    amount: number;
+    contentIds: string[];
   } | null>(null);
   const isMobile = useIsMobile();
 
@@ -115,8 +121,11 @@ export default function MyBooksPage() {
         const amount = parseFloat(params.get("amount") || "0");
         const title = params.get("title") || "Unknown Book";
         const ebookId = params.get("ebook_id") || "";
-        const _currency = params.get("currency") || "INR";
+        const orderId = params.get("orderId") || `order_${Date.now()}`;
         setJustPurchasedOrder({ title, ebookId, amount });
+        if (amount > 0 && ebookId) {
+          setPurchasePixel({ orderId, amount, contentIds: [ebookId] });
+        }
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ["#0A1F3D", "#C9962A", "#25D366"] });
         const phoneToSearch = paramPhone || localStorage.getItem("customer_phone");
         if (phoneToSearch) performSearch(phoneToSearch);
@@ -178,6 +187,15 @@ export default function MyBooksPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-[#F5F5F0]">
+
+      {purchasePixel && (
+        <PurchasePixelEvent
+          orderId={purchasePixel.orderId}
+          amount={purchasePixel.amount}
+          contentIds={purchasePixel.contentIds}
+          numItems={purchasePixel.contentIds.length}
+        />
+      )}
 
       {/* Help dialog kept mounted (auto-opens after purchase / on download click) */}
       <DownloadInstructions open={showInstructions} onOpenChange={setShowInstructions} showTrigger={false} />
