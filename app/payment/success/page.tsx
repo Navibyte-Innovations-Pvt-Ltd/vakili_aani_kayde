@@ -8,6 +8,7 @@ import { BackPrevention } from "@/components/back-prevention";
 import { createShortLink } from "@/lib/short-link";
 import { getBaseUrl } from "@/lib/base-url";
 import crypto from "crypto";
+import { PurchasePixelEvent } from "./_components/purchase-pixel-event";
 
 export const dynamic = 'force-dynamic';
 
@@ -117,23 +118,11 @@ async function SuccessPageContent({ searchParams }: { searchParams: Promise<{ or
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-            {/* Meta Pixel Purchase — fires once on confirmed payment */}
-            <script
-                dangerouslySetInnerHTML={{
-                    __html: `
-                        if (window.fbq) {
-                            fbq('track', 'Purchase', {
-                                value: ${Number(order.amount)},
-                                currency: 'INR',
-                                content_ids: ${JSON.stringify(order.items.map(i => i.ebookId))},
-                                content_type: 'product',
-                                num_items: ${order.items.length}
-                            }, {
-                                eventID: '${order.id}'
-                            });
-                        }
-                    `
-                }}
+            <PurchasePixelEvent
+                orderId={order.id}
+                amount={Number(order.amount)}
+                contentIds={order.items.map(i => i.ebookId)}
+                numItems={order.items.length}
             />
             {/* Prevent Back Button Script */}
             <BackPrevention />

@@ -115,7 +115,7 @@ export default function MyBooksPage() {
         const amount = parseFloat(params.get("amount") || "0");
         const title = params.get("title") || "Unknown Book";
         const ebookId = params.get("ebook_id") || "";
-        const currency = params.get("currency") || "INR";
+        const _currency = params.get("currency") || "INR";
         setJustPurchasedOrder({ title, ebookId, amount });
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ["#0A1F3D", "#C9962A", "#25D366"] });
         const phoneToSearch = paramPhone || localStorage.getItem("customer_phone");
