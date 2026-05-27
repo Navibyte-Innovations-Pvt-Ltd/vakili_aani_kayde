@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack --port 2222",
-    "build": "next build && next-sitemap",
+    "build": "next build",
     "start": "next start --port 2222",
     "lint": "eslint .",
     "validate": "bun run lint && bun x tsc --noEmit && bun x pruny",
