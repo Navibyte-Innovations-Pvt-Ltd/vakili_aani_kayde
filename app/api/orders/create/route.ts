@@ -85,21 +85,25 @@ export async function POST(req: NextRequest) {
                 const rzpStatus = rzpOrder.status; // "created" | "attempted" | "paid"
 
                 if (rzpStatus === "paid") {
-                    // Payment was captured on Razorpay but our DB missed it!
-                    // Auto-recover: find the payment and fulfill the order.
-                    console.warn("[ORDER_CREATE] Razorpay order is PAID but DB is PENDING — auto-recovering:", existingRecentOrder.id);
-                    const payments = await razorpay.orders.fetchPayments(existingRecentOrder.razorpayOrderId);
-                    const capturedPayment = payments.items?.find(
-                        (p) => p.status === "captured"
-                    );
-                    if (capturedPayment) {
-                        await fulfillOrder(existingRecentOrder.id, capturedPayment.id, "verify");
-                        await logOrderEvent("ORDER_AUTO_RECOVERED", "server", existingRecentOrder.id, {
-                            razorpayOrderId: existingRecentOrder.razorpayOrderId,
-                            razorpayPaymentId: capturedPayment.id,
-                        });
-                    }
-                    // Don't reuse — the order is now PAID, create fresh if user wants another
+                    // Payment captured on Razorpay but DB missed it.
+                    // Recover async — don't block user creating a fresh order.
+                    console.warn("[ORDER_CREATE] Razorpay order is PAID but DB is PENDING — auto-recovering async:", existingRecentOrder.id);
+                    void (async () => {
+                        try {
+                            const payments = await razorpay.orders.fetchPayments(existingRecentOrder.razorpayOrderId!);
+                            const capturedPayment = payments.items?.find((p) => p.status === "captured");
+                            if (capturedPayment) {
+                                await fulfillOrder(existingRecentOrder.id, capturedPayment.id, "verify");
+                                await logOrderEvent("ORDER_AUTO_RECOVERED", "server", existingRecentOrder.id, {
+                                    razorpayOrderId: existingRecentOrder.razorpayOrderId,
+                                    razorpayPaymentId: capturedPayment.id,
+                                });
+                            }
+                        } catch (e) {
+                            console.error("[ORDER_CREATE] Auto-recovery failed:", e instanceof Error ? e.message : e);
+                        }
+                    })();
+                    // Don't reuse — order is PAID (or recovering). Create fresh.
                     canReuse = false;
                 } else if (rzpStatus === "created" || rzpStatus === "attempted") {
                     // Still active — safe to reuse
@@ -175,22 +179,23 @@ export async function POST(req: NextRequest) {
             throw rzpError;
         }
 
-        // 3. Link the Razorpay order to our DB record
-        await prisma_db.order.update({
-            where: { id: order.id },
-            data: { razorpayOrderId: razorpayOrder.id },
-        });
+        // 3. Link Razorpay order + log in parallel — independent writes
+        await Promise.all([
+            prisma_db.order.update({
+                where: { id: order.id },
+                data: { razorpayOrderId: razorpayOrder.id },
+            }),
+            logOrderEvent("ORDER_CREATED", "server", order.id, {
+                ebookId: ebook.id,
+                ebookTitle: ebook.title,
+                amount: finalPrice,
+                razorpayOrderId: razorpayOrder.id,
+                customerPhone: phone,
+                customerEmail: email,
+            }),
+        ]);
 
         console.info("[ORDER_CREATE] Order created:", { orderId: order.id, razorpayOrderId: razorpayOrder.id });
-
-        await logOrderEvent("ORDER_CREATED", "server", order.id, {
-            ebookId: ebook.id,
-            ebookTitle: ebook.title,
-            amount: finalPrice,
-            razorpayOrderId: razorpayOrder.id,
-            customerPhone: phone,
-            customerEmail: email,
-        });
 
         return NextResponse.json({
             orderId: order.id,

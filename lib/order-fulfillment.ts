@@ -169,8 +169,8 @@ export async function fulfillOrder(
 
         if (isNewPayment) {
             console.info(`[FULFILLMENT] Marking order ${orderId} as PAID (won race)`);
-            // Re-fetch to get updated data with relations
-            order = await fetchOrderFlat(orderId) ?? order;
+            // Patch in-memory — relations didn't change, only status/razorpayPaymentId
+            order = { ...order, status: "PAID", razorpayPaymentId } as typeof order;
             await logOrderEvent("ORDER_FULFILLED", source, orderId, {
                 razorpayPaymentId,
                 amount: order.amount,
