@@ -19,8 +19,13 @@ export async function POST(req: NextRequest) {
             const error_reason = formData.get("error[reason]");
 
             if (error_code) {
+                // Look up DB order so the event is linked to the correct orderId
+                const failedOrder = razorpay_order_id
+                    ? await prisma_db.order.findUnique({ where: { razorpayOrderId: razorpay_order_id }, select: { id: true } }).catch(() => null)
+                    : null;
+
                 console.error("[CALLBACK] Payment failed:", { error_code, error_description, error_reason, order_id: razorpay_order_id });
-                await logOrderEvent("CALLBACK_ERROR", "callback", null, {
+                await logOrderEvent("CALLBACK_ERROR", "callback", failedOrder?.id ?? null, {
                     razorpayOrderId: razorpay_order_id,
                     error_code,
                     error_description,
@@ -30,11 +35,17 @@ export async function POST(req: NextRequest) {
             }
 
             // Empty callback — user likely abandoned mid-redirect (back button, network drop)
+            // Look up order so abandonment is linked to the correct orderId
+            const abandonedOrder = razorpay_order_id
+                ? await prisma_db.order.findUnique({ where: { razorpayOrderId: razorpay_order_id }, select: { id: true } }).catch(() => null)
+                : null;
+
             console.warn("[CALLBACK] Empty callback received — no payment or error fields. Likely user abandoned.", {
                 keys: [...formData.keys()],
             });
-            await logOrderEvent("CALLBACK_EMPTY", "callback", null, {
+            await logOrderEvent("CALLBACK_EMPTY", "callback", abandonedOrder?.id ?? null, {
                 formKeys: [...formData.keys()],
+                razorpayOrderId: razorpay_order_id,
             });
             return NextResponse.redirect(new URL("/", req.url));
         }

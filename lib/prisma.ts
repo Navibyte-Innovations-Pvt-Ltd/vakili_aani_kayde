@@ -42,4 +42,6 @@ const createPrismaClient = () => {
 
 export const prisma_db = globalForPrisma.prismaDb ?? createPrismaClient();
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prismaDb = prisma_db;
+// Cache in globalThis for all environments — prevents extra pool creation on Next.js
+// hot reloads (dev) and across module re-evaluations in long-running serverless instances.
+globalForPrisma.prismaDb = prisma_db;
