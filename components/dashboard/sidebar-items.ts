@@ -4,6 +4,7 @@ import {
   BookOpen,
   FileText,
   LayoutDashboard,
+  MessageSquare,
   Settings,
   ShoppingCart,
   Users,
@@ -45,6 +46,11 @@ export const DASHBOARD_SIDEBAR_ITEMS: DashboardSidebarItem[] = [
     title: "Analytics",
     href: "/dashboard/analytics",
     icon: BarChart,
+  },
+  {
+    title: "WhatsApp",
+    href: "/dashboard/whatsapp",
+    icon: MessageSquare,
   },
   {
     title: "Settings",

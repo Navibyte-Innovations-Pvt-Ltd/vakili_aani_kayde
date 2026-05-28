@@ -1,9 +1,4 @@
-import {
-    sendPaymentSuccessWhatsapp,
-    hasBookPdfConfig,
-    sendBookWithPdfWhatsapp,
-    sendComboPdfWhatsapp,
-} from "@/lib/whatsapp";
+import { sendAisensyTemplate } from "@/lib/whatsapp";
 import { getCloudFrontSignedUrl } from "@/lib/s3";
 
 type OrderForWhatsapp = {
@@ -23,66 +18,28 @@ type OrderForWhatsapp = {
 };
 
 /**
- * Sends WhatsApp notification for a paid order.
- * Uses CloudFront signed URLs directly — the PDF is sent as a document attachment.
- * No JWT, no short links needed.
- *
- * @returns true if WhatsApp was sent successfully, false otherwise
+ * Sends PDF directly to customer via AiSensy after successful purchase.
+ * Template: payment_sccess_pdf_v2 (APPROVED) — document header, fixed body.
  */
-export async function sendOrderWhatsapp(
-    order: OrderForWhatsapp,
-): Promise<boolean> {
-    if (!order.customerPhone) {
+export async function sendOrderWhatsapp(order: OrderForWhatsapp): Promise<boolean> {
+    if (!order.customerPhone) return false;
+
+    const ebook = order.items[0]?.ebook;
+    if (!ebook?.fileUrl || ebook.fileUrl === "COMBO_COLLECTION") {
+        console.warn("[WHATSAPP] No fileUrl for order", order.id);
         return false;
     }
 
-    const customerPhone = order.customerPhone;
-    const customerName = order.customerName || "Customer";
+    const pdfUrl = await getCloudFrontSignedUrl(ebook.fileUrl, 86400);
 
-    if (order.items.length === 1) {
-        const item = order.items[0];
-        const ebook = item.ebook;
-
-        let totalPages = ebook.pages || 0;
-        if (ebook.isCombo && ebook.includedEbooks) {
-            totalPages = ebook.includedEbooks.reduce((sum, sub) => sum + (sub.pages || 0), 0);
-        }
-
-        const displayTitle = totalPages > 0
-            ? `${ebook.title} (एकूण ${totalPages} पाने)`
-            : ebook.title;
-
-        if (hasBookPdfConfig(ebook.id)) {
-            // Path 1: Pre-configured book — generates its own CloudFront URL internally
-            await sendBookWithPdfWhatsapp(customerPhone, customerName, ebook.id, displayTitle);
-        } else if (ebook.fileUrl && ebook.fileUrl !== "COMBO_COLLECTION") {
-            // Path 2: Generate CloudFront signed URL (24h expiry)
-            const pdfUrl = await getCloudFrontSignedUrl(ebook.fileUrl, 86400);
-            if (ebook.isCombo) {
-                await sendComboPdfWhatsapp(customerPhone, displayTitle, pdfUrl);
-            } else {
-                await sendPaymentSuccessWhatsapp(customerPhone, customerName, displayTitle, pdfUrl, pdfUrl);
-            }
-        } else {
-            // Path 3: No file URL available
-            console.warn(`[WHATSAPP] No fileUrl for ebook ${ebook.id}, sending text-only notification`);
-            await sendPaymentSuccessWhatsapp(customerPhone, customerName, displayTitle, "");
-        }
-    } else {
-        // Multiple items
-        const itemsWithPages = order.items.map((i) => {
-            let pages = i.ebook.pages || 0;
-            if (i.ebook.isCombo && i.ebook.includedEbooks) {
-                pages = i.ebook.includedEbooks.reduce((sum, sub) => sum + (sub.pages || 0), 0);
-            }
-            return pages > 0 ? `${i.ebook.title} (एकूण ${pages} पाने)` : i.ebook.title;
-        }).join(", ");
-
-        const firstFileUrl = order.items.find(i => i.ebook.fileUrl && i.ebook.fileUrl !== "COMBO_COLLECTION")?.ebook.fileUrl;
-        const pdfUrl = firstFileUrl ? await getCloudFrontSignedUrl(firstFileUrl, 86400) : undefined;
-
-        await sendPaymentSuccessWhatsapp(customerPhone, customerName, itemsWithPages, pdfUrl || "", pdfUrl);
-    }
+    await sendAisensyTemplate({
+        phone: order.customerPhone,
+        campaignName: "payment_sccess_pdf_v2",
+        templateParams: [],
+        mediaUrl: pdfUrl,
+        mediaFilename: `${ebook.title}.pdf`,
+        customerName: order.customerName || "Customer",
+    });
 
     return true;
 }

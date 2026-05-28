@@ -2,6 +2,7 @@ import { prisma_db } from "./prisma";
 import { getCloudFrontSignedUrl } from "./s3";
 
 const INTERAKT_API_KEY = process.env.INTERAKT_API_KEY;
+const AISENSY_API_KEY = process.env.AISENSY_API_KEY;
 
 // Configuration for books with direct PDF WhatsApp templates (Template mapping only)
 const BOOK_PDF_CONFIGS: Record<string, { templateName: string }> = {
@@ -177,6 +178,71 @@ export const sendPaymentSuccessWhatsapp = async (
     });
 };
 
+/**
+ * Send WhatsApp template via AiSensy.
+ * Used for document (PDF) delivery templates like payment_sccess_pdf_v2.
+ */
+export const sendAisensyTemplate = async ({
+    phone,
+    campaignName,
+    templateParams = [],
+    mediaUrl,
+    mediaFilename,
+    customerName = "Customer",
+}: {
+    phone: string;
+    campaignName: string;
+    templateParams?: string[];
+    mediaUrl?: string;
+    mediaFilename?: string;
+    customerName?: string;
+}): Promise<void> => {
+    if (!AISENSY_API_KEY) {
+        console.warn("[AISENSY] AISENSY_API_KEY not set. Skipping.");
+        return;
+    }
+
+    // Normalize phone to E.164 without + (AiSensy expects plain digits with country code)
+    let cleanPhone = phone.replace(/[^0-9]/g, "");
+    if (cleanPhone.length === 10) cleanPhone = "91" + cleanPhone;
+
+    const devOverride = process.env.DEV_WHATSAPP_OVERRIDE;
+    const targetPhone = devOverride
+        ? devOverride.replace(/[^0-9]/g, "").padStart(12, "91")
+        : cleanPhone;
+
+    const payload: Record<string, unknown> = {
+        apiKey: AISENSY_API_KEY,
+        campaignName,
+        destination: targetPhone,
+        userName: customerName,
+        templateParams,
+        source: "order-fulfillment",
+    };
+
+    if (mediaUrl) {
+        payload.media = {
+            url: mediaUrl,
+            filename: mediaFilename || "Book.pdf",
+        };
+    }
+
+    try {
+        const res = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+            console.error("[AISENSY] Failed:", res.status, await res.text().catch(() => ""));
+        } else {
+            console.info("[AISENSY] Sent template", campaignName, "to", targetPhone);
+        }
+    } catch (err) {
+        console.error("[AISENSY] Network error:", err instanceof Error ? err.message : err);
+    }
+};
+
 // Helper function to check if a book has PDF delivery configured
 export const hasBookPdfConfig = (ebookId: string): boolean => {
     return ebookId in BOOK_PDF_CONFIGS;
@@ -235,27 +301,20 @@ export const sendBookWithPdfWhatsapp = async (
 
 
 
-// Function for Pending Payment Follow-up (Manual Trigger)
+// Function for Pending Payment Follow-up (Manual Trigger + Cron)
+// Template: pending_followup_v2
+// {{1}} -> Customer name, {{2}} -> Book title, {{3}} -> Payment resume link
 export const sendPaymentReminder = async (
     phone: string,
     customerName: string,
     bookTitle: string,
     paymentResumeLink: string
 ) => {
-    // Template: pending_payment_followup_v1
-    // {{1}} -> Name
-    // {{2}} -> Book Title
-    // {{3}} -> Payment Link
-
-    await sendWhatsappMessage({
+    await sendAisensyTemplate({
         phone,
-        templateName: "pending_followup_v2",
-        languageCode: "mr",
-        bodyValues: [
-            customerName,
-            bookTitle,
-            paymentResumeLink
-        ]
+        campaignName: "pending_folloup_mr_v1",
+        templateParams: [customerName, bookTitle, paymentResumeLink],
+        customerName,
     });
 };
 
