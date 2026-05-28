@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { cacheComboPdf } from "@/lib/combo-cache";
 import { logOrderEvent } from "@/lib/order-logger";
 import { sendOrderWhatsapp } from "@/lib/send-order-whatsapp";
+import { sendMetaCAPIPurchase } from "@/lib/meta-capi";
 
 const ORDER_INCLUDE = {
     items: { include: { ebook: { include: { includedEbooks: { include: { ebook: true } } } } } },
@@ -190,6 +191,19 @@ export async function fulfillOrder(
     const shouldSendNotifications = isNewPayment || (source === "webhook" && !isNewPayment && !order.whatsappSentAt);
     if (shouldSendNotifications) {
         deliverWhatsappNotificationAsync(order, source);
+    }
+
+    // 3b. Server-side Meta CAPI Purchase event (NON-BLOCKING, deduplicates with browser pixel)
+    // Fires on first fulfillment only — event_id = orderId ensures dedup even if browser pixel also fired.
+    if (isNewPayment) {
+        const firstEbookId = order.items?.[0]?.ebookId;
+        void sendMetaCAPIPurchase({
+            orderId: order.id,
+            amount: Number(order.amount),
+            contentIds: firstEbookId ? [firstEbookId] : [],
+            customerPhone: order.customerPhone,
+            customerEmail: order.customerEmail,
+        });
     }
 
     // 4. Best-effort combo cache warm-up (fire-and-forget)

@@ -138,6 +138,8 @@ export default function MyBooksPage() {
 
       } else if (params.get("payment_pending") === "true") {
         const pendingOrderId = params.get("orderId");
+        const pendingAmount = parseFloat(params.get("amount") || "0");
+        const pendingEbookId = params.get("ebook_id") || "";
         const phoneToSearch = paramPhone || localStorage.getItem("customer_phone");
         if (phoneToSearch) {
           setQuery(phoneToSearch);
@@ -150,12 +152,20 @@ export default function MyBooksPage() {
               const res = await fetch("/api/orders/lookup", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: phoneToSearch.trim() }) });
               if (res.ok) {
                 const data = await res.json();
-                const paidOrder = pendingOrderId ? data.orders?.find((o: Order) => o.id === pendingOrderId) : data.orders?.length > 0;
+                const paidOrder: Order | undefined = pendingOrderId
+                  ? data.orders?.find((o: Order) => o.id === pendingOrderId)
+                  : data.orders?.[0];
                 if (paidOrder) {
                   if (pollIntervalId !== null) clearInterval(pollIntervalId);
                   setOrders(withAbsoluteUrls(data.orders));
                   toast.success("खरेदी यशस्वी! तुमचे पुस्तक तयार आहे.", { id: "pending-poll" });
                   confetti({ particleCount: 100, spread: 60, origin: { y: 0.6 } });
+                  // Fire Purchase pixel — payment was captured even though callback failed
+                  const pixelAmount = pendingAmount || paidOrder.amount;
+                  const pixelEbookId = pendingEbookId || paidOrder.items[0]?.ebookId || "";
+                  if (pixelAmount > 0 && pixelEbookId) {
+                    setPurchasePixel({ orderId: paidOrder.id, amount: pixelAmount, contentIds: [pixelEbookId] });
+                  }
                 }
               }
             } catch { /* ignore poll errors */ }

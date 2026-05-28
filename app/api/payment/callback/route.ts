@@ -5,6 +5,13 @@ import { fulfillOrder } from "@/lib/order-fulfillment";
 import { logOrderEvent } from "@/lib/order-logger";
 
 export async function POST(req: NextRequest) {
+    // Track order context so the catch block can pass it to the fallback URL
+    let fallbackOrderId: string | null = null;
+    let fallbackPhone: string | null = null;
+    let fallbackEmail: string | null = null;
+    let fallbackAmount: string | null = null;
+    let fallbackEbookId: string | null = null;
+
     try {
         // Razorpay sends data as form-urlencoded
         const formData = await req.formData();
@@ -71,6 +78,12 @@ export async function POST(req: NextRequest) {
             return new NextResponse("Order not found", { status: 404 });
         }
 
+        // Capture context for fallback URL before any async that might throw
+        fallbackOrderId = existingOrder.id;
+        fallbackPhone = existingOrder.customerPhone ?? null;
+        fallbackEmail = existingOrder.customerEmail ?? null;
+        fallbackAmount = existingOrder.amount.toString();
+
         await logOrderEvent("CALLBACK_RECEIVED", "callback", existingOrder.id, {
             razorpayOrderId: razorpay_order_id,
             razorpayPaymentId: razorpay_payment_id,
@@ -78,6 +91,7 @@ export async function POST(req: NextRequest) {
 
         // Fulfill Order (This is idempotent)
         const result = await fulfillOrder(existingOrder.id, razorpay_payment_id, "callback");
+        fallbackEbookId = result.ebookId ?? null;
 
         const successUrl = new URL("/my-books", req.url);
         successUrl.searchParams.set("orderId", existingOrder.id);
@@ -109,9 +123,15 @@ export async function POST(req: NextRequest) {
     } catch (error) {
         console.error("[PAYMENT_CALLBACK_ERROR]", error);
         // Never show a blank 500 to a paying customer.
-        // Redirect to /my-books with pending state — the webhook will fulfill later.
+        // Pass all available context so the pending-poll page can fire the pixel
+        // once the webhook fulfills the order.
         const fallbackUrl = new URL("/my-books", req.url);
         fallbackUrl.searchParams.set("payment_pending", "true");
+        if (fallbackOrderId) fallbackUrl.searchParams.set("orderId", fallbackOrderId);
+        if (fallbackPhone) fallbackUrl.searchParams.set("phone", fallbackPhone);
+        if (fallbackEmail) fallbackUrl.searchParams.set("email", fallbackEmail);
+        if (fallbackAmount) fallbackUrl.searchParams.set("amount", fallbackAmount);
+        if (fallbackEbookId) fallbackUrl.searchParams.set("ebook_id", fallbackEbookId);
         return NextResponse.redirect(fallbackUrl, { status: 303 });
     }
 }
