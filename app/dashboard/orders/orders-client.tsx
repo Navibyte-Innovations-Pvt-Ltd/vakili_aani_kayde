@@ -33,9 +33,99 @@ import {
     FileText,
     ChevronRight,
     ExternalLink,
+    Activity,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
+interface OrderLog {
+    id: string;
+    event: string;
+    source: string;
+    metadata: Record<string, unknown> | null;
+    createdAt: string;
+}
+
+const EVENT_LABELS: Record<string, { label: string; color: string }> = {
+    ORDER_CREATED: { label: "Order created", color: "text-blue-600 bg-blue-50" },
+    MODAL_OPENED: { label: "Payment modal opened", color: "text-blue-600 bg-blue-50" },
+    MODAL_DISMISSED: { label: "Modal dismissed by user", color: "text-orange-600 bg-orange-50" },
+    PAYMENT_FAILED_CLIENT: { label: "Payment failed (client)", color: "text-red-600 bg-red-50" },
+    CALLBACK_RECEIVED: { label: "Payment callback received", color: "text-green-600 bg-green-50" },
+    CALLBACK_EMPTY: { label: "Abandoned mid-redirect", color: "text-orange-600 bg-orange-50" },
+    CALLBACK_ERROR: { label: "Gateway error", color: "text-red-600 bg-red-50" },
+    CALLBACK_SIG_INVALID: { label: "Invalid signature", color: "text-red-600 bg-red-50" },
+    WEBHOOK_RECEIVED: { label: "Webhook received", color: "text-green-600 bg-green-50" },
+    VERIFY_CALLED: { label: "Verify called", color: "text-blue-600 bg-blue-50" },
+    VERIFY_RECEIVED: { label: "Verify received", color: "text-blue-600 bg-blue-50" },
+    VERIFY_SIG_INVALID: { label: "Verify: invalid signature", color: "text-red-600 bg-red-50" },
+    VERIFY_ERROR: { label: "Verify error", color: "text-red-600 bg-red-50" },
+    VERIFY_FAILED: { label: "Verify failed", color: "text-red-600 bg-red-50" },
+    ORDER_FULFILLED: { label: "Order fulfilled", color: "text-green-600 bg-green-50" },
+    ORDER_ALREADY_PAID: { label: "Already paid (idempotent)", color: "text-green-600 bg-green-50" },
+    ORDER_AUTO_RECOVERED: { label: "Auto-recovered from stuck state", color: "text-purple-600 bg-purple-50" },
+    WHATSAPP_SENT: { label: "WhatsApp sent", color: "text-green-600 bg-green-50" },
+    WHATSAPP_FAILED: { label: "WhatsApp failed", color: "text-red-600 bg-red-50" },
+    PAYMENT_LINK_CREATED: { label: "Payment link created", color: "text-blue-600 bg-blue-50" },
+    PAYMENT_REMINDER_SENT: { label: "Reminder sent", color: "text-blue-600 bg-blue-50" },
+    PAYMENT_REMINDER_FAILED: { label: "Reminder failed", color: "text-red-600 bg-red-50" },
+    STATUS_UPDATED: { label: "Status updated", color: "text-gray-600 bg-gray-50" },
+};
+
+function OrderLogsLoader({ orderId }: { orderId: string }) {
+    const [logs, setLogs] = useState<OrderLog[] | null>(null);
+
+    useEffect(() => {
+        let cancelled = false;
+        fetch(`/api/admin/orders/${orderId}/logs`)
+            .then((r) => r.json())
+            .then((data: OrderLog[]) => { if (!cancelled) setLogs(data); })
+            .catch(() => { if (!cancelled) setLogs([]); });
+        return () => { cancelled = true; };
+    }, [orderId]);
+
+    const loading = logs === null;
+
+    if (loading) {
+        return (
+            <div className="flex items-center gap-2 py-4 text-xs text-muted-foreground">
+                <Activity className="h-3.5 w-3.5 animate-pulse" />
+                Loading event log...
+            </div>
+        );
+    }
+
+    if (!logs || logs.length === 0) {
+        return (
+            <p className="py-2 text-xs text-muted-foreground">No events recorded for this order.</p>
+        );
+    }
+
+    return (
+        <div className="space-y-1.5">
+            {logs.map((log) => {
+                const meta = EVENT_LABELS[log.event] ?? { label: log.event, color: "text-gray-600 bg-gray-50" };
+                const extraMeta = log.metadata as Record<string, string> | null;
+                const errorDesc = extraMeta?.error_description || extraMeta?.error_reason || extraMeta?.message;
+                return (
+                    <div key={log.id} className="flex items-start gap-2">
+                        <span className={cn("mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold", meta.color)}>
+                            {meta.label}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                            {errorDesc && (
+                                <p className="truncate text-[10px] font-medium text-red-500">{errorDesc}</p>
+                            )}
+                            <p className="text-[10px] text-muted-foreground">
+                                {format(new Date(log.createdAt), "MMM dd, h:mm:ss a")} · {log.source}
+                            </p>
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
 
 type OrderStatus = "PAID" | "PENDING" | "FAILED" | "CANCELLED";
 
@@ -418,6 +508,14 @@ export function OrdersClient({ orders, loadedAt }: OrdersClientProps) {
                                                 {format(new Date(drawerOrder.updatedAt), "MMM dd, yyyy • h:mm a")}
                                             </span>
                                         </div>
+                                    </div>
+                                </section>
+
+                                {/* Event Log */}
+                                <section>
+                                    <p className="mb-2 text-[10px] font-bold tracking-wider text-gray-400 uppercase">Event Log</p>
+                                    <div className="rounded-xl border border-gray-100 bg-gray-50 p-3">
+                                        <OrderLogsLoader key={drawerOrder.id} orderId={drawerOrder.id} />
                                     </div>
                                 </section>
 

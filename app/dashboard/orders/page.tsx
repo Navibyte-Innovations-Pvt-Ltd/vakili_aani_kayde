@@ -3,6 +3,7 @@ import { OrdersClient } from "./orders-client";
 import { StatsCards } from "./stats-cards";
 import { RefreshButton } from "./refresh-button";
 import { RevenueChart } from "./revenue-chart";
+import { DropAnalysis, type DropBucket } from "./drop-analysis";
 import { getISTDateRange, getNowIST, fromIST } from "@/lib/date-utils";
 import { startOfDay, startOfMonth, endOfMonth, subMonths, subDays } from "date-fns";
 
@@ -98,6 +99,75 @@ export default async function OrdersPage({ searchParams }: { searchParams?: Prom
     const totalAttempted = Object.values(statusMap).reduce((a, b) => a + b, 0);
     const conversionRate = totalAttempted > 0 ? ((statusMap['PAID'] || 0) / totalAttempted) * 100 : 0;
 
+    // Drop-off analysis: fetch OrderLog events for PENDING orders to categorize why they didn't convert
+    const pendingOrders = orders.filter((o) => o.status === "PENDING");
+    const pendingIds = pendingOrders.map((o) => o.id);
+    const dropLogs = pendingIds.length > 0
+        ? await prisma_db.orderLog.findMany({
+            where: {
+                orderId: { in: pendingIds },
+                event: { in: ["MODAL_OPENED", "MODAL_DISMISSED", "PAYMENT_FAILED_CLIENT", "CALLBACK_EMPTY", "CALLBACK_ERROR"] },
+            },
+            select: { orderId: true, event: true, metadata: true },
+        })
+        : [];
+
+    // Determine drop category per order (last meaningful event wins)
+    const EVENT_PRIORITY: Record<string, number> = {
+        MODAL_OPENED: 1,
+        MODAL_DISMISSED: 2,
+        CALLBACK_EMPTY: 3,
+        PAYMENT_FAILED_CLIENT: 4,
+        CALLBACK_ERROR: 5,
+    };
+    const orderDropMap = new Map<string, { event: string; metadata: unknown }>();
+    for (const log of dropLogs) {
+        const existing = orderDropMap.get(log.orderId ?? "");
+        const priority = EVENT_PRIORITY[log.event] ?? 0;
+        const existingPriority = existing ? (EVENT_PRIORITY[existing.event] ?? 0) : -1;
+        if (priority > existingPriority) {
+            orderDropMap.set(log.orderId ?? "", { event: log.event, metadata: log.metadata });
+        }
+    }
+
+    const bucketCounts: Record<string, number> = {
+        never_started: 0,
+        modal_dismissed: 0,
+        abandoned_redirect: 0,
+        gateway_error: 0,
+        client_error: 0,
+        unknown: 0,
+    };
+    const gatewayErrors: string[] = [];
+
+    for (const order of pendingOrders) {
+        const drop = orderDropMap.get(order.id);
+        if (!drop) {
+            bucketCounts.never_started++;
+        } else if (drop.event === "CALLBACK_ERROR") {
+            bucketCounts.gateway_error++;
+            const meta = drop.metadata as Record<string, string> | null;
+            if (meta?.error_description) gatewayErrors.push(meta.error_description);
+        } else if (drop.event === "PAYMENT_FAILED_CLIENT") {
+            bucketCounts.client_error++;
+        } else if (drop.event === "CALLBACK_EMPTY") {
+            bucketCounts.abandoned_redirect++;
+        } else if (drop.event === "MODAL_DISMISSED") {
+            bucketCounts.modal_dismissed++;
+        } else if (drop.event === "MODAL_OPENED") {
+            bucketCounts.unknown++;
+        }
+    }
+
+    const dropBuckets: DropBucket[] = [
+        { category: "never_started", count: bucketCounts.never_started, label: "Never started", description: "Order created but user never opened the payment modal" },
+        { category: "modal_dismissed", count: bucketCounts.modal_dismissed, label: "Dismissed modal", description: "User opened Razorpay modal but closed it without paying" },
+        { category: "abandoned_redirect", count: bucketCounts.abandoned_redirect, label: "Abandoned redirect", description: "User hit back button or network dropped during payment redirect" },
+        { category: "gateway_error", count: bucketCounts.gateway_error, label: "Gateway error", description: "Razorpay reported a payment error", errorSamples: [...new Set(gatewayErrors)].slice(0, 3) },
+        { category: "client_error", count: bucketCounts.client_error, label: "Payment failed", description: "Payment failed on client side (card declined, UPI timeout, etc.)" },
+        { category: "unknown", count: bucketCounts.unknown, label: "Unknown drop", description: "Modal was opened but no further events recorded" },
+    ];
+
     // Serialize Prisma Decimal/Date to plain JS values for RSC boundary
     const serializedOrders = orders.map(o => ({
         ...o,
@@ -134,6 +204,9 @@ export default async function OrdersPage({ searchParams }: { searchParams?: Prom
                 failedOrders={failedOrders}
                 dateFilter={dateFilter}
             />
+
+            {/* Drop-off Analysis */}
+            <DropAnalysis buckets={dropBuckets} totalPending={pendingOrders.length} />
 
             {/* Revenue Chart */}
             <RevenueChart orders={serializedOrders} dateFilter={dateFilter} />
