@@ -250,6 +250,28 @@ export function OrdersClient({ orders, loadedAt }: OrdersClientProps) {
         toast.success(label);
     }, []);
 
+    const handleSendPdf = async (order: Order) => {
+        const promise = fetch(`/api/admin/orders/${order.id}/send-pdf`, { method: "POST" })
+            .then(async (res) => { if (!res.ok) throw new Error(await res.text() || "Failed"); });
+        toast.promise(promise, {
+            loading: "PDF पाठवत आहे...",
+            success: "PDF WhatsApp वर पाठवले!",
+            error: (err) => `Failed: ${(err as Error).message}`,
+        });
+        await promise;
+    };
+
+    const handleSendFollowup = async (order: Order) => {
+        const promise = fetch(`/api/admin/orders/${order.id}/send-followup`, { method: "POST" })
+            .then(async (res) => { if (!res.ok) throw new Error(await res.text() || "Failed"); });
+        toast.promise(promise, {
+            loading: "Reminder पाठवत आहे...",
+            success: "Payment reminder पाठवले!",
+            error: (err) => `Failed: ${(err as Error).message}`,
+        });
+        await promise;
+    };
+
     const handleWhatsAppLink = async (order: Order) => {
         try {
             if (order.status !== "PAID") {
@@ -853,7 +875,7 @@ export function OrdersClient({ orders, loadedAt }: OrdersClientProps) {
                                             </div>
                                         </TableCell>
                                         <TableCell onClick={(e) => e.stopPropagation()}>
-                                            <div className="flex items-center justify-end gap-2">
+                                            <div className="flex items-center justify-end gap-1.5">
                                                 <Button
                                                     variant="ghost" size="icon"
                                                     className="h-8 w-8 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-[#0A2342]"
@@ -862,6 +884,28 @@ export function OrdersClient({ orders, loadedAt }: OrdersClientProps) {
                                                 >
                                                     <Copy className="h-4 w-4" />
                                                 </Button>
+                                                {order.status === "PAID" && order.customerPhone && (
+                                                    <Button
+                                                        variant="ghost" size="sm"
+                                                        onClick={() => handleSendPdf(order)}
+                                                        className="h-8 gap-1.5 rounded-lg border-blue-100 bg-blue-50/50 px-2 text-blue-600 hover:bg-blue-100"
+                                                        title="Send PDF via WhatsApp"
+                                                    >
+                                                        <FileText className="h-3.5 w-3.5" />
+                                                        <span className="hidden text-xs font-semibold lg:inline">PDF</span>
+                                                    </Button>
+                                                )}
+                                                {(order.status === "PENDING" || order.status === "FAILED") && order.customerPhone && (
+                                                    <Button
+                                                        variant="ghost" size="sm"
+                                                        onClick={() => handleSendFollowup(order)}
+                                                        className="h-8 gap-1.5 rounded-lg border-orange-100 bg-orange-50/50 px-2 text-orange-600 hover:bg-orange-100"
+                                                        title="Send payment reminder"
+                                                    >
+                                                        <MessageSquare className="h-3.5 w-3.5" />
+                                                        <span className="hidden text-xs font-semibold lg:inline">Remind</span>
+                                                    </Button>
+                                                )}
                                                 <Button
                                                     variant="ghost" size="sm"
                                                     onClick={() => handleWhatsAppLink(order)}
@@ -869,7 +913,6 @@ export function OrdersClient({ orders, loadedAt }: OrdersClientProps) {
                                                     title="Send via WhatsApp"
                                                 >
                                                     <WhatsappIcon className="h-4 w-4" />
-                                                    <span className="hidden text-xs font-semibold lg:inline">WhatsApp</span>
                                                 </Button>
                                             </div>
                                         </TableCell>
