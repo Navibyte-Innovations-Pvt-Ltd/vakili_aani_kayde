@@ -312,6 +312,8 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
     <div className="min-h-screen bg-[#F5F5F0] pb-28 md:pb-12">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      {/* Preload Razorpay on product pages — users are likely to buy */}
+      <link rel="preload" href="https://checkout.razorpay.com/v1/checkout.js" as="script" />
       <PixelViewContent ebookId={ebook.id} title={ebook.title} price={finalPrice} />
 
       {/* ── MOBILE TOP NAV ── */}
