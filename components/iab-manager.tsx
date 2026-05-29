@@ -29,22 +29,28 @@ export function IABManager() {
       !(window as unknown as { MSStream: unknown }).MSStream;
 
     // eslint-disable-next-line react-hooks/set-state-in-effect -- Client-side only state initialization
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Client-side only state initialization
     setIsAndroid(android);
     // eslint-disable-next-line react-hooks/set-state-in-effect -- Client-side only state initialization
     setIsIOS(ios);
 
-    // Show overlay immediately — blocks buy button before user taps it
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Client-side only state initialization
-    setIsVisible(true);
-
-    // FOR ANDROID: Attempt Chrome intent in background after overlay renders
+    // FOR ANDROID: Attempt instant force-jump to Chrome
     if (android) {
       const currentUrl = window.location.href.replace(/^https?:\/\//, "");
       const intentUrl = `intent://${currentUrl}#Intent;scheme=https;package=com.android.chrome;end`;
+
       const timer = setTimeout(() => {
         window.location.href = intentUrl;
-      }, 300);
+        // If the user isn't redirected after 2 seconds, show the manual button
+        setTimeout(() => setIsVisible(true), 2000);
+      }, 500);
+
       return () => clearTimeout(timer);
+    }
+
+    // FOR iOS: Just show the handoff UI immediately
+    if (ios) {
+      setIsVisible(true);
     }
   }, []);
 
@@ -84,10 +90,13 @@ export function IABManager() {
           </div>
 
           {isAndroid && (
-            <div className="space-y-4 pt-4">
+            <div className="px-2 pt-4">
               <Button
                 onClick={() => {
-                  const currentUrl = window.location.href.replace(/^https?:\/\//, "");
+                  const currentUrl = window.location.href.replace(
+                    /^https?:\/\//,
+                    "",
+                  );
                   window.location.href = `intent://${currentUrl}#Intent;scheme=https;package=com.android.chrome;end`;
                 }}
                 className="h-14 w-full rounded-2xl bg-brand-teal text-lg font-bold text-white shadow-xl shadow-brand-teal/20 hover:bg-brand-teal/90"
@@ -95,21 +104,6 @@ export function IABManager() {
                 <Chrome className="mr-2 h-5 w-5" />
                 Chrome मध्ये उघडा
               </Button>
-              <div className="rounded-2xl border border-brand-teal/10 bg-brand-teal/5 p-4 text-left">
-                <p className="mb-3 text-center text-xs font-black tracking-widest text-brand-teal uppercase">
-                  वरील बटण काम नाही केल्यास (If button doesn&apos;t work)
-                </p>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white font-black text-brand-teal shadow-sm ring-1 ring-brand-teal/10 text-sm">1</div>
-                    <p className="text-sm font-bold text-gray-700">उजव्या कोपऱ्यात <MoreVertical className="inline-block h-4 w-4" /> (3 ठिपके) वर क्लिक करा.</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white font-black text-brand-teal shadow-sm ring-1 ring-brand-teal/10 text-sm">2</div>
-                    <p className="text-sm font-bold text-gray-700"><span className="font-black text-brand-teal">&quot;Open in Chrome&quot;</span> किंवा <span className="font-black text-brand-teal">&quot;Open in Browser&quot;</span> निवडा.</p>
-                  </div>
-                </div>
-              </div>
             </div>
           )}
 
