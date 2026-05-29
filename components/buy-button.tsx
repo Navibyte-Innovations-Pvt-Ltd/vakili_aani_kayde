@@ -282,6 +282,16 @@ export function BuyButton({
     };
   }, []);
 
+  // Preload Razorpay as soon as modal opens — user spends ~10-30s on step 1
+  // so by the time they hit Pay, script is already in memory
+  useEffect(() => {
+    if (!open) return;
+    if (isRazorpayLoaded || typeof window.Razorpay !== "undefined") return;
+    loadScript(RZP_SCRIPT_URL).then((loaded) => {
+      if (loaded) setIsRazorpayLoaded(true);
+    });
+  }, [open, isRazorpayLoaded]);
+
   // Robust Mobile OS Detection (User Agent)
   useEffect(() => {
     const userAgent =
