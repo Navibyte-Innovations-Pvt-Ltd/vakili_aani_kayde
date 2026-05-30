@@ -186,43 +186,41 @@ const RZP_SCRIPT_URL = "https://checkout.razorpay.com/v1/checkout.js";
 const loadScript = (src: string): Promise<boolean> => {
   return new Promise((resolve) => {
     if (typeof document === "undefined") return resolve(false);
-    // Already loaded — fastest path
     if (typeof window.Razorpay !== "undefined") return resolve(true);
 
-    // Dedup: if a script tag for this src already exists (any source), poll for window.Razorpay
-    // rather than injecting a second tag. Handles Next.js Script + preload cases.
-    const existing = Array.from(document.querySelectorAll("script")).find(
-      (s) => s.src === src || s.getAttribute("src") === src
-    );
-
+    // If script tag exists but hasn't loaded yet, wait for it with higher timeout
+    const existing = document.querySelector(`script[src="${src}"]`) as HTMLScriptElement | null;
     if (existing) {
-      // Script in DOM but not yet executed — poll
       const checkInterval = setInterval(() => {
         if (typeof window.Razorpay !== "undefined") {
           clearInterval(checkInterval);
           clearTimeout(timeout);
           resolve(true);
         }
-      }, 50);
+      }, 100);
       const timeout = setTimeout(() => {
         clearInterval(checkInterval);
         resolve(typeof window.Razorpay !== "undefined");
-      }, 8000);
+      }, 10000); // Increased to 10s for slow internet
       return;
     }
 
-    // Inject fresh script tag (preload hint already fetched it; execution is instant)
     const script = document.createElement("script");
     script.src = src;
     script.async = true;
     script.onload = () => resolve(true);
     script.onerror = () => {
-      console.error("Razorpay script failed to load — ad-blocker or network error.");
+      console.error("Razorpay script failed to load. Ad-blocker or network issues?");
       resolve(false);
     };
     document.body.appendChild(script);
-    // Safety timeout — if onload never fires
-    setTimeout(() => resolve(typeof window.Razorpay !== "undefined"), 8000);
+
+    // Safety timeout for new injection
+    setTimeout(() => {
+      if (typeof window.Razorpay === "undefined") {
+        resolve(false);
+      }
+    }, 15000);
   });
 };
 
@@ -287,16 +285,6 @@ export function BuyButton({
       document.body.style.pointerEvents = "";
     };
   }, []);
-
-  // Preload Razorpay as soon as modal opens — user spends ~10-30s on step 1
-  // so by the time they hit Pay, script is already in memory
-  useEffect(() => {
-    if (!open) return;
-    if (isRazorpayLoaded || typeof window.Razorpay !== "undefined") return;
-    loadScript(RZP_SCRIPT_URL).then((loaded) => {
-      if (loaded) setIsRazorpayLoaded(true);
-    });
-  }, [open, isRazorpayLoaded]);
 
   // Robust Mobile OS Detection (User Agent)
   useEffect(() => {
@@ -427,22 +415,26 @@ export function BuyButton({
     saveToLocal("customer_email", email);
 
     try {
-      // Fire Razorpay load + order creation in PARALLEL — saves 200-800ms on slow connections
-      const alreadyLoaded = isRazorpayLoaded || typeof window.Razorpay !== "undefined";
-      const [isLoaded, res] = await Promise.all([
-        alreadyLoaded ? Promise.resolve(true) : loadScript(RZP_SCRIPT_URL),
-        fetchWithRetry("/api/orders/create", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ebookId, name, email, phone }),
-        }),
-      ]);
-
-      if (isLoaded) setIsRazorpayLoaded(true);
+      let isLoaded = isRazorpayLoaded || typeof window.Razorpay !== "undefined";
+      if (!isLoaded) {
+        toast.loading("पेमेंट गेटवे तयार करत आहोत...", { id: "rzp-load", duration: 5000 });
+        isLoaded = await loadScript(RZP_SCRIPT_URL);
+        if (isLoaded) {
+          setIsRazorpayLoaded(true);
+          toast.success("पेमेंट गेटवे तयार आहे!", { id: "rzp-load" });
+        }
+      }
 
       if (!isLoaded || typeof window.Razorpay === "undefined") {
+        toast.dismiss("rzp-load");
         throw new Error("तुमचे इंटरनेट स्लो आहे किंवा ब्राउझरने पेमेंट स्क्रिप्ट ब्लॉक केली आहे. कृपया रिफ्रेश करा (Refresh) आणि पुन्हा प्रयत्न करा.");
       }
+
+      const res = await fetchWithRetry("/api/orders/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ebookId, name, email, phone }),
+      });
 
       if (!res.ok) {
         const errorText = await res.text();

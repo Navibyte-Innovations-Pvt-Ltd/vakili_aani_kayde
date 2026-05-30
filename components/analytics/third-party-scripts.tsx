@@ -15,7 +15,6 @@ export function ThirdPartyScripts() {
         id="razorpay-checkout-js"
         src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="afterInteractive"
-        crossOrigin="anonymous"
       />
       <Script
         id="gtm-script"
