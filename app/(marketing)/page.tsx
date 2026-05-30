@@ -14,6 +14,8 @@ export default function Home() {
     <div className="flex min-h-screen flex-col bg-background font-sans">
       <HeroSection />
 
+      <FeaturesSection />
+
       <Suspense fallback={<EbooksLoading />}>
         <EbooksContainer />
       </Suspense>
@@ -21,8 +23,6 @@ export default function Home() {
       <Suspense fallback={<EbooksLoading />}>
         <CombosContainer />
       </Suspense>
-
-      <FeaturesSection />
 
       <BuyingGuideSection />
       {/* LeadMagnet hidden as it is email-based

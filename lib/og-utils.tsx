@@ -65,9 +65,9 @@ export async function generateOgImage(options: OgImageOptions) {
   const displayTitle = title.length > 70 ? title.substring(0, 70) + "..." : title;
   const titleFontSize = displayTitle.length > 45 ? "46px" : displayTitle.length > 28 ? "56px" : "66px";
 
-  const NAVY = "#0A1F3D";
-  const GOLD = "#C9962A";
-  const GOLD_LIGHT = "#F5E6C8";
+  const NAVY = "#5A1A2B";
+  const GOLD = "#C79A3E";
+  const GOLD_LIGHT = "#EBD9B8";
 
   return new ImageResponse(
     <div

@@ -7,12 +7,12 @@ export function HeroSection() {
     return (
         <section className="relative overflow-hidden bg-white pt-8 pb-16 md:pt-14 md:pb-24">
             {/* Subtle parchment-texture gradient background */}
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(201,150,42,0.08),transparent)]" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(199, 154, 62,0.08),transparent)]" />
             {/* Fine dot grid overlay */}
             <div
                 className="pointer-events-none absolute inset-0 opacity-[0.03]"
                 style={{
-                    backgroundImage: "radial-gradient(circle, #0A1F3D 1px, transparent 1px)",
+                    backgroundImage: "radial-gradient(circle, #5A1A2B 1px, transparent 1px)",
                     backgroundSize: "28px 28px",
                 }}
             />

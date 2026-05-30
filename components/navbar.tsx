@@ -115,7 +115,7 @@ export function Navbar() {
               </SheetTrigger>
               <SheetContent
                 side="right"
-                className="flex w-full flex-col border-none bg-[#0A1F3D] p-0 text-white sm:w-[320px]"
+                className="flex w-full flex-col border-none bg-[#5A1A2B] p-0 text-white sm:w-[320px]"
               >
                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
@@ -221,7 +221,7 @@ export function Navbar() {
                   </div>
 
                   {/* Secret admin link */}
-                  <Link href="/dashboard" onClick={() => setIsOpen(false)} className="block text-center text-[10px] text-[#0A1F3D] select-none cursor-default">
+                  <Link href="/dashboard" onClick={() => setIsOpen(false)} className="block text-center text-[10px] text-[#5A1A2B] select-none cursor-default">
                     &copy; {new Date().getFullYear()} vakilianikayde.in
                   </Link>
                 </div>

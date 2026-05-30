@@ -9,7 +9,7 @@ export default function manifest(): MetadataRoute.Manifest {
         display: 'standalone',
         display_override: ['window-controls-overlay', 'standalone'],
         background_color: '#ffffff',
-        theme_color: '#0A1F3D',
+        theme_color: '#5A1A2B',
         categories: ['education', 'lifestyle', 'books'],
         icons: [
             {

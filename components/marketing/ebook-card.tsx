@@ -56,7 +56,7 @@ export function EbookCard({ ebook, searchQuery, className }: EbookCardProps) {
     <Link
       href={`/ebooks/${ebook.id}`}
       onClick={() => setIsLoading(true)}
-      className={`group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_2px_12px_rgba(0,0,0,0.07)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_28px_rgba(10,31,61,0.13)] ${className}`}
+      className={`group relative flex flex-col overflow-hidden rounded-md border border-brand-gold/25 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.07)] transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold hover:shadow-[0_8px_28px_rgba(90,26,43,0.16)] hover:ring-1 hover:ring-brand-gold/40 ${className}`}
     >
       {/* Loading Overlay */}
       {isLoading && (
@@ -90,7 +90,7 @@ export function EbookCard({ ebook, searchQuery, className }: EbookCardProps) {
         <div className="absolute top-2.5 right-2.5 z-10 flex flex-col items-end gap-1">
           <DiscountBadge />
           {ebook.isCombo && (
-            <span className="rounded-md bg-purple-600 px-2 py-0.5 text-[10px] font-black text-white uppercase tracking-wide">
+            <span className="rounded-md bg-brand-teal px-2 py-0.5 text-[10px] font-black text-brand-gold uppercase tracking-wide ring-1 ring-brand-gold/40">
               Combo
             </span>
           )}
@@ -108,7 +108,7 @@ export function EbookCard({ ebook, searchQuery, className }: EbookCardProps) {
       {/* Content */}
       <div className="flex flex-1 flex-col px-3.5 pt-3 pb-3.5">
         {/* Title */}
-        <h3 className="mb-1.5 line-clamp-2 text-[14px] font-bold leading-snug text-gray-900 transition-colors group-hover:text-brand-teal">
+        <h3 className="font-heading mb-1.5 line-clamp-2 text-[14px] font-bold leading-snug text-brand-teal transition-colors group-hover:text-brand-gold">
           <HighlightText text={ebook.title} query={searchQuery} />
         </h3>
 
@@ -129,7 +129,7 @@ export function EbookCard({ ebook, searchQuery, className }: EbookCardProps) {
           </div>
 
           {/* CTA — full width */}
-          <div className="flex w-full items-center justify-center gap-1 rounded-xl bg-brand-teal px-2 py-2 text-[11px] font-bold text-white transition-colors group-hover:bg-brand-gold">
+          <div className="flex w-full items-center justify-center gap-1 rounded-md bg-brand-gold px-2 py-2 text-[11px] font-bold text-brand-teal transition-colors group-hover:bg-brand-teal group-hover:text-brand-gold">
             Download PDF
             <ArrowRight className="h-3 w-3 shrink-0 transition-transform group-hover:translate-x-0.5" />
           </div>

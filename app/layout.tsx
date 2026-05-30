@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Noto_Sans_Devanagari } from "next/font/google";
+import { Fraunces, Plus_Jakarta_Sans, Geist_Mono, Mukta } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AppProviders } from "@/components/providers/app-providers";
@@ -19,9 +19,17 @@ import {
   TWITTER_HANDLE,
 } from "@/lib/constants/site";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const fontSans = Plus_Jakarta_Sans({
+  variable: "--font-sans-base",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const fontHeading = Fraunces({
+  variable: "--font-heading",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "900"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
@@ -29,15 +37,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const notoDevanagari = Noto_Sans_Devanagari({
+const notoDevanagari = Mukta({
   variable: "--font-devanagari",
-  subsets: ["devanagari"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+  subsets: ["devanagari", "latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
 export const viewport: Viewport = {
-  themeColor: "#0A1F3D",
+  themeColor: "#5A1A2B",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -142,7 +150,7 @@ export default function RootLayout({
       </head>
 
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${notoDevanagari.variable} antialiased`}
+        className={`${fontSans.variable} ${fontHeading.variable} ${geistMono.variable} ${notoDevanagari.variable} antialiased`}
       >
         <TagManagerNoScript />
         <IABManager />
