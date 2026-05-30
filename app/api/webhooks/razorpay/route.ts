@@ -10,6 +10,9 @@ type RazorpayPaymentEntity = {
     payment_link_id?: string;
     email?: string;
     contact?: string;
+    error_code?: string;
+    error_description?: string;
+    error_reason?: string;
     notes?: {
         db_order_id?: string;
         [key: string]: unknown;
@@ -127,6 +130,39 @@ export async function POST(req: NextRequest) {
 
             const result = await fulfillOrder(order.id, paymentId, "webhook");
             return NextResponse.json({ ok: true, handled: true, orderId: result.orderId, isNewPayment: result.isNewPayment });
+        }
+
+        // Payment attempt declined by bank/card/UPI. Mark FAILED — but never overwrite a
+        // PAID/already-FAILED order. A later payment.captured (Razorpay allows retry on the
+        // same order_id) re-flips FAILED→PAID via fulfillOrder's `status != PAID` guard.
+        if (event === "payment.failed") {
+            const reason = payment?.error_description || payment?.error_reason || payment?.error_code || "Payment failed";
+            const updated = await prisma_db.order.updateMany({
+                where: { id: order.id, status: { notIn: ["PAID", "FAILED"] } },
+                data: { status: "FAILED", failureReason: String(reason) },
+            });
+            await logOrderEvent("PAYMENT_FAILED_WEBHOOK", "webhook", order.id, {
+                razorpayPaymentId: paymentId,
+                error_code: payment?.error_code,
+                error_description: payment?.error_description,
+                error_reason: payment?.error_reason,
+                statusChanged: updated.count > 0,
+            });
+            return NextResponse.json({ ok: true, handled: true, orderId: order.id, status: "FAILED", changed: updated.count > 0 });
+        }
+
+        // Payment link cancelled or expired — mark CANCELLED unless already PAID/FAILED.
+        if (event === "payment_link.cancelled" || event === "payment_link.expired") {
+            const updated = await prisma_db.order.updateMany({
+                where: { id: order.id, status: { notIn: ["PAID", "FAILED"] } },
+                data: { status: "CANCELLED", failureReason: event },
+            });
+            await logOrderEvent("ORDER_CANCELLED", "webhook", order.id, {
+                event,
+                razorpayPaymentLinkId: payment?.payment_link_id ?? paymentLink?.id,
+                statusChanged: updated.count > 0,
+            });
+            return NextResponse.json({ ok: true, handled: true, orderId: order.id, status: "CANCELLED", changed: updated.count > 0 });
         }
 
         return NextResponse.json({ ok: true, handled: false, reason: "event_ignored" });
