@@ -191,7 +191,8 @@ export async function fulfillOrder(
             console.info(`[FULFILLMENT] Marking order ${orderId} as PAID (won race)`);
             // Patch in-memory — relations didn't change, only status/razorpayPaymentId
             order = { ...order, status: "PAID", razorpayPaymentId } as typeof order;
-            await logOrderEvent("ORDER_FULFILLED", source, orderId, {
+            // Fire-and-forget — logging must not delay user redirect/response
+            void logOrderEvent("ORDER_FULFILLED", source, orderId, {
                 razorpayPaymentId,
                 amount: order.amount,
                 customerPhone: order.customerPhone,
@@ -199,11 +200,11 @@ export async function fulfillOrder(
             });
         } else {
             console.info(`[FULFILLMENT] Order ${orderId} was already PAID by another caller (lost race)`);
-            await logOrderEvent("ORDER_ALREADY_PAID", source, orderId, { razorpayPaymentId });
+            void logOrderEvent("ORDER_ALREADY_PAID", source, orderId, { razorpayPaymentId });
         }
     } else {
         console.info(`[FULFILLMENT] Order ${orderId} is already PAID. Re-processing fulfillment artifacts.`);
-        await logOrderEvent("ORDER_ALREADY_PAID", source, orderId, { razorpayPaymentId });
+        void logOrderEvent("ORDER_ALREADY_PAID", source, orderId, { razorpayPaymentId });
     }
 
     // 3. Send WhatsApp notification (NON-BLOCKING — doesn't delay user redirect)

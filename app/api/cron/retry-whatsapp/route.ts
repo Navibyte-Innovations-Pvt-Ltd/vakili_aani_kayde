@@ -33,7 +33,21 @@ export async function GET(req: Request) {
             items: {
                 include: {
                     ebook: {
-                        include: { includedEbooks: { include: { ebook: true } } },
+                        select: {
+                            id: true,
+                            title: true,
+                            fileUrl: true,
+                            pages: true,
+                            isCombo: true,
+                            comboOrder: true,
+                            includedEbooks: {
+                                select: {
+                                    ebook: {
+                                        select: { id: true, title: true, fileUrl: true, pages: true },
+                                    },
+                                },
+                            },
+                        },
                     },
                 },
             },

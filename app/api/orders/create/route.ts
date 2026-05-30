@@ -12,11 +12,25 @@ process.emitWarning = ((warning: string | Error) => {
     _origWarn(warning);
 }) as typeof process.emitWarning;
 
-// Module-scoped — reused across requests
+// Module-scoped — reused across warm instances
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID || "",
     key_secret: process.env.RAZORPAY_KEY_SECRET || "",
 });
+
+// Ebook cache — avoids DB roundtrip for same ebook on warm instances
+// TTL: 5 min (ebooks rarely change price mid-session)
+type CachedEbook = { id: string; price: number; isEnabled: boolean; title: string; ts: number };
+const ebookCache = new Map<string, CachedEbook>();
+const EBOOK_CACHE_TTL = 5 * 60 * 1000;
+
+async function getEbookCached(id: string) {
+    const cached = ebookCache.get(id);
+    if (cached && Date.now() - cached.ts < EBOOK_CACHE_TTL) return cached;
+    const ebook = await prisma_db.ebook.findUnique({ where: { id }, select: { id: true, price: true, isEnabled: true, title: true } });
+    if (ebook) ebookCache.set(id, { ...ebook, ts: Date.now() });
+    return ebook;
+}
 
 export async function POST(req: NextRequest) {
     try {
@@ -41,9 +55,7 @@ export async function POST(req: NextRequest) {
         // Parallelize independent checks to reduce latency
         const [rateLimitCheck, ebook] = await Promise.all([
             checkRateLimit(email || phoneClean || ip, "create-order"),
-            prisma_db.ebook.findUnique({
-                where: { id: ebookId },
-            })
+            getEbookCached(ebookId),
         ]);
 
         if (!rateLimitCheck.isAllowed) {
