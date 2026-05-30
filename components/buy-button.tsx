@@ -186,37 +186,43 @@ const RZP_SCRIPT_URL = "https://checkout.razorpay.com/v1/checkout.js";
 const loadScript = (src: string): Promise<boolean> => {
   return new Promise((resolve) => {
     if (typeof document === "undefined") return resolve(false);
+    // Already loaded — fastest path
     if (typeof window.Razorpay !== "undefined") return resolve(true);
 
-    // Script tag injected by next/script — wait for it to finish loading
-    const existing = document.querySelector(`script[src="${src}"]`) as HTMLScriptElement | null;
+    // Dedup: if a script tag for this src already exists (any source), poll for window.Razorpay
+    // rather than injecting a second tag. Handles Next.js Script + preload cases.
+    const existing = Array.from(document.querySelectorAll("script")).find(
+      (s) => s.src === src || s.getAttribute("src") === src
+    );
+
     if (existing) {
+      // Script in DOM but not yet executed — poll
       const checkInterval = setInterval(() => {
         if (typeof window.Razorpay !== "undefined") {
           clearInterval(checkInterval);
           clearTimeout(timeout);
           resolve(true);
         }
-      }, 50); // Poll every 50ms instead of 100ms
+      }, 50);
       const timeout = setTimeout(() => {
         clearInterval(checkInterval);
         resolve(typeof window.Razorpay !== "undefined");
-      }, 5000); // 5s max wait — if not loaded in 5s, network is too slow
+      }, 8000);
       return;
     }
 
-    // Fallback: inject script ourselves (should rarely happen)
+    // Inject fresh script tag (preload hint already fetched it; execution is instant)
     const script = document.createElement("script");
     script.src = src;
     script.async = true;
     script.onload = () => resolve(true);
     script.onerror = () => {
-      console.error("Razorpay script failed to load. Ad-blocker or network issues?");
+      console.error("Razorpay script failed to load — ad-blocker or network error.");
       resolve(false);
     };
     document.body.appendChild(script);
-
-    setTimeout(() => resolve(typeof window.Razorpay !== "undefined"), 5000);
+    // Safety timeout — if onload never fires
+    setTimeout(() => resolve(typeof window.Razorpay !== "undefined"), 8000);
   });
 };
 

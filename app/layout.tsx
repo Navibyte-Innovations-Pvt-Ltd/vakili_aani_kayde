@@ -137,6 +137,7 @@ export default function RootLayout({
         <ThirdPartyScripts />
         <link rel="preconnect" href="https://checkout.razorpay.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://checkout.razorpay.com" />
+        <link rel="preload" href="https://checkout.razorpay.com/v1/checkout.js" as="script" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://api.razorpay.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://api.razorpay.com" />
       </head>
