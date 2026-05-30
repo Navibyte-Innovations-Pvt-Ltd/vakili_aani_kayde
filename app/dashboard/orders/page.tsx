@@ -2,7 +2,6 @@ import { prisma_db } from "@/lib/prisma";
 import { OrdersClient } from "./orders-client";
 import { StatsCards } from "./stats-cards";
 import { RefreshButton } from "./refresh-button";
-import { RevenueChart } from "./revenue-chart";
 import { DropAnalysis, type DropBucket } from "./drop-analysis";
 import { getISTDateRange, getNowIST, fromIST } from "@/lib/date-utils";
 import { startOfDay, startOfMonth, endOfMonth, subMonths, subDays } from "date-fns";
@@ -223,9 +222,6 @@ export default async function OrdersPage({ searchParams }: { searchParams?: Prom
 
             {/* Drop-off Analysis */}
             <DropAnalysis buckets={dropBuckets} totalPending={pendingOrders.length} />
-
-            {/* Revenue Chart */}
-            <RevenueChart orders={serializedOrders} dateFilter={dateFilter} />
 
             {/* Orders Table */}
             <OrdersClient orders={serializedOrders} loadedAt={new Date().toISOString()} customFrom={customFrom} customTo={customTo} />

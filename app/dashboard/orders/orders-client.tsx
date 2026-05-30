@@ -181,6 +181,7 @@ export function OrdersClient({ orders, loadedAt, customFrom, customTo }: OrdersC
     const [staleMinutes, setStaleMinutes] = useState(0);
     const [fromInput, setFromInput] = useState(customFrom || "");
     const [toInput, setToInput] = useState(customTo || "");
+    const [showCustom, setShowCustom] = useState(!!customFrom);
 
     const dateFilter = searchParams.get("date") || "today";
     const isCustomActive = !!customFrom;
@@ -602,10 +603,10 @@ export function OrdersClient({ orders, loadedAt, customFrom, customTo }: OrdersC
                                 {DATE_FILTERS.map((f) => (
                                     <button
                                         key={f.value}
-                                        onClick={() => f.value === 'custom' ? undefined : handleDateChange(f.value)}
+                                        onClick={() => f.value === 'custom' ? setShowCustom(s => !s) : handleDateChange(f.value)}
                                         className={cn(
                                             "rounded-lg px-3 py-1.5 text-xs font-semibold transition-all",
-                                            (f.value === 'custom' ? isCustomActive : dateFilter === f.value && !isCustomActive)
+                                            (f.value === 'custom' ? showCustom : dateFilter === f.value && !isCustomActive)
                                                 ? "bg-white text-[#0A2342] shadow-sm ring-1 ring-black/5"
                                                 : "text-gray-500 hover:bg-gray-200/50 hover:text-gray-900"
                                         )}
@@ -615,7 +616,7 @@ export function OrdersClient({ orders, loadedAt, customFrom, customTo }: OrdersC
                                 ))}
                             </div>
                             {/* Custom date inputs — always visible for quick access when Custom selected */}
-                            {(isCustomActive || dateFilter === 'custom') && (
+                            {showCustom && (
                                 <div className="flex items-center gap-2">
                                     <input
                                         type="date"

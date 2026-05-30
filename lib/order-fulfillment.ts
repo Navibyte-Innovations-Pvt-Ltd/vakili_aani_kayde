@@ -6,7 +6,27 @@ import { sendOrderWhatsapp } from "@/lib/send-order-whatsapp";
 import { sendMetaCAPIPurchase } from "@/lib/meta-capi";
 
 const ORDER_INCLUDE = {
-    items: { include: { ebook: { include: { includedEbooks: { include: { ebook: true } } } } } },
+    items: {
+        include: {
+            ebook: {
+                select: {
+                    id: true,
+                    title: true,
+                    fileUrl: true,
+                    pages: true,
+                    isCombo: true,
+                    comboOrder: true,
+                    includedEbooks: {
+                        select: {
+                            ebook: {
+                                select: { id: true, title: true, fileUrl: true, pages: true },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
 } as const;
 
 /** Fetch order with items and flatten ComboItem join records */

@@ -201,6 +201,7 @@ model Order {
   @@index([razorpayOrderId])
   @@index([status])
   @@index([createdAt])
+  @@index([customerPhone, status, createdAt])
 }
 
 model OrderItem {
