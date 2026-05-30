@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import confetti from "canvas-confetti";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -23,7 +22,6 @@ import {
 import { FaWhatsapp } from "react-icons/fa";
 import { format } from "date-fns";
 import { ComboCarousel } from "./combo-carousel";
-import { DownloadInstructions } from "./_components/download-instructions";
 import { PurchasePixelEvent } from "@/components/purchase-pixel-event";
 
 interface Order {
@@ -59,7 +57,7 @@ export default function MyBooksPage() {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState<Order[] | null>(null);
-  const [showInstructions, setShowInstructions] = useState(false);
+  const [downloadingKey, setDownloadingKey] = useState<string | null>(null);
   const [isFinalizing, setIsFinalizing] = useState(false);
   const [pollingTimedOut, setPollingTimedOut] = useState(false);
   const [justPurchasedOrder, setJustPurchasedOrder] = useState<{
@@ -73,7 +71,6 @@ export default function MyBooksPage() {
     amount: number;
     contentIds: string[];
   } | null>(null);
-  const isMobile = useIsMobile();
 
   const performSearch = useCallback(async (searchTerm: string) => {
     if (!searchTerm.trim()) return;
@@ -129,7 +126,6 @@ export default function MyBooksPage() {
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ["#0A1F3D", "#C9962A", "#25D366"] });
         const phoneToSearch = paramPhone || localStorage.getItem("customer_phone");
         if (phoneToSearch) performSearch(phoneToSearch);
-        if (isMobile) setTimeout(() => setShowInstructions(true), 2500);
         if (amount > 0) {
           setIsFinalizing(true);
           setTimeout(() => setIsFinalizing(false), 3000);
@@ -187,9 +183,30 @@ export default function MyBooksPage() {
       }
     }
     return () => { if (pollIntervalId !== null) clearInterval(pollIntervalId); };
-  }, [isMobile, performSearch]);
+  }, [performSearch]);
 
   const handleSearch = async (e: React.FormEvent) => { e.preventDefault(); performSearch(query); };
+
+  // Trigger the PDF download and show a loader on the button. The file is served
+  // via a CloudFront/S3 signed URL (cross-origin, no CORS) so the browser handles
+  // the actual download — we can't read completion in JS. Show the loader for a
+  // short window to confirm the click registered, then reset.
+  const handleDownload = useCallback((url: string, key: string) => {
+    if (downloadingKey) return;
+    setDownloadingKey(key);
+    const dlUrl = `${url}?dl=1`;
+    // Kick off the download without navigating away from the page.
+    const a = document.createElement("a");
+    a.href = dlUrl;
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => {
+      setDownloadingKey(null);
+      toast.success("डाउनलोड सुरू झाले! 📥");
+    }, 2500);
+  }, [downloadingKey]);
 
   const justPurchasedItem = justPurchasedOrder && orders
     ? orders.flatMap(o => o.items).find(i => i.ebookId === justPurchasedOrder.ebookId || i.title === justPurchasedOrder.title)
@@ -206,9 +223,6 @@ export default function MyBooksPage() {
           numItems={purchasePixel.contentIds.length}
         />
       )}
-
-      {/* Help dialog kept mounted (auto-opens after purchase / on download click) */}
-      <DownloadInstructions open={showInstructions} onOpenChange={setShowInstructions} showTrigger={false} />
 
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-5 md:max-w-4xl">
 
@@ -252,14 +266,18 @@ export default function MyBooksPage() {
                 {justPurchasedItem ? (
                   <div className="mt-4 w-full">
                     <div className="grid grid-cols-2 gap-2.5">
-                      <a
-                        href={`${justPurchasedItem.url}?dl=1`}
-                        rel="noopener noreferrer"
-                        onClick={() => setShowInstructions(true)}
-                        className="flex items-center justify-center gap-1.5 rounded-xl bg-brand-gold py-3 text-sm font-black text-white shadow-lg shadow-brand-gold/20 transition-all hover:bg-brand-gold/90 active:scale-95"
+                      <button
+                        type="button"
+                        disabled={downloadingKey === "just-purchased"}
+                        onClick={() => handleDownload(justPurchasedItem.url, "just-purchased")}
+                        className="flex items-center justify-center gap-1.5 rounded-xl bg-brand-gold py-3 text-sm font-black text-white shadow-lg shadow-brand-gold/20 transition-all hover:bg-brand-gold/90 active:scale-95 disabled:opacity-70"
                       >
-                        <Download className="h-4 w-4" /> Download
-                      </a>
+                        {downloadingKey === "just-purchased" ? (
+                          <><Loader2 className="h-4 w-4 animate-spin" /> डाउनलोड होत आहे...</>
+                        ) : (
+                          <><Download className="h-4 w-4" /> Download</>
+                        )}
+                      </button>
                       {WA_NUMBER ? (
                         <a
                           href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`📚 *वकिली आणि कायदे — माझी PDF*\n\n📖 *${justPurchasedItem.title}*\n\n🔗 Download Link:\n${justPurchasedItem.url}\n\n⚠️ हा link फक्त माझ्यासाठी आहे. हे message save करा.`)}`}
@@ -280,9 +298,6 @@ export default function MyBooksPage() {
                         </a>
                       )}
                     </div>
-                    <button onClick={() => setShowInstructions(true)} className="mt-2.5 text-[10px] font-bold text-white/40 underline-offset-2 transition-colors hover:text-white/70 hover:underline">
-                      PDF कुठे मिळेल?
-                    </button>
                   </div>
                 ) : (
                   <div className="mt-4 flex items-center gap-2 text-sm font-bold text-white/50">
@@ -437,12 +452,16 @@ export default function MyBooksPage() {
                           <FaWhatsapp className="h-3.5 w-3.5" />
                           Save Link
                         </a>
-                        <a href={`${item.url}?dl=1`} rel="noopener noreferrer"
-                          className="flex items-center justify-center gap-1.5 rounded-xl bg-brand-teal py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-brand-teal/90 active:scale-95"
-                          onClick={() => setShowInstructions(true)}>
-                          <Download className="h-3.5 w-3.5" />
-                          Download
-                        </a>
+                        <button type="button"
+                          disabled={downloadingKey === `${order.id}-${idx}`}
+                          className="flex items-center justify-center gap-1.5 rounded-xl bg-brand-teal py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-brand-teal/90 active:scale-95 disabled:opacity-70"
+                          onClick={() => handleDownload(item.url, `${order.id}-${idx}`)}>
+                          {downloadingKey === `${order.id}-${idx}` ? (
+                            <><Loader2 className="h-3.5 w-3.5 animate-spin" /> डाउनलोड होत आहे...</>
+                          ) : (
+                            <><Download className="h-3.5 w-3.5" /> Download</>
+                          )}
+                        </button>
                       </div>
                     </div>
                   ))}
