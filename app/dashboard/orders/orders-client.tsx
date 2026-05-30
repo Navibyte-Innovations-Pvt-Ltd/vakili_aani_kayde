@@ -156,6 +156,8 @@ interface Order {
 interface OrdersClientProps {
     orders: Order[];
     loadedAt: string;
+    customFrom?: string;
+    customTo?: string;
 }
 
 // --- CSV helpers (properly escaped) ---
@@ -167,7 +169,7 @@ function csvEscape(value: string | number | null | undefined): string {
     return str;
 }
 
-export function OrdersClient({ orders, loadedAt }: OrdersClientProps) {
+export function OrdersClient({ orders, loadedAt, customFrom, customTo }: OrdersClientProps) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -177,8 +179,11 @@ export function OrdersClient({ orders, loadedAt }: OrdersClientProps) {
     const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
     const [drawerOrder, setDrawerOrder] = useState<Order | null>(null);
     const [staleMinutes, setStaleMinutes] = useState(0);
+    const [fromInput, setFromInput] = useState(customFrom || "");
+    const [toInput, setToInput] = useState(customTo || "");
 
     const dateFilter = searchParams.get("date") || "today";
+    const isCustomActive = !!customFrom;
 
     // Staleness ticker
     useEffect(() => {
@@ -191,7 +196,19 @@ export function OrdersClient({ orders, loadedAt }: OrdersClientProps) {
 
     const handleDateChange = (value: string) => {
         const params = new URLSearchParams(searchParams);
+        params.delete("from");
+        params.delete("to");
         if (value) params.set("date", value); else params.delete("date");
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
+    const handleCustomApply = () => {
+        if (!fromInput) return;
+        const params = new URLSearchParams(searchParams);
+        params.delete("date");
+        params.set("from", fromInput);
+        if (toInput) params.set("to", toInput);
+        else params.delete("to");
         router.push(`${pathname}?${params.toString()}`);
     };
 
@@ -378,6 +395,7 @@ export function OrdersClient({ orders, loadedAt }: OrdersClientProps) {
         { label: '2M', value: '2months' },
         { label: '3M', value: '3months' },
         { label: 'All', value: 'all' },
+        { label: 'Custom', value: 'custom' },
     ];
 
     const STATUS_FILTERS = [
@@ -579,21 +597,48 @@ export function OrdersClient({ orders, loadedAt }: OrdersClientProps) {
                         </div>
 
                         {/* Date Filter */}
-                        <div className="flex w-fit items-center self-start rounded-xl bg-gray-100/80 p-1 md:self-auto">
-                            {DATE_FILTERS.map((f) => (
-                                <button
-                                    key={f.value}
-                                    onClick={() => handleDateChange(f.value)}
-                                    className={cn(
-                                        "rounded-lg px-3 py-1.5 text-xs font-semibold transition-all",
-                                        dateFilter === f.value
-                                            ? "bg-white text-[#0A2342] shadow-sm ring-1 ring-black/5"
-                                            : "text-gray-500 hover:bg-gray-200/50 hover:text-gray-900"
-                                    )}
-                                >
-                                    {f.label}
-                                </button>
-                            ))}
+                        <div className="flex flex-col gap-2 self-start md:self-auto">
+                            <div className="flex w-fit items-center rounded-xl bg-gray-100/80 p-1">
+                                {DATE_FILTERS.map((f) => (
+                                    <button
+                                        key={f.value}
+                                        onClick={() => f.value === 'custom' ? undefined : handleDateChange(f.value)}
+                                        className={cn(
+                                            "rounded-lg px-3 py-1.5 text-xs font-semibold transition-all",
+                                            (f.value === 'custom' ? isCustomActive : dateFilter === f.value && !isCustomActive)
+                                                ? "bg-white text-[#0A2342] shadow-sm ring-1 ring-black/5"
+                                                : "text-gray-500 hover:bg-gray-200/50 hover:text-gray-900"
+                                        )}
+                                    >
+                                        {f.label}
+                                    </button>
+                                ))}
+                            </div>
+                            {/* Custom date inputs — always visible for quick access when Custom selected */}
+                            {(isCustomActive || dateFilter === 'custom') && (
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="date"
+                                        value={fromInput}
+                                        onChange={(e) => setFromInput(e.target.value)}
+                                        className="rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-medium text-gray-700 shadow-sm focus:border-[#0A2342] focus:outline-none"
+                                    />
+                                    <span className="text-xs text-gray-400">to</span>
+                                    <input
+                                        type="date"
+                                        value={toInput}
+                                        onChange={(e) => setToInput(e.target.value)}
+                                        className="rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs font-medium text-gray-700 shadow-sm focus:border-[#0A2342] focus:outline-none"
+                                    />
+                                    <button
+                                        onClick={handleCustomApply}
+                                        disabled={!fromInput}
+                                        className="rounded-lg bg-[#0A2342] px-3 py-1.5 text-xs font-bold text-white shadow-sm disabled:opacity-40 hover:bg-[#0A2342]/90"
+                                    >
+                                        Apply
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
 

@@ -32,11 +32,27 @@ function getComparisonQuery(filter: DateFilter, nowIST: Date) {
     }
 }
 
-export default async function OrdersPage({ searchParams }: { searchParams?: Promise<{ date?: string }> }) {
-    const dateFilter = ((await searchParams)?.date as DateFilter) || 'today';
-    const dateQuery = getISTDateRange(dateFilter);
+export default async function OrdersPage({ searchParams }: { searchParams?: Promise<{ date?: string; from?: string; to?: string }> }) {
+    const sp = await searchParams;
+    const dateFilter = (sp?.date as DateFilter) || 'today';
     const nowIST = getNowIST();
-    const comparisonQuery = getComparisonQuery(dateFilter, nowIST);
+
+    // Custom date range takes priority over preset filter
+    const customFrom = sp?.from;
+    const customTo = sp?.to;
+    const isCustom = !!customFrom;
+
+    let dateQuery: { gte?: Date; lte?: Date } | undefined;
+    if (isCustom) {
+        // Parse YYYY-MM-DD strings as IST start/end of day
+        const fromDate = new Date(`${customFrom}T00:00:00+05:30`);
+        const toDate = customTo ? new Date(`${customTo}T23:59:59+05:30`) : new Date();
+        dateQuery = { gte: fromDate, lte: toDate };
+    } else {
+        dateQuery = getISTDateRange(dateFilter);
+    }
+
+    const comparisonQuery = isCustom ? undefined : getComparisonQuery(dateFilter, nowIST);
 
     const [orders, currentStats, previousStats, statusCounts, failedStats] = await Promise.all([
         prisma_db.order.findMany({
@@ -212,7 +228,7 @@ export default async function OrdersPage({ searchParams }: { searchParams?: Prom
             <RevenueChart orders={serializedOrders} dateFilter={dateFilter} />
 
             {/* Orders Table */}
-            <OrdersClient orders={serializedOrders} loadedAt={new Date().toISOString()} />
+            <OrdersClient orders={serializedOrders} loadedAt={new Date().toISOString()} customFrom={customFrom} customTo={customTo} />
         </div>
     );
 }

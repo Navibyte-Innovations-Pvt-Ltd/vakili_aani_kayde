@@ -56,6 +56,9 @@ export const metadata: Metadata = {
   authors: [{ name: "Adv. Omkar Shinde", url: SITE_URL }],
   creator: "Adv. Omkar Shinde",
   publisher: SITE_NAME,
+  other: {
+    "facebook-domain-verification": "p95z2wpc16r8xi96cgfc916s6okia9",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
