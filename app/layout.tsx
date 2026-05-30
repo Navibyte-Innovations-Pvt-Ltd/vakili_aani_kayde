@@ -55,9 +55,15 @@ export const metadata: Metadata = {
   authors: [{ name: "Adv. Omkar Shinde", url: SITE_URL }],
   creator: "Adv. Omkar Shinde",
   publisher: SITE_NAME,
-  other: {
-    "facebook-domain-verification": "p95z2wpc16r8xi96cgfc916s6okia9",
-  },
+  ...(process.env.NEXT_PUBLIC_FACEBOOK_DOMAIN_VERIFICATION
+    ? {
+        other: {
+          // TODO: set per-domain token in .env
+          "facebook-domain-verification":
+            process.env.NEXT_PUBLIC_FACEBOOK_DOMAIN_VERIFICATION,
+        },
+      }
+    : {}),
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -81,7 +87,7 @@ export const metadata: Metadata = {
     locale: "mr_IN",
     url: SITE_URL,
     title: SITE_TITLE,
-    description: "हक्क समजून घ्या, योग्य निर्णय घ्या. दररोज उपयोगी पडणारी कायदेशीर माहिती — थेट आणि स्पष्ट.",
+    description: "तुमचे हक्क जाणा, योग्य निर्णय घ्या — Adv. Omkar Shinde यांच्या कलमातून थेट कायदेशीर मार्गदर्शन.",
     siteName: SITE_NAME,
     images: [
       {
@@ -95,12 +101,16 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: SITE_TITLE,
-    description: "हक्क समजून घ्या, योग्य निर्णय घ्या. दररोज उपयोगी पडणारी कायदेशीर माहिती — थेट आणि स्पष्ट.",
+    description: "तुमचे हक्क जाणा, योग्य निर्णय घ्या — Adv. Omkar Shinde यांच्या कलमातून थेट कायदेशीर मार्गदर्शन.",
     images: ["/image.png"],
     creator: TWITTER_HANDLE,
   },
   alternates: {
     canonical: "/",
+  },
+  verification: {
+    // TODO: generate fresh token for vakilianikayde.in in Search Console, set NEXT_PUBLIC_GSC_VERIFICATION in .env
+    google: process.env.NEXT_PUBLIC_GSC_VERIFICATION,
   },
   robots: {
     index: true,

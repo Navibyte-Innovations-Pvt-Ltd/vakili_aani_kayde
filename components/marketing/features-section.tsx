@@ -4,19 +4,19 @@ export function FeaturesSection() {
     const features = [
         {
             icon: BookOpen,
-            title: "सोपी भाषा",
-            desc: "कायद्याची क्लिष्ट आणि अवघड भाषा सोप्या मराठीत समजून घ्या.",
+            title: "स्पष्ट मराठी",
+            desc: "गुंतागुंतीचे कायदे साध्या, थेट मराठीत — कोणत्याही पूर्वज्ञानाशिवाय समजण्यासाठी.",
         },
         {
             icon: ShieldCheck,
-            title: "तज्ञांचे मार्गदर्शन",
-            desc: "उच्च न्यायालयातील अनुभवी वकीलांकडून तयार केलेले खात्रीशीर साहित्य.",
+            title: "वकिलाने लिहिलेले",
+            desc: "Adv. Omkar Shinde यांनी प्रत्यक्ष व्यवहाराच्या अनुभवातून तयार केलेले अचूक मार्गदर्शन.",
             featured: true,
         },
         {
             icon: Wallet,
-            title: "किफायतशीर दर",
-            desc: "सर्वसामान्यांना सहज परवडणाऱ्या दरात कायदेशीर ई-बुक्स उपलब्ध.",
+            title: "परवडणारी किंमत",
+            desc: "प्रत्येकाला हक्काचे ज्ञान मिळावे यासाठी अत्यंत माफक दरात उपलब्ध.",
         },
     ];
 
@@ -27,7 +27,7 @@ export function FeaturesSection() {
                     वकिली आणि कायदे का?
                 </span>
                 <h2 className="relative mb-12 text-2xl font-black text-brand-teal md:text-4xl">
-                    नागरिकांसाठी महत्त्वाचे फायदे
+                    वकिली आणि कायदे का निवडावे?
                     <span className="absolute -bottom-3 left-1/2 h-1 w-16 -translate-x-1/2 rounded-full bg-brand-gold md:w-24" />
                 </h2>
 

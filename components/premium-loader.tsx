@@ -10,8 +10,8 @@ interface PremiumLoaderProps {
 }
 
 export function PremiumLoader({
-    marathiText = "लोड होत आहे...",
-    englishText = "Loading Knowledge",
+    marathiText = "माहिती तयार होत आहे...",
+    englishText = "Preparing Your Legal Guide",
     fullScreen = false,
 }: PremiumLoaderProps) {
     const [progress, setProgress] = useState(8);

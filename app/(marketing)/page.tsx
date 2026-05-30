@@ -22,9 +22,9 @@ export default function Home() {
         <CombosContainer />
       </Suspense>
 
-      <BuyingGuideSection />
-
       <FeaturesSection />
+
+      <BuyingGuideSection />
       {/* LeadMagnet hidden as it is email-based
       <div className="container mx-auto px-4 py-16">
         <LeadMagnet />

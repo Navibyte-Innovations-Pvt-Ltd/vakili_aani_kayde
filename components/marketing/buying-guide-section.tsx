@@ -7,29 +7,29 @@ export function BuyingGuideSection() {
   const steps = [
     {
       icon: BookOpen,
-      title: "१. पुस्तक निवडा",
-      desc: "तुम्हाला हवे असलेले ई-बुक किंवा कॉम्बो पॅक निवडा आणि 'आता डाउनलोड करा' बटणावर क्लिक करा.",
+      title: "१. ई-बुक निवडा",
+      desc: "तुमच्या गरजेनुसार ई-बुक अथवा कॉम्बो पॅक निवडा. 'आता खरेदी करा' या बटणावर टॅप करा.",
       color: "text-blue-600",
       bg: "bg-blue-50",
     },
     {
       icon: Smartphone,
-      title: "२. माहिती भरा",
-      desc: "तुमचे नाव आणि व्हॉट्सॲप नंबर अचूक भरा. याच नंबरवर तुम्हाला ई-बुकची लिंक मिळेल.",
+      title: "२. संपर्क तपशील द्या",
+      desc: "नाव व व्हॉट्सॲप क्रमांक योग्यरित्या नोंदवा — त्याच क्रमांकावर ई-बुक पाठवले जाईल.",
       color: "text-purple-600",
       bg: "bg-purple-50",
     },
     {
       icon: ShieldCheck,
-      title: "३. सुरक्षित पेमेंट",
-      desc: "Google Pay, PhonePe, Paytm किंवा कार्डद्वारे सुरक्षितपणे पेमेंट पूर्ण करा.",
+      title: "३. पेमेंट करा",
+      desc: "UPI, Google Pay, PhonePe किंवा डेबिट/क्रेडिट कार्डने सुरक्षितपणे रक्कम भरा.",
       color: "text-green-600",
       bg: "bg-green-50",
     },
     {
       icon: Download,
-      title: "४. लगेच डाउनलोड",
-      desc: "पेमेंट होताच ई-बुकची PDF लगेच डाउनलोड करा आणि वाचनाचा आनंद घ्या!",
+      title: "४. PDF मिळवा",
+      desc: "पेमेंट यशस्वी होताच PDF तुमच्या व्हॉट्सॲपवर येईल — ताबडतोब वाचनास सुरुवात करा.",
       color: "text-brand-gold",
       bg: "bg-amber-50",
     },
@@ -49,13 +49,13 @@ export function BuyingGuideSection() {
         {/* Section Header */}
         <div className="mx-auto mb-12 max-w-2xl text-center lg:mb-16">
           <span className="mb-2 inline-block rounded-full bg-brand-teal/10 px-4 py-1.5 text-sm font-bold text-brand-teal">
-            सोपी प्रक्रिया
+            खरेदीची पद्धत
           </span>
           <h2 className="mb-4 text-3xl font-black text-brand-teal lg:text-4xl">
-            ई-बुक कसे खरेदी करावे?
+            तुमचे ई-बुक कसे मिळवाल?
           </h2>
           <p className="text-lg font-medium text-gray-600">
-            फक्त ४ सोप्या स्टेप्समध्ये कायदेशीर ज्ञान मिळवा
+            चार पायऱ्यांमध्ये कायदेशीर ज्ञान तुमच्यापर्यंत
           </p>
         </div>
 
@@ -107,9 +107,9 @@ export function BuyingGuideSection() {
               <HelpCircle className="h-6 w-6" />
             </div>
             <div className="text-left">
-              <h4 className="text-lg font-bold text-brand-teal">काही अडचण येत आहे?</h4>
+              <h4 className="text-lg font-bold text-brand-teal">मदत हवी आहे का?</h4>
               <p className="text-sm font-medium text-gray-600">
-                पेमेंट केल्यानंतर ई-बुक मिळाले नाही? काळजी करू नका! आमची सपोर्ट टीम तुम्हाला मदत करेल.
+                पेमेंट झाले पण PDF आला नाही? आम्ही लगेच मदत करू — खाली दिलेल्या क्रमांकावर व्हॉट्सॲप करा.
                 <br className="hidden sm:block" />
                 व्हॉट्सॲप करा: <span className="font-bold text-gray-900">+91 8149319058</span>
               </p>
