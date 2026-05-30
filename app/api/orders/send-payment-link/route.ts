@@ -1,22 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma_db } from "@/lib/prisma";
-import Razorpay from "razorpay";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { logOrderEvent } from "@/lib/order-logger";
 import { sendPaymentReminder } from "@/lib/whatsapp";
-import { getBaseUrl } from "@/lib/base-url";
-
-// Suppress DEP0169: Razorpay SDK v2.9.6 uses url.parse() internally
-const _origWarn = process.emitWarning.bind(process);
-process.emitWarning = ((warning: string | Error) => {
-    if (typeof warning === "string" && warning.includes("DEP0169")) return;
-    _origWarn(warning);
-}) as typeof process.emitWarning;
-
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID || "",
-    key_secret: process.env.RAZORPAY_KEY_SECRET || "",
-});
+import { getOrCreatePaymentLink } from "@/lib/get-or-create-payment-link";
 
 export async function POST(req: NextRequest) {
     try {
@@ -58,34 +45,8 @@ export async function POST(req: NextRequest) {
 
         const bookTitle = order.items[0]?.ebook?.title || "Ebook";
         const customerName = order.customerName || "Customer";
-        const baseUrl = getBaseUrl();
-        const callbackUrl = `${baseUrl}/api/payment/link-callback`;
 
-        // If payment link already exists on order, reuse it
-        let paymentLinkUrl: string;
-
-        if (order.razorpayPaymentLinkId) {
-            // Fetch existing payment link to check if still active
-            try {
-                const existingLink = await razorpay.paymentLink.fetch(order.razorpayPaymentLinkId) as {
-                    id: string;
-                    status: string;
-                    short_url: string;
-                };
-                if (["created", "issued", "partially_paid"].includes(existingLink.status)) {
-                    // Still active, reuse it
-                    paymentLinkUrl = existingLink.short_url;
-                } else {
-                    // Expired or paid — create new one
-                    paymentLinkUrl = await createPaymentLink(order, callbackUrl);
-                }
-            } catch {
-                // Fetch failed — create new one
-                paymentLinkUrl = await createPaymentLink(order, callbackUrl);
-            }
-        } else {
-            paymentLinkUrl = await createPaymentLink(order, callbackUrl);
-        }
+        const paymentLinkUrl = await getOrCreatePaymentLink(order);
 
         await logOrderEvent("PAYMENT_LINK_CREATED", "payment-link", orderId, {
             paymentLinkUrl,
@@ -117,46 +78,4 @@ export async function POST(req: NextRequest) {
         console.error("[SEND_PAYMENT_LINK]", error);
         return NextResponse.json({ error: "Internal error" }, { status: 500 });
     }
-}
-
-async function createPaymentLink(
-    order: {
-        id: string;
-        amount: number;
-        customerName: string | null;
-        customerEmail: string | null;
-        customerPhone: string | null;
-        items: { ebook: { title: string } }[];
-    },
-    callbackUrl: string,
-): Promise<string> {
-    const bookTitle = order.items[0]?.ebook?.title || "Ebook";
-
-    const paymentLink = await razorpay.paymentLink.create({
-        amount: Math.round(order.amount * 100), // paise
-        currency: "INR",
-        description: `Payment for ${bookTitle}`,
-        reference_id: order.id,
-        customer: {
-            name: order.customerName || undefined,
-            email: order.customerEmail || undefined,
-            contact: order.customerPhone || undefined,
-        },
-        notify: { sms: false, email: false }, // We send our own WhatsApp
-        callback_url: callbackUrl,
-        callback_method: "get",
-        expire_by: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24hr expiry
-        notes: {
-            db_order_id: order.id,
-            book_title: bookTitle,
-        },
-    }) as { id: string; short_url: string };
-
-    // Store payment link ID on order
-    await prisma_db.order.update({
-        where: { id: order.id },
-        data: { razorpayPaymentLinkId: paymentLink.id },
-    });
-
-    return paymentLink.short_url;
 }

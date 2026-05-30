@@ -25,7 +25,7 @@ const TEMPLATES: Template[] = [
         params: [],
     },
     {
-        id: "pending_folloup_mr_v1",
+        id: "payment_pending_followup_camp_v1",
         label: "Pending Payment Follow-up",
         description: "Reminder for unpaid orders",
         hasMedia: false,

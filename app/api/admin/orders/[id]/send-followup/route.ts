@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma_db } from "@/lib/prisma";
 import { sendPaymentReminder } from "@/lib/whatsapp";
 import { logOrderEvent } from "@/lib/order-logger";
+import { getOrCreatePaymentLink } from "@/lib/get-or-create-payment-link";
 
 export async function POST(
     _req: NextRequest,
@@ -25,21 +26,19 @@ export async function POST(
     if (!order.customerPhone) return new NextResponse("No phone number", { status: 400 });
 
     const bookTitle = order.items.map((i) => i.ebook.title).join(", ");
-    const firstEbookId = order.items[0]?.ebookId;
-    const resumeLink = firstEbookId
-        ? `https://www.vakilianikayde.in/ebooks/${firstEbookId}`
-        : "https://www.vakilianikayde.in/ebooks";
+    const paymentLink = await getOrCreatePaymentLink(order);
 
     await sendPaymentReminder(
         order.customerPhone,
         order.customerName || "Customer",
         bookTitle,
-        resumeLink,
+        paymentLink,
     );
 
     await logOrderEvent("PAYMENT_REMINDER_SENT", "server", order.id, {
         phone: order.customerPhone,
         source: "admin-manual",
+        paymentLink,
     });
 
     return NextResponse.json({ ok: true });

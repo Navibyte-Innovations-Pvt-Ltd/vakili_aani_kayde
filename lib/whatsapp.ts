@@ -312,7 +312,7 @@ export const sendPaymentReminder = async (
 ) => {
     await sendAisensyTemplate({
         phone,
-        campaignName: "pending_folloup_mr_v1",
+        campaignName: "payment_pending_followup_camp_v1",
         templateParams: [customerName, bookTitle, paymentResumeLink],
         customerName,
     });
