@@ -83,7 +83,7 @@ model OTP {
   verified  Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  @@index([email])
+  @@index([email, verified])
 }
 
 model PasswordResetToken {
@@ -95,7 +95,6 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
 
   @@index([email])
-  @@index([token])
 }
 
 model RateLimit {
@@ -108,7 +107,6 @@ model RateLimit {
   updatedAt  DateTime @updatedAt
 
   @@unique([identifier, action])
-  @@index([identifier, action])
 }
 
 model PushSubscription {
@@ -156,12 +154,13 @@ model Ebook {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([shortCode])
   @@index([isEnabled])
   @@index([isCombo])
   @@index([category])
   @@index([language])
   @@index([createdAt])
+  @@index([isEnabled, createdAt])
+  @@index([isEnabled, isCombo])
 }
 
 enum Language {
@@ -198,10 +197,11 @@ model Order {
 
   @@index([customerEmail])
   @@index([customerPhone])
-  @@index([razorpayOrderId])
   @@index([status])
   @@index([createdAt])
   @@index([customerPhone, status, createdAt])
+  @@index([status, createdAt])
+  @@index([status, whatsappSentAt, createdAt])
 }
 
 model OrderItem {
@@ -233,7 +233,6 @@ model ShortLink {
   createdAt DateTime  @default(now())
   expiresAt DateTime?
 
-  @@index([shortCode])
 }
 
 model OrderLog {
@@ -247,6 +246,7 @@ model OrderLog {
   @@index([orderId])
   @@index([event])
   @@index([createdAt])
+  @@index([orderId, event])
 }
 
 model ComboItem {
