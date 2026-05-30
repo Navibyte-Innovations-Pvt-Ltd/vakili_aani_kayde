@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { Home, BookOpen, Sparkles, Download } from "lucide-react";
+import { Scale, Library, Layers, BookMarked } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-  { href: "/", icon: Home, label: "Home" },
-  { href: "/ebooks", icon: BookOpen, label: "E-Books" },
-  { href: "/combos", icon: Sparkles, label: "Combos", special: true },
-  { href: "/my-books", icon: Download, label: "My Books" },
+  { href: "/", icon: Scale, label: "मुख्यपृष्ठ" },
+  { href: "/ebooks", icon: Library, label: "ई-बुक्स" },
+  { href: "/combos", icon: Layers, label: "कॉम्बो", special: true },
+  { href: "/my-books", icon: BookMarked, label: "पुस्तके" },
 ];
 
 export function BottomNav() {
@@ -17,43 +17,42 @@ export function BottomNav() {
 
   return (
     <nav className="pb-safe fixed right-0 bottom-0 left-0 z-50 md:hidden">
-      {/* Blur backing */}
-      <div className="absolute inset-0 bg-white/90 backdrop-blur-xl" />
-      {/* Top border accent */}
-      <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-brand-gold/30 to-transparent" />
+      {/* Solid paper backing with maroon top hairline */}
+      <div className="absolute inset-0 bg-brand-cream/95 backdrop-blur-xl" />
+      <div className="absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-brand-teal/0 via-brand-gold to-brand-teal/0" />
 
-      <div className="relative flex h-16 items-center justify-around px-2">
+      <div className="relative flex h-16 items-stretch justify-around px-2">
         {NAV_ITEMS.map(({ href, icon: Icon, label, special }) => {
           const active = pathname === href;
           return (
             <Link
               key={href}
               href={href}
-              className="flex flex-1 flex-col items-center justify-center gap-1 py-1 transition-all active:scale-90"
+              className="relative flex flex-1 flex-col items-center justify-center gap-1 py-1 transition-all active:scale-90"
             >
-              {/* Icon pill */}
-              <div
+              {/* Active top indicator bar */}
+              <span
                 className={cn(
-                  "relative flex h-9 w-9 items-center justify-center rounded-2xl transition-all duration-200",
-                  active
-                    ? "bg-brand-teal shadow-[0_4px_12px_rgba(10,31,61,0.18)]"
-                    : special
-                      ? "bg-brand-gold/10"
-                      : "bg-transparent",
+                  "absolute top-0 left-1/2 h-0.5 -translate-x-1/2 rounded-full bg-brand-teal transition-all duration-300",
+                  active ? "w-8 opacity-100" : "w-0 opacity-0",
                 )}
-              >
+              />
+
+              {/* Bare icon — outline style, no pill */}
+              <div className="relative">
                 <Icon
+                  strokeWidth={active ? 2.4 : 1.8}
                   className={cn(
-                    "h-4.5 w-4.5 transition-colors",
+                    "h-5.5 w-5.5 transition-all duration-200",
                     active
-                      ? "text-white"
+                      ? "text-brand-teal"
                       : special
                         ? "text-brand-gold"
-                        : "text-gray-400",
+                        : "text-brand-ink/40",
                   )}
                 />
                 {special && !active && (
-                  <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-orange-500" />
+                  <span className="absolute -top-1 -right-1.5 h-1.5 w-1.5 rounded-full bg-brand-gold ring-2 ring-brand-cream" />
                 )}
               </div>
 
@@ -65,7 +64,7 @@ export function BottomNav() {
                     ? "font-black text-brand-teal"
                     : special
                       ? "font-bold text-brand-gold"
-                      : "font-medium text-gray-400",
+                      : "font-medium text-brand-ink/40",
                 )}
               >
                 {label}

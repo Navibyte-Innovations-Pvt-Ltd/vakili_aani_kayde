@@ -48,7 +48,7 @@ export function HeroSection() {
                         className="h-13 min-w-48 rounded-lg bg-brand-gold px-8 text-base font-black text-white shadow-lg shadow-brand-gold/25 transition-all duration-200 hover:bg-brand-gold/90 hover:shadow-xl hover:shadow-brand-gold/30 active:scale-[0.98]"
                     >
                         <Link href="#ebooks" className="flex items-center gap-2">
-                            📖 Ebooks पहा — ₹49
+                            📖 Ebooks पहा
                         </Link>
                     </Button>
                     <Button
@@ -71,7 +71,7 @@ export function HeroSection() {
 
                 {/* Instant delivery badge */}
                 <p className="mt-5 text-xs font-medium text-slate-400">
-                    ⚡ Instant Download — Secure Payment — फक्त ₹49 पासून सुरुवात
+                    ⚡ Instant Download — Secure Payment — सुरक्षित आणि तत्काळ
                 </p>
             </div>
         </section>

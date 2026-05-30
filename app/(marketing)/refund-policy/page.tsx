@@ -4,7 +4,7 @@ import { LegalPageWrapper, LegalSection } from "@/components/legal-page-wrapper"
 
 export const metadata: Metadata = {
   title: "परतावा धोरण (Refund Policy) | वकिली आणि कायदे",
-  description: "Refund and Cancellation Policy for Vakili Aani Kayde — digital ebook purchases. (परतावा धोरण)",
+  description: "वकिली आणि कायदे — डिजिटल ई-बुक खरेदीसाठी लागू होणारे परतावा व रद्दीकरण धोरण. (Refund & Cancellation terms for digital ebook orders.)",
 };
 
 export default function RefundPolicyPage() {
@@ -14,55 +14,55 @@ export default function RefundPolicyPage() {
       titleEn="Refund & Cancellation Policy"
       icon={AlertTriangle}
       badge="डिजिटल उत्पादन धोरण"
-      badgeEn="All products are digital ebooks (PDF only). No physical copies are shipped."
-      bannerText="आम्ही केवळ डिजिटल ई-बुक्स (PDF) विकतो. एकदा खरेदी केल्यानंतर परतावा किंवा रद्दीकरण स्वीकारले जात नाही."
+      badgeEn="Every product is a digital ebook in PDF format only — nothing physical is shipped."
+      bannerText="आमची सर्व उत्पादने केवळ डिजिटल ई-बुक्स (PDF) आहेत. खरेदी एकदा पूर्ण झाली की परतावा अथवा रद्दीकरण दिले जात नाही."
     >
       <LegalSection number="१" title="आम्ही काय विकतो? (What We Sell)">
         <ul className="list-disc space-y-2 pl-6">
-          <li><strong>उत्पादनाचे स्वरूप:</strong> केवळ डिजिटल ई-बुक (PDF फाइल) — कोणतीही Hard Copy / Printed Book नाही.</li>
-          <li><strong>वितरण:</strong> पेमेंट यशस्वी झाल्यावर तत्काळ — ईमेल + WhatsApp द्वारे.</li>
-          <li><strong>उद्देश:</strong> संदर्भ आणि माहिती (Reference &amp; Educational) — कायदेशीर सल्ला नाही.</li>
+          <li><strong>उत्पादनाचे स्वरूप:</strong> फक्त डिजिटल ई-बुक (PDF फाइल) — कुठलीही Hard Copy किंवा Printed Book दिली जात नाही.</li>
+          <li><strong>वितरण:</strong> ईमेल आणि WhatsApp मार्फत, पेमेंट यशस्वी होताच लगेच.</li>
+          <li><strong>उद्देश:</strong> माहिती व संदर्भासाठी (Reference &amp; Educational) — हा कायदेशीर सल्ला नव्हे.</li>
         </ul>
-        <p className="mt-3 text-slate-400">Product type: Digital ebook PDF only. No physical/hard copy. Delivered instantly via email and WhatsApp. For reference and educational purposes only — not legal advice.</p>
+        <p className="mt-3 text-slate-400">These are PDF-only digital ebooks with no printed or physical version. They reach you immediately through email and WhatsApp, and are meant purely for reference and learning rather than as legal advice.</p>
       </LegalSection>
 
       <LegalSection number="२" title="परतावा धोरण (Refund Policy)">
-        <p className="mb-2">आमची सर्व पुस्तके PDF स्वरूपातील डिजिटल उत्पादने आहेत. एकदा डाउनलोड लिंक दिल्यानंतर परतावा शक्य नाही. खरेदी करण्यापूर्वी उत्पादन वर्णन काळजीपूर्वक वाचावे.</p>
-        <p className="text-slate-400">All products are digital PDFs. Once the download link is delivered, a refund is not possible. Customers are strongly advised to read the product description carefully before purchasing.</p>
+        <p className="mb-2">प्रत्येक पुस्तक हे PDF स्वरूपातील डिजिटल उत्पादन असल्याने, डाउनलोड लिंक एकदा पाठवल्यावर परतावा देता येत नाही. म्हणूनच खरेदीआधी उत्पादनाचे वर्णन नीट वाचून घ्यावे.</p>
+        <p className="text-slate-400">Because each item is a digital PDF, no refund can be given once the download link has been sent. We urge buyers to go through the product description thoroughly before placing an order.</p>
       </LegalSection>
 
       <LegalSection number="३" title="रद्दीकरण धोरण (Cancellation Policy)">
-        <p className="mb-2">डिजिटल उत्पादने तात्काळ वितरित होतात, त्यामुळे पेमेंट पूर्ण झाल्यानंतर ऑर्डर रद्द करता येत नाही. पेमेंट सुरू केल्यावर — Razorpay पेमेंट विंडो बंद करण्यापूर्वी — रद्द करणे शक्य आहे.</p>
-        <p className="text-slate-400">Since digital products are delivered instantly, cancellations are not possible after payment is completed. You may cancel before completing payment (by closing the Razorpay payment window).</p>
+        <p className="mb-2">डिजिटल उत्पादनांचे वितरण लगेच होत असल्यामुळे, पेमेंट पूर्ण झाल्यावर ऑर्डर रद्द करता येत नाही. मात्र पेमेंट पूर्ण होण्याआधी — म्हणजे Razorpay विंडो बंद करून — तुम्ही रद्द करू शकता.</p>
+        <p className="text-slate-400">As digital products go out instantly, an order cannot be cancelled once payment is done. Cancellation is only possible before you finish paying — simply close the Razorpay payment window.</p>
       </LegalSection>
 
       <LegalSection number="४" title="अपवाद परिस्थिती (Exceptional Circumstances)">
-        <p className="mb-3">खालील परिस्थितीत आम्ही मदत करू:</p>
+        <p className="mb-3">पुढील प्रसंगांमध्ये मात्र आम्ही तुमच्या मदतीला येऊ:</p>
         <ul className="list-disc space-y-3 pl-6">
           <li>
-            <strong>दुहेरी पेमेंट (Double Payment):</strong> तांत्रिक त्रुटीमुळे एकाच ऑर्डरसाठी दोनदा पैसे कापले गेल्यास — अतिरिक्त रक्कम परत केली जाईल.
-            <span className="block text-sm text-slate-400 mt-1">(If charged twice for the same order due to a technical error, the extra amount will be refunded.)</span>
+            <strong>दुहेरी पेमेंट (Double Payment):</strong> एखाद्या तांत्रिक बिघाडामुळे एकाच ऑर्डरचे पैसे दोन वेळा कापले गेले, तर जादा कापलेली रक्कम परत दिली जाईल.
+            <span className="block text-sm text-slate-400 mt-1">(Should a technical glitch deduct money twice for one order, the surplus amount is returned to you.)</span>
           </li>
           <li>
-            <strong>पेमेंट कापले पण पुस्तक नाही (Payment Deducted, Product Not Received):</strong> पेमेंट यशस्वी झाले पण 30 मिनिटांत पुस्तक मिळाले नाही, तर आम्ही पुस्तक पुन्हा पाठवू किंवा परतावा देऊ.
-            <span className="block text-sm text-slate-400 mt-1">(If payment was deducted but ebook was not delivered within 30 minutes, we will resend the ebook or initiate a full refund.)</span>
+            <strong>पेमेंट कापले पण पुस्तक नाही (Payment Deducted, Product Not Received):</strong> पैसे यशस्वीरीत्या कापले गेले परंतु 30 मिनिटांत पुस्तक पोहोचले नाही, अशा वेळी आम्ही ते पुन्हा पाठवू किंवा पूर्ण परतावा देऊ.
+            <span className="block text-sm text-slate-400 mt-1">(If the amount was taken but no ebook arrived within 30 minutes, we will either send it again or process a full refund.)</span>
           </li>
         </ul>
 
         <div className="mt-4 rounded-lg border border-gray-100 bg-gray-50 p-4 text-sm">
-          <p className="font-semibold mb-2">या परिस्थितीत काय करावे? (What to do)</p>
+          <p className="font-semibold mb-2">अशा वेळी कोणती पावले उचलावीत? (What to do)</p>
           <ol className="list-decimal pl-5 space-y-1 text-gray-600">
-            <li>Transaction ID आणि पेमेंटचा screenshot तयार करा.</li>
-            <li>खालील ईमेल वर 48 तासांत संपर्क करा.</li>
-            <li>आम्ही 48–72 तासांत प्रतिसाद देऊ आणि 7 कार्यालयीन दिवसांत निराकरण करू.</li>
+            <li>तुमचा Transaction ID व पेमेंटचा screenshot जवळ ठेवा.</li>
+            <li>48 तासांच्या आत खालील ईमेलवर आम्हाला कळवा.</li>
+            <li>आमचा प्रतिसाद 48–72 तासांत येईल आणि 7 कार्यालयीन दिवसांत प्रकरण निकाली काढले जाईल.</li>
           </ol>
-          <p className="mt-2 text-slate-400">(Prepare: Transaction ID + screenshot. Email us within 48 hours. We respond within 48–72 hours and resolve within 7 working days.)</p>
+          <p className="mt-2 text-slate-400">(Keep your Transaction ID and screenshot ready, write to us at the email below within 48 hours; we reply in 48–72 hours and settle the matter inside 7 working days.)</p>
         </div>
       </LegalSection>
 
       <LegalSection number="५" title="परतावा प्रक्रिया (Refund Process)">
-        <p className="mb-2">मान्य परतावा मूळ पेमेंट पद्धतीने (UPI / Card / Net Banking) दिला जातो. Razorpay processing वेळ: 5–7 कार्यालयीन दिवस.</p>
-        <p className="text-slate-400">Approved refunds are credited back to the original payment method (UPI/Card/Net Banking) via Razorpay within 5–7 working days.</p>
+        <p className="mb-2">मंजूर झालेला परतावा ज्या पद्धतीने पैसे भरले होते त्याच मार्गाने (UPI / Card / Net Banking) जमा केला जातो. Razorpay मार्फत यासाठी 5–7 कार्यालयीन दिवस लागतात.</p>
+        <p className="text-slate-400">Once approved, the refund returns to the same payment route you used (UPI/Card/Net Banking), processed through Razorpay over 5–7 working days.</p>
       </LegalSection>
 
       <LegalSection number="६" title="तक्रार / Support संपर्क (Grievance Contact)">

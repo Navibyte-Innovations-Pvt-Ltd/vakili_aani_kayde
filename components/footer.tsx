@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Phone, MapPin, Instagram, MessageCircle, ShieldCheck, Scale } from "lucide-react";
+import { Mail, Phone, Instagram, MessageCircle, ShieldCheck, Scale } from "lucide-react";
 import { SITE_INSTAGRAM_URL } from "@/lib/constants/site";
 
 const QUICK_LINKS = [
@@ -175,10 +175,6 @@ export function Footer() {
                   ) : (
                     <div className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-gray-100 px-8 text-sm font-bold text-gray-500">Support unavailable</div>
                   )}
-              </li>
-              <li className="flex items-start gap-3 text-sm text-white/50">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-gold/60" />
-                पुणे, महाराष्ट्र
               </li>
             </ul>
           </div>
