@@ -398,6 +398,16 @@ export function BuyButton({
       );
     }
     setOpen(true);
+
+    // Eager-warm the Razorpay script the moment checkout opens, so it loads
+    // in the background while the user fills the form. By the time they click
+    // "Pay", window.Razorpay is ready and the modal opens instantly — removing
+    // the 10-15s load-wait that otherwise causes abandonment (orphan PENDING orders).
+    if (!isRazorpayLoaded && typeof window !== "undefined" && typeof window.Razorpay === "undefined") {
+      loadScript(RZP_SCRIPT_URL).then((ok) => {
+        if (ok) setIsRazorpayLoaded(true);
+      });
+    }
   }
 
   async function onPaymentSubmit(data: CheckoutFormValues) {
