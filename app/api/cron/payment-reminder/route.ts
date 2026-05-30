@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma_db } from "@/lib/prisma";
 import { sendPaymentReminder } from "@/lib/whatsapp";
 import { logOrderEvent } from "@/lib/order-logger";
+import { getOrCreatePaymentLink } from "@/lib/get-or-create-payment-link";
 
 export const dynamic = "force-dynamic";
 
@@ -67,18 +68,13 @@ export async function GET(req: Request) {
 
         try {
             const bookTitle = order.items.map((i) => i.ebook.title).join(", ");
-            const firstEbookId = order.items[0]?.ebookId;
-
-            // Link to the product page so they can retry purchase
-            const resumeLink = firstEbookId
-                ? `https://www.vakilianikayde.in/ebooks/${firstEbookId}`
-                : "https://www.vakilianikayde.in/ebooks";
+            const paymentLink = await getOrCreatePaymentLink(order);
 
             await sendPaymentReminder(
                 order.customerPhone as string,
                 order.customerName || "Customer",
                 bookTitle,
-                resumeLink,
+                paymentLink,
             );
 
             await logOrderEvent("PAYMENT_REMINDER_SENT", "server", order.id, {
