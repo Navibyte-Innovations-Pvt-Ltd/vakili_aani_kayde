@@ -8,5 +8,4 @@ export const SITE_INSTAGRAM_URL =
   "https://www.instagram.com/vakili_ani_kayde/";
 export const GOOGLE_TAG_MANAGER_ID = "GTM-PCFKW6DR";
 export const GOOGLE_ANALYTICS_ID = "G-64JLRBPX3S";
-export const GOOGLE_SITE_VERIFICATION = "fW-cAAOVxaCatIYIBjZgPCHFxwFWBApQRBQ4a1yUqXE";
 export const TWITTER_HANDLE = "@vakilianikayde";

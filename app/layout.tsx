@@ -12,7 +12,6 @@ import {
   ThirdPartyScripts,
 } from "@/components/analytics/third-party-scripts";
 import {
-  GOOGLE_SITE_VERIFICATION,
   SITE_DESCRIPTION,
   SITE_NAME,
   SITE_TITLE,
@@ -102,9 +101,6 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "/",
-  },
-  verification: {
-    google: GOOGLE_SITE_VERIFICATION,
   },
   robots: {
     index: true,
