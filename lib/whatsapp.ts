@@ -302,7 +302,7 @@ export const sendBookWithPdfWhatsapp = async (
 
 
 // Function for Pending Payment Follow-up (Manual Trigger + Cron)
-// Template: pending_followup_v2
+// Template: pending_folloup_mr_v3
 // {{1}} -> Customer name, {{2}} -> Book title, {{3}} -> Payment resume link
 export const sendPaymentReminder = async (
     phone: string,
@@ -312,7 +312,7 @@ export const sendPaymentReminder = async (
 ) => {
     await sendAisensyTemplate({
         phone,
-        campaignName: "payment_pending_followup_camp_v1",
+        campaignName: "pending_folloup_mr_v3",
         templateParams: [customerName, bookTitle, paymentResumeLink],
         customerName,
     });
