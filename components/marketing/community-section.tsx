@@ -4,8 +4,69 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Instagram } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
+import { type Language } from "@/lib/languages";
+import { useNavLanguage } from "@/components/nav-language-context";
+
+const LABELS: Record<Language, {
+    headingLead: string;
+    headingHighlight: string;
+    followers: string;
+    joinCta: string;
+    followNow: string;
+}> = {
+    MARATHI: {
+        headingLead: "महाराष्ट्रातील सर्वात मोठी",
+        headingHighlight: "कायदेविषयक कम्युनिटी",
+        followers: "Instagram वर फॉलोअर्स (Followers)",
+        joinCta: "दररोज नवीन कायदे आणि अपडेट्स मिळवण्यासाठी आजच आमच्या कम्युनिटीमध्ये सामील व्हा.",
+        followNow: "इंस्टाग्रामवर फॉलो करा (Follow Now)",
+    },
+    HINDI: {
+        headingLead: "महाराष्ट्र की सबसे बड़ी",
+        headingHighlight: "कानूनी कम्युनिटी",
+        followers: "Instagram पर फॉलोअर्स (Followers)",
+        joinCta: "हर दिन नए कानून और अपडेट्स पाने के लिए आज ही हमारी कम्युनिटी से जुड़ें.",
+        followNow: "Instagram पर फॉलो करें (Follow Now)",
+    },
+    ENGLISH: {
+        headingLead: "Maharashtra's Largest",
+        headingHighlight: "Legal Community",
+        followers: "Followers on Instagram",
+        joinCta: "Join our community today to get new laws and updates every day.",
+        followNow: "Follow on Instagram (Follow Now)",
+    },
+    TAMIL: {
+        headingLead: "மகாராஷ்டிராவின் மிகப்பெரிய",
+        headingHighlight: "சட்ட சமூகம்",
+        followers: "Instagram-ல் பின்தொடர்பவர்கள் (Followers)",
+        joinCta: "தினமும் புதிய சட்டங்கள் மற்றும் புதுப்பிப்புகளைப் பெற இன்றே எங்கள் சமூகத்தில் இணையுங்கள்.",
+        followNow: "Instagram-ல் பின்தொடரவும் (Follow Now)",
+    },
+    TELUGU: {
+        headingLead: "మహారాష్ట్రలో అతిపెద్ద",
+        headingHighlight: "న్యాయ కమ్యూనిటీ",
+        followers: "Instagram లో ఫాలోవర్లు (Followers)",
+        joinCta: "ప్రతిరోజూ కొత్త చట్టాలు మరియు అప్‌డేట్‌లను పొందడానికి ఈరోజే మా కమ్యూనిటీలో చేరండి.",
+        followNow: "Instagram లో ఫాలో అవ్వండి (Follow Now)",
+    },
+    GUJARATI: {
+        headingLead: "મહારાષ્ટ્રનું સૌથી મોટું",
+        headingHighlight: "કાનૂની કમ્યુનિટી",
+        followers: "Instagram પર ફોલોઅર્સ (Followers)",
+        joinCta: "દરરોજ નવા કાયદા અને અપડેટ્સ મેળવવા માટે આજે જ અમારી કમ્યુનિટીમાં જોડાઓ.",
+        followNow: "Instagram પર ફોલો કરો (Follow Now)",
+    },
+    BENGALI: {
+        headingLead: "মহারাষ্ট্রের সবচেয়ে বড়",
+        headingHighlight: "আইনি কমিউনিটি",
+        followers: "Instagram-এ ফলোয়ার্স (Followers)",
+        joinCta: "প্রতিদিন নতুন আইন এবং আপডেট পেতে আজই আমাদের কমিউনিটিতে যোগ দিন.",
+        followNow: "Instagram-এ ফলো করুন (Follow Now)",
+    },
+};
 
 export function CommunitySection() {
+    const t = LABELS[useNavLanguage()];
     const [count, setCount] = useState(0);
     const sectionRef = useRef<HTMLElement>(null);
     const hasAnimated = useRef(false);
@@ -63,8 +124,8 @@ export function CommunitySection() {
 
                 <div className="mx-auto max-w-3xl space-y-4">
                     <h2 className="text-xl leading-tight font-extrabold tracking-tight md:text-5xl">
-                        महाराष्ट्रातील सर्वात मोठी <br className="hidden md:block" />
-                        <span className="text-brand-gold">कायदेविषयक कम्युनिटी</span>
+                        {t.headingLead} <br className="hidden md:block" />
+                        <span className="text-brand-gold">{t.headingHighlight}</span>
                     </h2>
 
                     <div className="py-2 md:py-4">
@@ -72,17 +133,17 @@ export function CommunitySection() {
                             {count.toLocaleString()}+
                         </div>
                         <p className="text-base font-medium text-teal-100 md:text-xl">
-                            Instagram वर फॉलोअर्स (Followers)
+                            {t.followers}
                         </p>
                     </div>
 
                     <p className="mx-auto mb-4 max-w-xl text-sm text-teal-50/80 md:mb-6 md:text-lg">
-                        दररोज नवीन कायदे आणि अपडेट्स मिळवण्यासाठी आजच आमच्या कम्युनिटीमध्ये सामील व्हा.
+                        {t.joinCta}
                     </p>
 
                     <Button asChild size="lg" className="h-auto rounded-lg bg-brand-gold px-4 py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:scale-105 hover:bg-brand-gold/90 md:px-6 md:py-3 md:text-xl">
                         <Link href="https://www.instagram.com/vakili_ani_kayde/" target="_blank">
-                            इंस्टाग्रामवर फॉलो करा (Follow Now)
+                            {t.followNow}
                         </Link>
                     </Button>
                 </div>

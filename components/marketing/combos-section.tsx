@@ -6,6 +6,46 @@ import { ArrowRight } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { EbookCard } from "./ebook-card";
+import { type Language } from "@/lib/languages";
+import { useNavLanguage } from "@/components/nav-language-context";
+
+const LABELS: Record<Language, { heading: string; subtitle: string; viewAll: string }> = {
+    MARATHI: {
+        heading: "कायदेशीर कॉम्बो पॅक्स (Combos)",
+        subtitle: "एकापेक्षा जास्त पुस्तकांचे संच आता आकर्षक सवलतीत उपलब्ध. संपूर्ण माहिती एकाच ठिकाणी.",
+        viewAll: "सर्व कॉम्बो पॅक्स पहा",
+    },
+    HINDI: {
+        heading: "कानूनी कॉम्बो पैक्स (Combos)",
+        subtitle: "एक से अधिक पुस्तकों के सेट अब आकर्षक छूट पर उपलब्ध. पूरी जानकारी एक ही जगह.",
+        viewAll: "सभी कॉम्बो पैक्स देखें",
+    },
+    ENGLISH: {
+        heading: "Legal Combo Packs (Combos)",
+        subtitle: "Sets of multiple books now available at attractive discounts. Complete information in one place.",
+        viewAll: "View all combo packs",
+    },
+    TAMIL: {
+        heading: "சட்ட காம்போ பேக்குகள் (Combos)",
+        subtitle: "பல புத்தகங்களின் தொகுப்புகள் இப்போது கவர்ச்சிகரமான தள்ளுபடியில் கிடைக்கின்றன. முழு தகவலும் ஒரே இடத்தில்.",
+        viewAll: "அனைத்து காம்போ பேக்குகளையும் காண்க",
+    },
+    TELUGU: {
+        heading: "చట్టపరమైన కాంబో ప్యాక్‌లు (Combos)",
+        subtitle: "ఒకటి కంటే ఎక్కువ పుస్తకాల సెట్‌లు ఇప్పుడు ఆకర్షణీయమైన తగ్గింపుతో అందుబాటులో ఉన్నాయి. పూర్తి సమాచారం ఒకేచోట.",
+        viewAll: "అన్ని కాంబో ప్యాక్‌లను చూడండి",
+    },
+    GUJARATI: {
+        heading: "કાનૂની કોમ્બો પેક્સ (Combos)",
+        subtitle: "એક કરતાં વધુ પુસ્તકોના સેટ હવે આકર્ષક ડિસ્કાઉન્ટ પર ઉપલબ્ધ. સંપૂર્ણ માહિતી એક જ જગ્યાએ.",
+        viewAll: "બધા કોમ્બો પેક્સ જુઓ",
+    },
+    BENGALI: {
+        heading: "আইনি কম্বো প্যাকস (Combos)",
+        subtitle: "একাধিক বইয়ের সেট এখন আকর্ষণীয় ছাড়ে উপলব্ধ. সম্পূর্ণ তথ্য এক জায়গায়.",
+        viewAll: "সমস্ত কম্বো প্যাকস দেখুন",
+    },
+};
 
 interface Ebook {
     id: string;
@@ -24,6 +64,7 @@ interface CombosSectionProps {
 
 export function CombosSection({ combos }: CombosSectionProps) {
 
+    const t = LABELS[useNavLanguage()];
 
     // Duplicate items if there are few, to ensure smooth infinite loop
     const shouldDuplicate = combos.length > 0 && combos.length < 8;
@@ -45,10 +86,10 @@ export function CombosSection({ combos }: CombosSectionProps) {
                         Special Packages
                     </div>
                     <h2 className="relative inline-block text-xl font-extrabold text-brand-teal md:text-4xl">
-                        कायदेशीर कॉम्बो पॅक्स (Combos)
+                        {t.heading}
                     </h2>
                     <p className="mx-auto max-w-2xl text-sm text-muted-foreground md:text-base">
-                        एकापेक्षा जास्त पुस्तकांचे संच आता आकर्षक सवलतीत उपलब्ध. संपूर्ण माहिती एकाच ठिकाणी.
+                        {t.subtitle}
                     </p>
                 </div>
 
@@ -71,7 +112,7 @@ export function CombosSection({ combos }: CombosSectionProps) {
 
                 <div className="mt-12 text-center">
                     <Button asChild variant="outline" size="lg" className="rounded-full border-2 border-brand-teal px-8 text-base font-bold text-brand-teal transition-colors hover:bg-brand-teal hover:text-white">
-                        <Link href="/combos">सर्व कॉम्बो पॅक्स पहा <ArrowRight className="ml-2 h-5 w-5" /></Link>
+                        <Link href="/combos">{t.viewAll} <ArrowRight className="ml-2 h-5 w-5" /></Link>
                     </Button>
                 </div>
             </div>

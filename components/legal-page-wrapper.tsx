@@ -34,7 +34,7 @@ export function LegalPageWrapper({
         <div className="relative mx-auto max-w-4xl">
           {/* Breadcrumb */}
           <nav className="mb-6 flex items-center gap-1.5 text-[11px] font-medium text-white/40">
-            <Link href="/" className="transition-colors hover:text-brand-gold">मुख्यपृष्ठ</Link>
+            <Link href="/" className="transition-colors hover:text-brand-gold">Home</Link>
             <ChevronRight className="h-3 w-3" />
             <span className="text-white/60">{title}</span>
           </nav>
@@ -43,7 +43,7 @@ export function LegalPageWrapper({
           <div className="mb-4 flex items-center gap-2.5">
             <span className="h-px w-7 bg-brand-gold" />
             <span className="text-[10px] font-bold tracking-[0.25em] text-brand-gold uppercase">
-              कायदेशीर दस्तऐवज · Legal
+              Legal
             </span>
           </div>
 
@@ -56,11 +56,11 @@ export function LegalPageWrapper({
               <h1 className="font-heading text-3xl leading-tight font-black text-white md:text-4xl lg:text-5xl">
                 {title}
               </h1>
-              <p className="mt-1.5 text-sm font-medium tracking-wide text-brand-gold/80">{titleEn}</p>
+              {titleEn ? <p className="mt-1.5 text-sm font-medium tracking-wide text-brand-gold/80">{titleEn}</p> : null}
             </div>
           </div>
 
-          <p className="mt-5 text-[11px] tracking-wide text-white/30">अखेरचे अद्यतन · Last updated: {lastUpdated}</p>
+          <p className="mt-5 text-[11px] tracking-wide text-white/30">Last updated: {lastUpdated}</p>
         </div>
       </div>
 
@@ -78,7 +78,7 @@ export function LegalPageWrapper({
             <div>
               <p className="text-[11px] font-black tracking-wider text-brand-teal uppercase">{badge}</p>
               <p className="mt-1 text-sm leading-relaxed text-brand-ink/70">{bannerText}</p>
-              <p className="mt-1 text-[11px] text-brand-ink/40">{badgeEn}</p>
+              {badgeEn ? <p className="mt-1 text-[11px] text-brand-ink/40">{badgeEn}</p> : null}
             </div>
           </div>
         </div>
@@ -99,15 +99,15 @@ export function LegalPageWrapper({
               <Scale className="h-5 w-5 text-brand-gold" />
             </div>
             <div>
-              <p className="font-heading text-lg font-bold text-white">काही प्रश्न आहेत?</p>
-              <p className="text-sm text-white/55">आमच्याशी संपर्क करा — आम्ही मदत करू.</p>
+              <p className="font-heading text-lg font-bold text-white">Have questions?</p>
+              <p className="text-sm text-white/55">Contact us — we&apos;re here to help.</p>
             </div>
           </div>
           <Link
             href="/contact"
             className="rounded-md bg-brand-gold px-6 py-2.5 text-sm font-bold text-brand-teal shadow-sm ring-1 ring-brand-gold/40 transition-all hover:bg-white hover:ring-white active:scale-95"
           >
-            संपर्क करा (Contact Us)
+            Contact Us
           </Link>
         </div>
       </div>

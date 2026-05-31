@@ -9,6 +9,9 @@
  * NOTE: the Prisma `Language` enum (prisma/schema.prisma) must be kept in sync.
  */
 
+/** Cookie that stores the visitor's sticky language preference. */
+export const LANGUAGE_COOKIE = "pref_lang";
+
 export const LANGUAGES = [
   "MARATHI",
   "HINDI",

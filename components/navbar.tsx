@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { type Language } from "@/lib/languages";
 import { useNavLanguage } from "@/components/nav-language-context";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 type NavKey = "home" | "ebooks" | "combos";
 
@@ -101,6 +102,7 @@ export function Navbar() {
 
           {/* Right: CTA */}
           <div className="hidden items-center gap-3 md:flex">
+            <LanguageSwitcher />
             <Button
               asChild
               size="sm"
@@ -112,6 +114,7 @@ export function Navbar() {
 
           {/* Mobile: hamburger */}
           <div className="flex items-center gap-2 md:hidden">
+            <LanguageSwitcher />
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button

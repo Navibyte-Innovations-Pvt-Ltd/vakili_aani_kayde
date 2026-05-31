@@ -5,7 +5,18 @@ import { Search, X, Home, Gavel, FileText, Scale, BookOpen } from "lucide-react"
 import { Input } from "@/components/ui/input";
 import { EbookCard } from "./ebook-card";
 import { Button } from "@/components/ui/button";
-import { LANGUAGE_NATIVE, coerceLanguage } from "@/lib/languages";
+import { LANGUAGE_NATIVE, coerceLanguage, type Language } from "@/lib/languages";
+import { useNavLanguage } from "@/components/nav-language-context";
+
+const ALL_LANGUAGES_LABEL: Record<Language, string> = {
+    MARATHI: "सर्व भाषा",
+    HINDI: "सभी भाषाएं",
+    ENGLISH: "All languages",
+    TAMIL: "அனைத்து மொழிகள்",
+    TELUGU: "అన్ని భాషలు",
+    GUJARATI: "બધી ભાષાઓ",
+    BENGALI: "সব ভাষা",
+};
 
 interface Ebook {
     id: string;
@@ -22,6 +33,7 @@ interface Ebook {
 }
 
 export function EbookCatalog({ initialEbooks }: { initialEbooks: Ebook[] }) {
+    const navLang = useNavLanguage();
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [selectedLanguage, setSelectedLanguage] = useState("All");
@@ -102,7 +114,7 @@ export function EbookCatalog({ initialEbooks }: { initialEbooks: Ebook[] }) {
                                         : "border-gray-200 bg-white text-gray-500 hover:border-brand-gold/50 hover:bg-amber-50"
                                 }`}
                             >
-                                {lang === "All" ? "सर्व भाषा" : LANGUAGE_NATIVE[coerceLanguage(lang)]}
+                                {lang === "All" ? ALL_LANGUAGES_LABEL[navLang] : LANGUAGE_NATIVE[coerceLanguage(lang)]}
                             </button>
                         ))}
                     </div>

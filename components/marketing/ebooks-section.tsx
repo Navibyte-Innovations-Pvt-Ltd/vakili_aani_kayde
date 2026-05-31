@@ -5,6 +5,46 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
+import { type Language } from "@/lib/languages";
+import { useNavLanguage } from "@/components/nav-language-context";
+
+const LABELS: Record<Language, { heading: string; subheading: string; viewAll: string }> = {
+    MARATHI: {
+        heading: "सर्वाधिक विक्री होणारी पुस्तके",
+        subheading: "तुमच्या कायदेशीर गरजांसाठी खास निवडलेली आणि तज्ञांनी लिहिलेली पुस्तके.",
+        viewAll: "सर्व पुस्तके पहा",
+    },
+    HINDI: {
+        heading: "सर्वाधिक बिकने वाली पुस्तकें",
+        subheading: "आपकी कानूनी ज़रूरतों के लिए विशेष रूप से चुनी गई और विशेषज्ञों द्वारा लिखी गई पुस्तकें।",
+        viewAll: "सभी पुस्तकें देखें",
+    },
+    ENGLISH: {
+        heading: "Best-Selling Books",
+        subheading: "Books specially curated and written by experts for your legal needs.",
+        viewAll: "View All Books",
+    },
+    TAMIL: {
+        heading: "அதிகம் விற்பனையாகும் புத்தகங்கள்",
+        subheading: "உங்கள் சட்டத் தேவைகளுக்காக சிறப்பாகத் தேர்ந்தெடுக்கப்பட்டு நிபுணர்களால் எழுதப்பட்ட புத்தகங்கள்.",
+        viewAll: "அனைத்து புத்தகங்களையும் பார்க்கவும்",
+    },
+    TELUGU: {
+        heading: "అత్యధికంగా అమ్ముడవుతున్న పుస్తకాలు",
+        subheading: "మీ చట్టపరమైన అవసరాల కోసం ప్రత్యేకంగా ఎంపిక చేసి నిపుణులు రాసిన పుస్తకాలు.",
+        viewAll: "అన్ని పుస్తకాలను చూడండి",
+    },
+    GUJARATI: {
+        heading: "સૌથી વધુ વેચાતી પુસ્તકો",
+        subheading: "તમારી કાનૂની જરૂરિયાતો માટે ખાસ પસંદ કરેલી અને નિષ્ણાતો દ્વારા લખાયેલી પુસ્તકો.",
+        viewAll: "બધી પુસ્તકો જુઓ",
+    },
+    BENGALI: {
+        heading: "সর্বাধিক বিক্রিত বই",
+        subheading: "আপনার আইনি প্রয়োজনের জন্য বিশেষভাবে নির্বাচিত এবং বিশেষজ্ঞদের লেখা বই।",
+        viewAll: "সব বই দেখুন",
+    },
+};
 
 interface Ebook {
     id: string;
@@ -24,6 +64,8 @@ interface EbooksSectionProps {
 import { EbookCard } from "./ebook-card";
 
 export function EbooksSection({ ebooks }: EbooksSectionProps) {
+    const t = LABELS[useNavLanguage()];
+
     // Duplicate items if there are few, to ensure smooth infinite loop
     const shouldDuplicate = ebooks.length > 0 && ebooks.length < 8;
     const carouselItems = shouldDuplicate
@@ -39,10 +81,10 @@ export function EbooksSection({ ebooks }: EbooksSectionProps) {
             <div className="mx-auto max-w-6xl px-4">
                 <div className="mb-8 space-y-3 text-center">
                     <h2 className="relative inline-block text-xl font-extrabold text-brand-teal md:text-4xl">
-                        सर्वाधिक विक्री होणारी पुस्तके
+                        {t.heading}
                     </h2>
                     <p className="mx-auto max-w-2xl text-sm text-muted-foreground md:text-base">
-                        तुमच्या कायदेशीर गरजांसाठी खास निवडलेली आणि तज्ञांनी लिहिलेली पुस्तके.
+                        {t.subheading}
                     </p>
                 </div>
 
@@ -65,7 +107,7 @@ export function EbooksSection({ ebooks }: EbooksSectionProps) {
 
                 <div className="mt-12 text-center">
                     <Button asChild variant="outline" size="lg" className="rounded-full border-2 border-brand-teal px-8 text-base font-bold text-brand-teal transition-colors hover:bg-brand-teal hover:text-white">
-                        <Link href="/ebooks">सर्व पुस्तके पहा <ArrowRight className="ml-2 h-5 w-5" /></Link>
+                        <Link href="/ebooks">{t.viewAll} <ArrowRight className="ml-2 h-5 w-5" /></Link>
                     </Button>
                 </div>
             </div>
