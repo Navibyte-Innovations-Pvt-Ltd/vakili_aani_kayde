@@ -8,7 +8,6 @@ import { SITE_INSTAGRAM_URL } from "@/lib/constants/site";
 const QUICK_LINKS = [
   { href: "/", label: "मुख्यपृष्ठ" },
   { href: "/ebooks", label: "ई-बुक्स" },
-  { href: "/combos", label: "कॉम्बो पॅक्स" },
   { href: "/my-books", label: "माझी पुस्तके" },
   { href: "/sitemap", label: "Sitemap" },
 ];

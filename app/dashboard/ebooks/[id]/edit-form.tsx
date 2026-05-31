@@ -51,6 +51,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form } from "@/components/ui/form";
 import InputField from "@/components/AppInputFields/InputField";
+import { LANGUAGES, LANGUAGE_DROPDOWN, coerceLanguage } from "@/lib/languages";
 
 // Helper for file size
 function formatBytes(bytes: number, decimals = 2) {
@@ -87,7 +88,7 @@ const formSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   category: z.string().min(1, "Please select a category"),
-  language: z.enum(["MARATHI", "HINDI", "ENGLISH"]).default("MARATHI"),
+  language: z.enum(LANGUAGES).default("MARATHI"),
   price: z.coerce.number().min(0, "Price must be a valid number"),
   pages: z.coerce.number().min(0, "Pages must be a valid number").optional(),
   isEnabled: z.boolean().default(true),
@@ -159,7 +160,7 @@ export default function EditEbookForm({ ebook }: EditEbookFormProps) {
       title: ebook.title || "",
       description: ebook.description || "",
       category: ebook.category || "Property Law",
-      language: (ebook.language as "MARATHI" | "HINDI" | "ENGLISH") || "MARATHI",
+      language: coerceLanguage(ebook.language),
       price: Number(ebook.price) || 0,
       pages: ebook.pages || 0,
       isEnabled: ebook.isEnabled ?? true,
@@ -607,11 +608,10 @@ export default function EditEbookForm({ ebook }: EditEbookFormProps) {
                       type="select"
                       placeholder="Select Language"
                       required
-                      options={[
-                        { value: "MARATHI", label: "मराठी (Marathi)" },
-                        { value: "HINDI", label: "हिंदी (Hindi)" },
-                        { value: "ENGLISH", label: "English" },
-                      ]}
+                      options={LANGUAGES.map((lang) => ({
+                        value: lang,
+                        label: LANGUAGE_DROPDOWN[lang],
+                      }))}
                     />
 
                     <InputField

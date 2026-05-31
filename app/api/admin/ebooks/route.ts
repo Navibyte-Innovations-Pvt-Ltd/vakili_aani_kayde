@@ -6,6 +6,7 @@ import { mergePDFs } from "@/lib/pdf-watermark";
 import { revalidateTag, revalidatePath } from "next/cache";
 
 import { CACHE_TAGS } from "@/lib/data-access";
+import { coerceLanguage } from "@/lib/languages";
 
 type CreateEbookJson = {
     title: string;
@@ -200,13 +201,12 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        const validLanguages = ["MARATHI", "HINDI", "ENGLISH"];
         const ebook = await prisma_db.ebook.create({
             data: {
                 title,
                 description,
                 category,
-                language: (validLanguages.includes(language) ? language : "MARATHI") as "MARATHI" | "HINDI" | "ENGLISH",
+                language: coerceLanguage(language),
                 price: parseFloat(price),
                 pages: pages ? parseInt(pages) : 0,
                 coverImage: coverImageUrl,

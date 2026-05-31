@@ -1,19 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { Scale, Library, Layers, BookMarked } from "lucide-react";
+import { Scale, Library, BookMarked } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { type Language } from "@/lib/languages";
+import { useNavLanguage } from "@/components/nav-language-context";
 
-const NAV_ITEMS = [
-  { href: "/", icon: Scale, label: "मुख्यपृष्ठ" },
-  { href: "/ebooks", icon: Library, label: "ई-बुक्स" },
-  { href: "/combos", icon: Layers, label: "कॉम्बो", special: true },
-  { href: "/my-books", icon: BookMarked, label: "पुस्तके" },
+type NavKey = "home" | "ebooks" | "combos" | "mybooks";
+
+const NAV_ITEMS: { href: string; icon: typeof Scale; key: NavKey; special?: boolean }[] = [
+  { href: "/", icon: Scale, key: "home" },
+  { href: "/ebooks", icon: Library, key: "ebooks" },
+  { href: "/my-books", icon: BookMarked, key: "mybooks" },
 ];
+
+const NAV_LABELS: Record<Language, Record<NavKey, string>> = {
+  MARATHI: { home: "मुख्यपृष्ठ", ebooks: "ई-बुक्स", combos: "कॉम्बो", mybooks: "पुस्तके" },
+  HINDI: { home: "होम", ebooks: "ई-बुक्स", combos: "कॉम्बो", mybooks: "मेरी किताबें" },
+  ENGLISH: { home: "Home", ebooks: "Ebooks", combos: "Combos", mybooks: "My Books" },
+  TAMIL: { home: "முகப்பு", ebooks: "மின்னூல்கள்", combos: "காம்போ", mybooks: "புத்தகங்கள்" },
+  TELUGU: { home: "హోమ్", ebooks: "ఈ-బుక్‌లు", combos: "కాంబో", mybooks: "పుస్తకాలు" },
+  GUJARATI: { home: "હોમ", ebooks: "ઈ-બુક્સ", combos: "કોમ્બો", mybooks: "પુસ્તકો" },
+  BENGALI: { home: "হোম", ebooks: "ই-বুক", combos: "কম্বো", mybooks: "বই" },
+};
 
 export function BottomNav() {
   const pathname = usePathname();
+  const labels = NAV_LABELS[useNavLanguage()];
 
   return (
     <nav className="pb-safe fixed right-0 bottom-0 left-0 z-50 md:hidden">
@@ -22,7 +36,8 @@ export function BottomNav() {
       <div className="absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-brand-teal/0 via-brand-gold to-brand-teal/0" />
 
       <div className="relative flex h-16 items-stretch justify-around px-2">
-        {NAV_ITEMS.map(({ href, icon: Icon, label, special }) => {
+        {NAV_ITEMS.map(({ href, icon: Icon, key, special }) => {
+          const label = labels[key];
           const active = pathname === href;
           return (
             <Link

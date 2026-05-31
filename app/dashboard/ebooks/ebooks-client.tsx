@@ -20,13 +20,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
-
-const LANG_LABEL: Record<string, string> = { MARATHI: "मराठी", HINDI: "हिंदी", ENGLISH: "EN" };
-const LANG_COLOR: Record<string, string> = {
-    MARATHI: "bg-orange-50 text-orange-700 border-orange-200",
-    HINDI: "bg-blue-50 text-blue-700 border-blue-200",
-    ENGLISH: "bg-green-50 text-green-700 border-green-200",
-};
+import { LANGUAGE_SHORT, LANGUAGE_BADGE, coerceLanguage } from "@/lib/languages";
 
 interface Ebook {
     id: string;
@@ -274,8 +268,8 @@ export function EbooksClient({ ebooks }: EbooksClientProps) {
                                             {ebook.title}
                                         </Link>
                                         {/* Language badge */}
-                                        <span className={cn("hidden shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-bold sm:inline", LANG_COLOR[ebook.language] ?? "bg-gray-50 text-gray-500 border-gray-200")}>
-                                            {LANG_LABEL[ebook.language] ?? ebook.language}
+                                        <span className={cn("hidden shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-bold sm:inline", LANGUAGE_BADGE[coerceLanguage(ebook.language)])}>
+                                            {LANGUAGE_SHORT[coerceLanguage(ebook.language)]}
                                         </span>
                                         {/* Combo badge */}
                                         {ebook.isCombo && (

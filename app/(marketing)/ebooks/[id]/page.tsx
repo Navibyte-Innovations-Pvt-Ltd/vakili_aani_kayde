@@ -15,17 +15,12 @@ import Image from "next/image";
 import { getEbookById, getComboEbooks } from "@/lib/data-access";
 import { SALE_CONFIG, getInflatedOriginalPrice } from "@/lib/sale-config";
 import { SaleTimer } from "@/components/marketing/sale-timer";
+import { LANGUAGE_NATIVE, LANGUAGE_ISO, coerceLanguage, type Language } from "@/lib/languages";
+import { SetNavLanguage } from "@/components/nav-language-context";
 
 export const revalidate = 0;
 
-const LANGUAGE_LABELS: Record<string, string> = {
-  MARATHI: "मराठी",
-  HINDI: "हिंदी",
-  ENGLISH: "English",
-};
-
-const PAGE_LABELS = {
-  MARATHI: {
+const MARATHI_PAGE_LABELS = {
     backNav: "मागील पृष्ठ",
     onlyText: "फक्त",
     discount: "सवलत",
@@ -63,7 +58,12 @@ const PAGE_LABELS = {
     authorLabel: "लेखकाबद्दल",
     authorBio: "'वकिली आणि कायदे' हे अनुभवी वकिलांचे व्यासपीठ आहे. सामान्य नागरिकांसाठी कायद्याची माहिती सोप्या मराठी भाषेत उपलब्ध करून देण्यासाठी याची स्थापना झाली.",
     socialProof: "वाचकांनी विश्वास ठेवला",
-  },
+} as const;
+
+type PageLabels = Record<keyof typeof MARATHI_PAGE_LABELS, string>;
+
+const PAGE_LABELS = {
+  MARATHI: MARATHI_PAGE_LABELS,
   HINDI: {
     backNav: "वापस जाएं",
     onlyText: "केवल",
@@ -142,7 +142,163 @@ const PAGE_LABELS = {
     authorBio: "'Vakili Aani Kayde' is a platform run by experienced lawyers. It was founded to make legal knowledge accessible to every citizen in simple, everyday language.",
     socialProof: "Trusted by readers",
   },
-} as const;
+  TAMIL: {
+    backNav: "முந்தைய பக்கம்",
+    onlyText: "மட்டும்",
+    discount: "தள்ளுபடி",
+    downloadBtn: "இப்போதே பதிவிறக்கவும்",
+    downloadBtnDesktop: "இப்போதே பதிவிறக்கவும் (Download Now)",
+    securePayment: "பாதுகாப்பான பணம் செலுத்துதல் | UPI, Card, Netbanking",
+    securePaymentDesktop: "பாதுகாப்பான பணம் செலுத்துதல் (Safe & Secure Payment)",
+    digitalNotice: "இது Digital PDF E-Book மட்டுமே — எந்த Physical / Printed பிரதியும் அனுப்பப்படாது.",
+    refundNotice: "PDF பதிவிறக்கம் செய்த பிறகு Refund சாத்தியமில்லை.",
+    faqHeader: "அடிக்கடி கேட்கப்படும் கேள்விகள்",
+    faq1Q: "இந்த புத்தகம் எனக்கு எப்படி கிடைக்கும்?",
+    faq1AfterPayment: "பணம் செலுத்தியது வெற்றிகரமாக முடிந்த பிறகு:",
+    faq1Download: "உடனடியாக Download Button காண்பிக்கப்படும்.",
+    faq1WhatsApp: "WhatsApp-இல் அனுப்பப்படும்.",
+    faq1Email: "Email-இலும் PDF அனுப்பப்படும்.",
+    faq2Q: "பணம் செலுத்துவது பாதுகாப்பானதா?",
+    faq2A: "ஆம், Razorpay 100% பாதுகாப்பானது. GooglePay, PhonePe, Paytm அல்லது கார்டு மூலம் பணம் செலுத்தலாம்.",
+    faq3Q: "மொபைலில் படிக்க முடியுமா?",
+    faq3A: "ஆம்! PDF கோப்பை எந்த மொபைல், லேப்டாப் அல்லது டேப்லெட்டிலும் படிக்கலாம்.",
+    faq4Q: "இது Physical புத்தகமா?",
+    faq4A: "இல்லை. இது முழுக்க Digital PDF E-Book. எந்த Printed / Hard Copy அனுப்பப்படாது. வாங்கிய பிறகு PDF-ஐ Email மற்றும் WhatsApp மூலம் உடனடியாக பெறுவீர்கள்.",
+    faq5Q: "எத்தனை சாதனங்களில் படிக்கலாம்?",
+    faq5A: "PDF-இல் எந்த கட்டுப்பாடும் இல்லை — Mobile, Tablet, Laptop, Desktop என எந்த சாதனத்திலும் படிக்கலாம்.",
+    faq6Q: "எதிர்காலத்தில் Update கிடைக்குமா?",
+    faq6A: "சட்டத்தில் முக்கியமான மாற்றங்கள் ஏற்படும்போது நாங்கள் Updated Edition வெளியிடுகிறோம். தற்போதைய பதிப்பு விவரங்கள் Product Page-இல் கொடுக்கப்பட்டுள்ளன.",
+    faq7Q: "இந்த புத்தகம் Legal Advice வழங்குகிறதா?",
+    faq7A: "இல்லை. இந்த புத்தகம் குறிப்பு மற்றும் கல்வி நோக்கத்திற்காக மட்டுமே. இது எந்த வகையிலும் Legal Advice அல்ல. உங்கள் குறிப்பிட்ட சட்டப் பிரச்சினைக்கு எப்போதும் தகுதியான வழக்கறிஞரை அணுகவும்.",
+    helpMobile: "உதவி வேண்டுமா?",
+    helpMobileSub: "WhatsApp-இல் பேசுங்கள்",
+    helpDesktop: "ஏதேனும் உதவி வேண்டுமா? (Need Help?)",
+    helpDesktopSub: "எங்கள் ஆதரவு குழுவுடன் பேசுங்கள்",
+    waMessage: "வணக்கம் 🙏 वकिली आणि कायदे குழு,\nஇந்த ஈ-புத்தகம் பற்றி மேலும் தகவல் வேண்டும்:",
+    recommendedTitle: "இதையும் நீங்கள் விரும்பலாம்",
+    recommendedSub: "எங்கள் மற்ற முக்கியமான புத்தகங்களைப் பார்க்கவும்",
+    authorLabel: "ஆசிரியர் பற்றி",
+    authorBio: "'वकिली आणि कायदे' என்பது அனுபவம் வாய்ந்த வழக்கறிஞர்களின் தளம். சாதாரண குடிமக்களுக்கு சட்ட அறிவை எளிய மொழியில் வழங்கும் நோக்கில் இது நிறுவப்பட்டது.",
+    socialProof: "வாசகர்களின் நம்பிக்கை",
+  },
+  TELUGU: {
+    backNav: "మునుపటి పేజీ",
+    onlyText: "మాత్రమే",
+    discount: "తగ్గింపు",
+    downloadBtn: "ఇప్పుడే డౌన్‌లోడ్ చేయండి",
+    downloadBtnDesktop: "ఇప్పుడే డౌన్‌లోడ్ చేయండి (Download Now)",
+    securePayment: "సురక్షిత చెల్లింపు | UPI, Card, Netbanking",
+    securePaymentDesktop: "సురక్షిత చెల్లింపు (Safe & Secure Payment)",
+    digitalNotice: "ఇది Digital PDF E-Book మాత్రమే — ఎటువంటి Physical / Printed కాపీ పంపబడదు.",
+    refundNotice: "PDF డౌన్‌లోడ్ చేసిన తర్వాత Refund సాధ్యం కాదు.",
+    faqHeader: "తరచుగా అడిగే ప్రశ్నలు",
+    faq1Q: "ఈ పుస్తకం నాకు ఎలా లభిస్తుంది?",
+    faq1AfterPayment: "చెల్లింపు విజయవంతమైన తర్వాత:",
+    faq1Download: "మీకు వెంటనే Download Button కనిపిస్తుంది.",
+    faq1WhatsApp: "WhatsApp లో పంపబడుతుంది.",
+    faq1Email: "Email కు కూడా PDF పంపబడుతుంది.",
+    faq2Q: "చెల్లింపు సురక్షితమేనా?",
+    faq2A: "అవును, Razorpay 100% సురక్షితం. GooglePay, PhonePe, Paytm లేదా కార్డ్ ద్వారా చెల్లించండి.",
+    faq3Q: "మొబైల్‌లో చదవవచ్చా?",
+    faq3A: "అవును! PDF ఫైల్‌ను ఏ మొబైల్, ల్యాప్‌టాప్ లేదా టాబ్లెట్‌లోనైనా చదవవచ్చు.",
+    faq4Q: "ఇది Physical పుస్తకమా?",
+    faq4A: "కాదు. ఇది పూర్తిగా Digital PDF E-Book. ఎటువంటి Printed / Hard Copy పంపబడదు. కొనుగోలు తర్వాత PDF Email మరియు WhatsApp ద్వారా వెంటనే అందుతుంది.",
+    faq5Q: "ఎన్ని పరికరాలలో చదవవచ్చు?",
+    faq5A: "PDF పై ఎటువంటి పరిమితి లేదు — Mobile, Tablet, Laptop, Desktop ఏ పరికరంలోనైనా చదవవచ్చు.",
+    faq6Q: "భవిష్యత్తులో Update లభిస్తుందా?",
+    faq6A: "చట్టంలో ముఖ్యమైన మార్పులు జరిగినప్పుడు మేము Updated Edition ప్రచురిస్తాము. ప్రస్తుత వెర్షన్ వివరాలు Product Page లో ఇవ్వబడ్డాయి.",
+    faq7Q: "ఈ పుస్తకం Legal Advice ఇస్తుందా?",
+    faq7A: "కాదు. ఈ పుస్తకం కేవలం సూచన మరియు విద్యా ప్రయోజనం కోసం మాత్రమే. ఇది ఏ విధమైన Legal Advice కాదు. మీ నిర్దిష్ట చట్టపరమైన సమస్య కోసం ఎల్లప్పుడూ అర్హత గల న్యాయవాదిని సంప్రదించండి.",
+    helpMobile: "సహాయం కావాలా?",
+    helpMobileSub: "WhatsApp లో మాట్లాడండి",
+    helpDesktop: "ఏదైనా సహాయం కావాలా? (Need Help?)",
+    helpDesktopSub: "మా సపోర్ట్ టీమ్‌తో మాట్లాడండి",
+    waMessage: "నమస్కారం 🙏 वकिली आणि कायदे టీమ్,\nఈ ఈ-బుక్ గురించి మరింత సమాచారం కావాలి:",
+    recommendedTitle: "మీకు ఇది కూడా నచ్చవచ్చు",
+    recommendedSub: "మా ఇతర ముఖ్యమైన పుస్తకాలను చూడండి",
+    authorLabel: "రచయిత గురించి",
+    authorBio: "'वकिली आणि कायदे' అనేది అనుభవజ్ఞులైన న్యాయవాదుల వేదిక. సామాన్య పౌరులకు చట్ట సమాచారాన్ని సరళమైన భాషలో అందించే లక్ష్యంతో ఇది స్థాపించబడింది.",
+    socialProof: "పాఠకుల నమ్మకం",
+  },
+  GUJARATI: {
+    backNav: "પાછલું પૃષ્ઠ",
+    onlyText: "ફક્ત",
+    discount: "છૂટ",
+    downloadBtn: "હમણાં જ ડાઉનલોડ કરો",
+    downloadBtnDesktop: "હમણાં જ ડાઉનલોડ કરો (Download Now)",
+    securePayment: "સુરક્ષિત ચુકવણી | UPI, Card, Netbanking",
+    securePaymentDesktop: "સુરક્ષિત ચુકવણી (Safe & Secure Payment)",
+    digitalNotice: "આ માત્ર Digital PDF E-Book છે — કોઈ Physical / Printed નકલ મોકલવામાં આવતી નથી.",
+    refundNotice: "PDF ડાઉનલોડ કર્યા પછી Refund શક્ય નથી.",
+    faqHeader: "વારંવાર પૂછાતા પ્રશ્નો",
+    faq1Q: "આ પુસ્તક મને કેવી રીતે મળશે?",
+    faq1AfterPayment: "ચુકવણી સફળ થયા પછી:",
+    faq1Download: "તમને તરત જ Download Button દેખાશે.",
+    faq1WhatsApp: "WhatsApp પર મોકલવામાં આવશે.",
+    faq1Email: "Email પર પણ PDF મોકલવામાં આવશે.",
+    faq2Q: "શું ચુકવણી સુરક્ષિત છે?",
+    faq2A: "હા, Razorpay 100% સુરક્ષિત છે. GooglePay, PhonePe, Paytm અથવા કાર્ડ દ્વારા ચુકવણી કરો.",
+    faq3Q: "શું મોબાઇલ પર વાંચી શકાય?",
+    faq3A: "હા! PDF ફાઇલ કોઈપણ મોબાઇલ, લેપટોપ અથવા ટેબ્લેટ પર વાંચી શકાય છે.",
+    faq4Q: "શું આ Physical પુસ્તક છે?",
+    faq4A: "ના. આ સંપૂર્ણપણે Digital PDF E-Book છે. કોઈ Printed / Hard Copy મોકલવામાં આવતી નથી. ખરીદી પછી PDF Email અને WhatsApp પર તરત જ મળશે.",
+    faq5Q: "કેટલા ઉપકરણો પર વાંચી શકાય?",
+    faq5A: "PDF પર કોઈ મર્યાદા નથી — Mobile, Tablet, Laptop, Desktop કોઈપણ ઉપકરણ પર વાંચી શકાય છે.",
+    faq6Q: "શું ભવિષ્યમાં Update મળશે?",
+    faq6A: "કાયદામાં મહત્વપૂર્ણ ફેરફારો થાય ત્યારે અમે Updated Edition પ્રકાશિત કરીએ છીએ. વર્તમાન સંસ્કરણની વિગતો Product Page પર આપેલી છે.",
+    faq7Q: "શું આ પુસ્તક Legal Advice આપે છે?",
+    faq7A: "ના. આ પુસ્તક માત્ર સંદર્ભ અને શૈક્ષણિક હેતુ માટે છે. તે કોઈપણ પ્રકારની Legal Advice નથી. તમારી ચોક્કસ કાનૂની સમસ્યા માટે હંમેશા લાયક વકીલની સલાહ લો.",
+    helpMobile: "મદદ જોઈએ છે?",
+    helpMobileSub: "WhatsApp પર વાત કરો",
+    helpDesktop: "કોઈ મદદ જોઈએ છે? (Need Help?)",
+    helpDesktopSub: "અમારી સપોર્ટ ટીમ સાથે વાત કરો",
+    waMessage: "નમસ્તે 🙏 वकिली आणि कायदे ટીમ,\nમારે આ ઈ-બુક વિશે વધુ માહિતી જોઈએ છે:",
+    recommendedTitle: "તમને આ પણ ગમશે",
+    recommendedSub: "અમારા અન્ય મહત્વપૂર્ણ પુસ્તકો જુઓ",
+    authorLabel: "લેખક વિશે",
+    authorBio: "'वकिली आणि कायदे' એ અનુભવી વકીલોનું પ્લેટફોર્મ છે. સામાન્ય નાગરિકો માટે કાનૂની માહિતી સરળ ભાષામાં ઉપલબ્ધ કરાવવા માટે તેની સ્થાપના કરવામાં આવી હતી.",
+    socialProof: "વાચકોનો વિશ્વાસ",
+  },
+  BENGALI: {
+    backNav: "পূর্ববর্তী পৃষ্ঠা",
+    onlyText: "মাত্র",
+    discount: "ছাড়",
+    downloadBtn: "এখনই ডাউনলোড করুন",
+    downloadBtnDesktop: "এখনই ডাউনলোড করুন (Download Now)",
+    securePayment: "নিরাপদ পেমেন্ট | UPI, Card, Netbanking",
+    securePaymentDesktop: "নিরাপদ পেমেন্ট (Safe & Secure Payment)",
+    digitalNotice: "এটি শুধুমাত্র Digital PDF E-Book — কোনো Physical / Printed কপি পাঠানো হয় না।",
+    refundNotice: "PDF ডাউনলোড করার পরে Refund সম্ভব নয়।",
+    faqHeader: "প্রায়শই জিজ্ঞাসিত প্রশ্ন",
+    faq1Q: "এই বইটি আমি কীভাবে পাব?",
+    faq1AfterPayment: "পেমেন্ট সফল হওয়ার পরে:",
+    faq1Download: "আপনি সঙ্গে সঙ্গে Download Button দেখতে পাবেন।",
+    faq1WhatsApp: "WhatsApp-এ পাঠানো হবে।",
+    faq1Email: "Email-এও PDF পাঠানো হবে।",
+    faq2Q: "পেমেন্ট কি নিরাপদ?",
+    faq2A: "হ্যাঁ, Razorpay 100% নিরাপদ। GooglePay, PhonePe, Paytm বা কার্ডের মাধ্যমে পেমেন্ট করুন।",
+    faq3Q: "মোবাইলে কি পড়া যায়?",
+    faq3A: "হ্যাঁ! PDF ফাইলটি যেকোনো মোবাইল, ল্যাপটপ বা ট্যাবলেটে পড়া যায়।",
+    faq4Q: "এটি কি Physical বই?",
+    faq4A: "না। এটি সম্পূর্ণরূপে Digital PDF E-Book। কোনো Printed / Hard Copy পাঠানো হয় না। কেনার পরে PDF Email এবং WhatsApp-এ সঙ্গে সঙ্গে পাবেন।",
+    faq5Q: "কতগুলো ডিভাইসে পড়া যাবে?",
+    faq5A: "PDF-এ কোনো সীমাবদ্ধতা নেই — Mobile, Tablet, Laptop, Desktop যেকোনো ডিভাইসে পড়তে পারবেন।",
+    faq6Q: "ভবিষ্যতে কি Update পাওয়া যাবে?",
+    faq6A: "আইনে গুরুত্বপূর্ণ পরিবর্তন হলে আমরা Updated Edition প্রকাশ করি। বর্তমান সংস্করণের বিবরণ Product Page-এ দেওয়া আছে।",
+    faq7Q: "এই বই কি Legal Advice দেয়?",
+    faq7A: "না। এই বইটি শুধুমাত্র রেফারেন্স এবং শিক্ষামূলক উদ্দেশ্যে। এটি কোনো ধরনের Legal Advice নয়। আপনার নির্দিষ্ট আইনি সমস্যার জন্য সর্বদা একজন যোগ্য আইনজীবীর পরামর্শ নিন।",
+    helpMobile: "সাহায্য দরকার?",
+    helpMobileSub: "WhatsApp-এ কথা বলুন",
+    helpDesktop: "কোনো সাহায্য দরকার? (Need Help?)",
+    helpDesktopSub: "আমাদের সাপোর্ট টিমের সাথে কথা বলুন",
+    waMessage: "নমস্কার 🙏 वकिली आणि कायदे টিম,\nআমি এই ই-বুক সম্পর্কে আরও তথ্য চাই:",
+    recommendedTitle: "আপনি এটিও পছন্দ করবেন",
+    recommendedSub: "আমাদের অন্যান্য গুরুত্বপূর্ণ বই দেখুন",
+    authorLabel: "লেখক সম্পর্কে",
+    authorBio: "'वकिली आणि कायदे' হল অভিজ্ঞ আইনজীবীদের একটি প্ল্যাটফর্ম। সাধারণ নাগরিকদের জন্য সহজ ভাষায় আইনি তথ্য উপলব্ধ করার লক্ষ্যে এটি প্রতিষ্ঠিত হয়েছে।",
+    socialProof: "পাঠকদের বিশ্বাস",
+  },
+} satisfies Record<Language, PageLabels>;
 
 export async function generateMetadata(
   props: { params: Promise<{ id: string }> }
@@ -222,7 +378,8 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
     .map((b) => ({ ...b, price: Number(b.price) }));
 
   const plainDescription = ebook.description?.replace(/<[^>]+>/g, " ").trim().slice(0, 160) + "..." || "";
-  const labels = PAGE_LABELS[(ebook.language ?? "MARATHI") as keyof typeof PAGE_LABELS] ?? PAGE_LABELS.MARATHI;
+  const bookLanguage = coerceLanguage(ebook.language);
+  const labels = PAGE_LABELS[bookLanguage];
   const finalPrice = Number(ebook.price);
   const crossedPrice = getInflatedOriginalPrice(finalPrice);
   const isSaleActive = SALE_CONFIG.isActive;
@@ -236,7 +393,7 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
     name: ebook.title,
     description: plainDescription,
     image: ebook.coverImage || "",
-    inLanguage: ebook.language === "HINDI" ? "hi" : ebook.language === "ENGLISH" ? "en" : "mr",
+    inLanguage: LANGUAGE_ISO[bookLanguage],
     bookFormat: "https://schema.org/EBook",
     fileFormat: "application/pdf",
     author: { "@type": "Organization", name: "Vakili Aani Kayde", url: "https://www.vakilianikayde.in" },
@@ -310,6 +467,7 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
 
   return (
     <div className="min-h-screen bg-[#F5F5F0] pb-28 md:pb-12">
+      <SetNavLanguage language={bookLanguage} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       {/* Preload Razorpay on product pages — users are likely to buy */}
@@ -353,7 +511,7 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
           {/* Tags */}
           <div className="mb-2 flex flex-wrap gap-1.5">
             <span className="rounded-full border border-brand-teal/20 bg-brand-teal/8 px-2.5 py-0.5 text-[10px] font-bold text-brand-teal">
-              {LANGUAGE_LABELS[ebook.language ?? "MARATHI"]} PDF
+              {LANGUAGE_NATIVE[bookLanguage]} PDF
             </span>
             {ebook.isCombo && <span className="rounded-full bg-purple-100 px-2.5 py-0.5 text-[10px] font-bold text-purple-700">Combo</span>}
             {isSaleActive && <span className="rounded-full bg-red-500 px-2.5 py-0.5 text-[10px] font-black text-white">SALE</span>}
@@ -541,7 +699,7 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
                   <span className="rounded-md bg-brand-gold/15 px-2.5 py-0.5 text-[11px] font-black text-brand-gold">#{ebook.displayId}</span>
                 )}
                 <span className="rounded-md border border-brand-teal/15 bg-brand-teal/5 px-2.5 py-0.5 text-[11px] font-semibold text-brand-teal">
-                  {LANGUAGE_LABELS[ebook.language ?? "MARATHI"]} PDF
+                  {LANGUAGE_NATIVE[bookLanguage]} PDF
                 </span>
                 {ebook.isCombo && <span className="rounded-md bg-purple-100 px-2.5 py-0.5 text-[11px] font-bold text-purple-700">Combo Pack</span>}
               </div>
@@ -584,7 +742,7 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
 
               <div className="mb-5 flex flex-wrap gap-2">
                 {[
-                  { icon: <DownloadIcon className="h-3 w-3" />, label: `PDF · ${LANGUAGE_LABELS[ebook.language ?? "MARATHI"]}` },
+                  { icon: <DownloadIcon className="h-3 w-3" />, label: `PDF · ${LANGUAGE_NATIVE[bookLanguage]}` },
                   ...(ebook.pages && ebook.pages > 0 ? [{ icon: <BookOpen className="h-3 w-3" />, label: `${ebook.pages} पाने` }] : []),
                   { icon: <Zap className="h-3 w-3" />, label: "Instant Download" },
                   { icon: <Smartphone className="h-3 w-3" />, label: "Mobile Readable" },

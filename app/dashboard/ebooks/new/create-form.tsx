@@ -21,6 +21,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form } from "@/components/ui/form";
 import InputField from "@/components/AppInputFields/InputField";
+import { LANGUAGES, LANGUAGE_DROPDOWN } from "@/lib/languages";
 
 // Helper for file size
 function formatBytes(bytes: number, decimals = 2) {
@@ -53,7 +54,7 @@ const formSchema = z.object({
     title: z.string().min(2, "Title must be at least 2 characters"),
     description: z.string().min(10, "Description must be at least 10 characters"),
     category: z.string().min(1, "Please select a category"),
-    language: z.enum(["MARATHI", "HINDI", "ENGLISH"]).default("MARATHI"),
+    language: z.enum(LANGUAGES).default("MARATHI"),
     price: z.coerce.number().min(0, "Price must be a valid number"),
     pages: z.coerce.number().min(0, "Pages must be a valid number").optional(),
     shortCode: z.string().regex(/^[a-z0-9-]*$/, "Only lowercase letters, numbers, hyphens").optional().or(z.literal("")),
@@ -430,11 +431,10 @@ export default function CreateEbookForm() {
                                             type="select"
                                             placeholder="Select Language"
                                             required
-                                            options={[
-                                                { value: "MARATHI", label: "मराठी (Marathi)" },
-                                                { value: "HINDI", label: "हिंदी (Hindi)" },
-                                                { value: "ENGLISH", label: "English" },
-                                            ]}
+                                            options={LANGUAGES.map((lang) => ({
+                                                value: lang,
+                                                label: LANGUAGE_DROPDOWN[lang],
+                                            }))}
                                         />
 
                                         <InputField

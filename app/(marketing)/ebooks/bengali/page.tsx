@@ -8,20 +8,20 @@ import { Metadata } from "next";
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "हिंदी कानूनी पुस्तकें | वकिली आणि कायदे",
-  description: "हिंदी में सरल भाषा में कानूनी मार्गदर्शक ई-बुक्स.",
+  title: "বাংলা আইনি বই | वकिली आणि कायदे",
+  description: "সহজ বাংলায় আইনি গাইড ই-বুক। সম্পত্তি আইন, ভোক্তা অধিকার, সাইবার জালিয়াতি এবং আরও অনেক কিছু।",
 };
 
-export default async function HindiEbooksPage() {
-  const ebooks = await getEbooksByLanguage("HINDI");
+export default async function BengaliEbooksPage() {
+  const ebooks = await getEbooksByLanguage("BENGALI");
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": "हिंदी कानूनी पुस्तकें | वकिली आणि कायदे",
-    "description": "हिंदी में सरल भाषा में कानूनी मार्गदर्शक ई-बुक्स.",
-    "url": "https://www.vakilianikayde.in/ebooks/hindi",
-    "inLanguage": "hi",
+    "name": "বাংলা আইনি বই | वकिली आणि कायदे",
+    "description": "সহজ বাংলায় আইনি গাইড ই-বুক।",
+    "url": "https://www.vakilianikayde.in/ebooks/bengali",
+    "inLanguage": "bn",
     "mainEntity": {
       "@type": "ItemList",
       "itemListElement": ebooks.map((ebook, index) => ({
@@ -38,7 +38,7 @@ export default async function HindiEbooksPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* Language tabs */}
-      <EbookLanguageTabs current="HINDI" />
+      <EbookLanguageTabs current="BENGALI" />
 
       {/* Catalog */}
       <div className="mx-auto max-w-6xl px-4 py-8">
@@ -47,8 +47,8 @@ export default async function HindiEbooksPage() {
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-brand-gold/15 bg-white shadow-sm">
               <BookOpen className="h-8 w-8 text-brand-gold/60" />
             </div>
-            <p className="font-black text-brand-teal">जल्द ही उपलब्ध होगी</p>
-            <p className="mt-1 text-sm text-gray-400">नई पुस्तकें जोड़ी जा रही हैं.</p>
+            <p className="font-black text-brand-teal">শীঘ্রই আসছে</p>
+            <p className="mt-1 text-sm text-gray-400">নতুন বই যোগ করা হচ্ছে।</p>
           </div>
         ) : (
           <EbookCatalog initialEbooks={ebooks} />

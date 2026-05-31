@@ -38,10 +38,10 @@ import {
 } from "@/components/ui/form";
 
 import { useRouter } from "next/navigation";
+import { coerceLanguage, type Language } from "@/lib/languages";
 
 
-const CHECKOUT_LABELS = {
-  MARATHI: {
+const MARATHI_CHECKOUT_LABELS = {
     readerCount: "2,000+ वाचक समाधानी",
     selectedBook: "निवडलेले पुस्तक",
     priceHeader: "किंमत",
@@ -66,7 +66,12 @@ const CHECKOUT_LABELS = {
     privacyText: "गोपनीयता धोरणाशी",
     processingText: "प्रोसेसिंग...",
     payBtn: "आता पेमेंट करा",
-  },
+} as const;
+
+type CheckoutLabels = Record<keyof typeof MARATHI_CHECKOUT_LABELS, string>;
+
+const CHECKOUT_LABELS = {
+  MARATHI: MARATHI_CHECKOUT_LABELS,
   HINDI: {
     readerCount: "2,000+ पाठक संतुष्ट",
     selectedBook: "चयनित पुस्तक",
@@ -119,9 +124,111 @@ const CHECKOUT_LABELS = {
     processingText: "Processing...",
     payBtn: "Pay Now",
   },
-} as const;
-
-type CheckoutLanguage = keyof typeof CHECKOUT_LABELS;
+  TAMIL: {
+    readerCount: "2,000+ வாசகர்கள் திருப்தி",
+    selectedBook: "தேர்ந்தெடுக்கப்பட்ட புத்தகம்",
+    priceHeader: "விலை",
+    nameLabel: "பெயர் (Name)",
+    namePlaceholder: "எ.கா. ராகுல் குமார்",
+    phoneLabel: "WhatsApp எண்",
+    phonePlaceholder: "எ.கா. 9876543210",
+    nextBtn: "அடுத்து (Next)",
+    secureText: "100% பாதுகாப்பான பரிவர்த்தனை",
+    instantPdf: "பணம் செலுத்திய உடனே PDF",
+    yourInfo: "உங்கள் தகவல்:",
+    editBtn: "மாற்று (Edit)",
+    whatsappInfo: "இந்த எண்ணுக்கு உங்களுக்கு ஈ-புத்தக இணைப்பு கிடைக்கும்.",
+    pdfNotice: "இந்த புத்தகம் டிஜிட்டல் PDF வடிவில் கிடைக்கும். Home Delivery வசதி இல்லை. பணம் செலுத்திய பிறகு PDF உடனடியாக WhatsApp-இல் கிடைக்கும்.",
+    iabTitle: "முக்கிய அறிவிப்பு",
+    iabMsg1: 'பணம் செலுத்தும்போது "You\'re leaving our app" என்ற செய்தி வரலாம்.',
+    iabMsg2: 'பணம் செலுத்துவதை முடிக்க "CONTINUE" என்பதைக் கிளிக் செய்யவும்.',
+    consentPrefix: "கீழே உள்ள பொத்தானைக் கிளிக் செய்வதன் மூலம், நீங்கள் எங்கள்",
+    consentAnd: "மற்றும்",
+    consentSuffix: "ஒப்புக்கொள்கிறீர்கள்.",
+    termsText: "விதிமுறைகள் மற்றும் நிபந்தனைகள்",
+    privacyText: "தனியுரிமைக் கொள்கைக்கு",
+    processingText: "செயலாக்கம்...",
+    payBtn: "இப்போதே பணம் செலுத்து",
+  },
+  TELUGU: {
+    readerCount: "2,000+ పాఠకులు సంతృప్తి",
+    selectedBook: "ఎంచుకున్న పుస్తకం",
+    priceHeader: "ధర",
+    nameLabel: "పేరు (Name)",
+    namePlaceholder: "ఉదా. రాహుల్ కుమార్",
+    phoneLabel: "WhatsApp నంబర్",
+    phonePlaceholder: "ఉదా. 9876543210",
+    nextBtn: "తదుపరి (Next)",
+    secureText: "100% సురక్షిత లావాదేవీ",
+    instantPdf: "చెల్లింపు తర్వాత వెంటనే PDF",
+    yourInfo: "మీ సమాచారం:",
+    editBtn: "మార్చు (Edit)",
+    whatsappInfo: "ఈ నంబర్‌కు మీకు ఈ-బుక్ లింక్ లభిస్తుంది.",
+    pdfNotice: "ఈ పుస్తకం డిజిటల్ PDF రూపంలో లభిస్తుంది. Home Delivery సదుపాయం లేదు. చెల్లింపు తర్వాత PDF వెంటనే WhatsApp లో లభిస్తుంది.",
+    iabTitle: "ముఖ్యమైన నోటీసు",
+    iabMsg1: 'చెల్లింపు సమయంలో "You\'re leaving our app" అనే సందేశం రావచ్చు.',
+    iabMsg2: 'చెల్లింపును పూర్తి చేయడానికి దయచేసి "CONTINUE" పై క్లిక్ చేయండి.',
+    consentPrefix: "క్రింది బటన్‌పై క్లిక్ చేయడం ద్వారా, మీరు మా",
+    consentAnd: "మరియు",
+    consentSuffix: "కు సమ్మతిస్తున్నారు.",
+    termsText: "నిబంధనలు మరియు షరతులు",
+    privacyText: "గోప్యతా విధానం",
+    processingText: "ప్రాసెసింగ్...",
+    payBtn: "ఇప్పుడే చెల్లించండి",
+  },
+  GUJARATI: {
+    readerCount: "2,000+ વાચકો સંતુષ્ટ",
+    selectedBook: "પસંદ કરેલ પુસ્તક",
+    priceHeader: "કિંમત",
+    nameLabel: "નામ (Name)",
+    namePlaceholder: "દા.ત. રાહુલ પટેલ",
+    phoneLabel: "WhatsApp નંબર",
+    phonePlaceholder: "દા.ત. 9876543210",
+    nextBtn: "આગળ (Next)",
+    secureText: "100% સુરક્ષિત વ્યવહાર",
+    instantPdf: "ચુકવણી પછી તરત જ PDF",
+    yourInfo: "તમારી માહિતી:",
+    editBtn: "બદલો (Edit)",
+    whatsappInfo: "આ નંબર પર તમને ઈ-બુકની લિંક મળશે.",
+    pdfNotice: "આ પુસ્તક ડિજિટલ PDF સ્વરૂપે મળશે. Home Delivery સુવિધા ઉપલબ્ધ નથી. ચુકવણી પછી PDF તરત જ WhatsApp પર મળશે.",
+    iabTitle: "મહત્વપૂર્ણ સૂચના",
+    iabMsg1: 'ચુકવણી દરમિયાન "You\'re leaving our app" સંદેશ આવી શકે છે.',
+    iabMsg2: 'ચુકવણી પૂર્ણ કરવા માટે કૃપા કરીને "CONTINUE" પર ક્લિક કરો.',
+    consentPrefix: "નીચેના બટન પર ક્લિક કરીને, તમે અમારી",
+    consentAnd: "અને",
+    consentSuffix: "સાથે સંમત થાઓ છો.",
+    termsText: "નિયમો અને શરતો",
+    privacyText: "ગોપનીયતા નીતિ",
+    processingText: "પ્રોસેસિંગ...",
+    payBtn: "હમણાં ચુકવણી કરો",
+  },
+  BENGALI: {
+    readerCount: "2,000+ পাঠক সন্তুষ্ট",
+    selectedBook: "নির্বাচিত বই",
+    priceHeader: "মূল্য",
+    nameLabel: "নাম (Name)",
+    namePlaceholder: "যেমন রাহুল দাস",
+    phoneLabel: "WhatsApp নম্বর",
+    phonePlaceholder: "যেমন 9876543210",
+    nextBtn: "পরবর্তী (Next)",
+    secureText: "100% নিরাপদ লেনদেন",
+    instantPdf: "পেমেন্টের পরে সঙ্গে সঙ্গে PDF",
+    yourInfo: "আপনার তথ্য:",
+    editBtn: "সম্পাদনা (Edit)",
+    whatsappInfo: "এই নম্বরে আপনি ই-বুকের লিঙ্ক পাবেন।",
+    pdfNotice: "এই বইটি ডিজিটাল PDF আকারে পাওয়া যাবে। Home Delivery সুবিধা উপলব্ধ নয়। পেমেন্টের পরে PDF সঙ্গে সঙ্গে WhatsApp-এ পাবেন।",
+    iabTitle: "গুরুত্বপূর্ণ বিজ্ঞপ্তি",
+    iabMsg1: 'পেমেন্টের সময় "You\'re leaving our app" বার্তা আসতে পারে।',
+    iabMsg2: 'পেমেন্ট সম্পূর্ণ করতে অনুগ্রহ করে "CONTINUE"-এ ক্লিক করুন।',
+    consentPrefix: "নিচের বোতামে ক্লিক করে, আপনি আমাদের",
+    consentAnd: "এবং",
+    consentSuffix: "তে সম্মত হচ্ছেন।",
+    termsText: "নিয়ম ও শর্তাবলী",
+    privacyText: "গোপনীয়তা নীতি",
+    processingText: "প্রসেসিং...",
+    payBtn: "এখনই পেমেন্ট করুন",
+  },
+} satisfies Record<Language, CheckoutLabels>;
 
 interface BuyButtonProps {
   ebookId: string;
@@ -546,6 +653,9 @@ export function BuyButton({
               currency: order.currency,
               phone,
             });
+            if (language) {
+              params.set("lang", language);
+            }
             if (email) {
               params.set("email", email);
             }
@@ -752,7 +862,7 @@ function CheckoutForm({
   language,
   initialData,
 }: CheckoutFormProps) {
-  const labels = CHECKOUT_LABELS[(language ?? "MARATHI") as CheckoutLanguage] ?? CHECKOUT_LABELS.MARATHI;
+  const labels = CHECKOUT_LABELS[coerceLanguage(language)];
 
   const [step, setStep] = useState<1 | 2>(1);
 

@@ -5,6 +5,7 @@ import { Search, X, Home, Gavel, FileText, Scale, BookOpen } from "lucide-react"
 import { Input } from "@/components/ui/input";
 import { EbookCard } from "./ebook-card";
 import { Button } from "@/components/ui/button";
+import { LANGUAGE_NATIVE, coerceLanguage } from "@/lib/languages";
 
 interface Ebook {
     id: string;
@@ -19,12 +20,6 @@ interface Ebook {
     isCombo?: boolean;
     pages?: number | null;
 }
-
-const LANGUAGE_LABELS: Record<string, string> = {
-    MARATHI: "मराठी",
-    HINDI: "हिंदी",
-    ENGLISH: "English",
-};
 
 export function EbookCatalog({ initialEbooks }: { initialEbooks: Ebook[] }) {
     const [searchQuery, setSearchQuery] = useState("");
@@ -107,7 +102,7 @@ export function EbookCatalog({ initialEbooks }: { initialEbooks: Ebook[] }) {
                                         : "border-gray-200 bg-white text-gray-500 hover:border-brand-gold/50 hover:bg-amber-50"
                                 }`}
                             >
-                                {lang === "All" ? "सर्व भाषा" : (LANGUAGE_LABELS[lang] ?? lang)}
+                                {lang === "All" ? "सर्व भाषा" : LANGUAGE_NATIVE[coerceLanguage(lang)]}
                             </button>
                         ))}
                     </div>

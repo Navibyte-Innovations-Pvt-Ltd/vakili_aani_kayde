@@ -167,6 +167,10 @@ enum Language {
   MARATHI
   HINDI
   ENGLISH
+  TAMIL
+  TELUGU
+  GUJARATI
+  BENGALI
 }
 
 enum OrderStatus {

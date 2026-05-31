@@ -1,9 +1,9 @@
 import { getEbooks } from "@/lib/data-access";
 import { EbookCatalog } from "@/components/marketing/ebook-catalog";
+import { EbookLanguageTabs } from "@/components/marketing/ebook-language-tabs";
 
 import { BookOpen } from "lucide-react";
 import { Metadata } from "next";
-import Link from "next/link";
 
 export const revalidate = 0; // Always render fresh — new books should appear immediately
 
@@ -37,19 +37,7 @@ export default async function EbooksPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* Language tabs */}
-      <div className="border-b border-gray-100 bg-white px-4">
-        <div className="mx-auto flex max-w-6xl gap-1 overflow-x-auto py-2">
-          <span className="rounded-full bg-brand-teal px-4 py-1.5 text-xs font-black text-white">
-            सर्व
-          </span>
-          <Link href="/ebooks/hindi" className="rounded-full px-4 py-1.5 text-xs font-bold text-gray-500 transition-colors hover:bg-brand-teal/8 hover:text-brand-teal">
-            हिंदी
-          </Link>
-          <Link href="/ebooks/english" className="rounded-full px-4 py-1.5 text-xs font-bold text-gray-500 transition-colors hover:bg-brand-teal/8 hover:text-brand-teal">
-            English
-          </Link>
-        </div>
-      </div>
+      <EbookLanguageTabs current="ALL" />
 
       {/* Catalog */}
       <div className="mx-auto max-w-6xl px-4 py-8">

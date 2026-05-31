@@ -5,6 +5,7 @@ import { uploadToS3, uploadPrivateFile, fetchPdfBuffer } from "@/lib/s3";
 import { mergePDFs } from "@/lib/pdf-watermark";
 import { revalidateTag } from "next/cache";
 import { CACHE_TAGS } from "@/lib/data-access";
+import { isLanguage } from "@/lib/languages";
 
 export const maxDuration = 120;
 
@@ -176,7 +177,7 @@ export async function PUT(
                 description: description || undefined,
                 price: price ? parseFloat(price) : undefined,
                 pages: pages ? parseInt(pages) : undefined,
-                language: (["MARATHI", "HINDI", "ENGLISH"].includes(language) ? language : undefined) as "MARATHI" | "HINDI" | "ENGLISH" | undefined,
+                language: isLanguage(language) ? language : undefined,
                 isEnabled: isEnabled ? isEnabled === "true" : undefined,
                 isCombo: isCombo,
                 coverImage: coverImageUrl,

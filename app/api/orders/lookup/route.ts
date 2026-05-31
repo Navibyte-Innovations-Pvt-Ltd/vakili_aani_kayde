@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
                                 title: true,
                                 pages: true,
                                 isCombo: true,
+                                language: true,
                                 shortCode: true, // Use permanent short code
                             }
                         }
@@ -58,6 +59,7 @@ export async function POST(req: NextRequest) {
                     ebookId: ebook.id,
                     pages: ebook.pages,
                     isCombo: ebook.isCombo,
+                    language: ebook.language,
                     url,
                 };
             });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,8 @@ import { FaWhatsapp } from "react-icons/fa";
 import { format } from "date-fns";
 import { ComboCarousel } from "./combo-carousel";
 import { PurchasePixelEvent } from "@/components/purchase-pixel-event";
+import { LANGUAGES, coerceLanguage, type Language } from "@/lib/languages";
+import { MYBOOKS_LABELS } from "./labels";
 
 interface Order {
   id: string;
@@ -34,10 +36,29 @@ interface Order {
     url: string;
     pages?: number | null;
     isCombo?: boolean;
+    language?: string;
   }[];
 }
 
 const WA_NUMBER = process.env.NEXT_PUBLIC_WA_NUMBER || "";
+
+// Pick the language the customer reads in — the most common across their books.
+function dominantLanguage(orders: Order[]): Language {
+  const tally: Partial<Record<Language, number>> = {};
+  for (const order of orders) {
+    for (const item of order.items) {
+      const lang = coerceLanguage(item.language);
+      tally[lang] = (tally[lang] ?? 0) + 1;
+    }
+  }
+  let best: Language = "MARATHI";
+  let bestCount = -1;
+  for (const lang of LANGUAGES) {
+    const count = tally[lang] ?? 0;
+    if (count > bestCount) { bestCount = count; best = lang; }
+  }
+  return best;
+}
 
 // API returns relative /d/CODE paths. Build absolute URLs from the real browser
 // origin so shared/WhatsApp links always point at the production domain.
@@ -56,6 +77,14 @@ function withAbsoluteUrls(orders: Order[]): Order[] {
 export default function MyBooksPage() {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const [bookLang, setBookLang] = useState<Language>("MARATHI");
+  // Ref mirrors bookLang so memoized callbacks (performSearch, poll) read the
+  // current language without being re-created on every language change.
+  const langRef = useRef<Language>("MARATHI");
+  const applyLang = useCallback((lang: Language) => {
+    langRef.current = lang;
+    setBookLang(lang);
+  }, []);
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [downloadingKey, setDownloadingKey] = useState<string | null>(null);
   const [isFinalizing, setIsFinalizing] = useState(false);
@@ -81,21 +110,25 @@ export default function MyBooksPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: searchTerm.trim() }),
       });
-      if (res.status === 429) throw new Error("खूप जास्त वेळा प्रयत्न केले गेले आहेत. कृपया थोड्या वेळाने प्रयत्न करा.");
-      if (!res.ok) throw new Error("काहीतरी चूक झाली. कृपया पुन्हा प्रयत्न करा.");
+      if (res.status === 429) throw new Error(MYBOOKS_LABELS[langRef.current].rateLimited);
+      if (!res.ok) throw new Error(MYBOOKS_LABELS[langRef.current].somethingWrong);
       const data = await res.json();
       setOrders(withAbsoluteUrls(data.orders));
-      if (data.orders.length > 0 && !justPurchasedOrder) {
-        toast.success(`${data.orders.length} पुस्तके सापडली!`);
-        localStorage.setItem("customer_phone", searchTerm.trim());
+      if (data.orders.length > 0) {
+        const lang = dominantLanguage(data.orders);
+        applyLang(lang);
+        if (!justPurchasedOrder) {
+          toast.success(MYBOOKS_LABELS[lang].booksFound.replace("{n}", String(data.orders.length)));
+          localStorage.setItem("customer_phone", searchTerm.trim());
+        }
       }
     } catch (error) {
       console.error(error);
-      toast.error("तांत्रिक अडचण आली. कृपया थोड्या वेळाने प्रयत्न करा.");
+      toast.error(MYBOOKS_LABELS[langRef.current].techError);
     } finally {
       setLoading(false);
     }
-  }, [justPurchasedOrder]);
+  }, [justPurchasedOrder, applyLang]);
 
   useEffect(() => {
     let pollIntervalId: ReturnType<typeof setInterval> | null = null;
@@ -105,6 +138,10 @@ export default function MyBooksPage() {
       const paramEmail = params.get("email");
       if (paramPhone) { localStorage.setItem("customer_phone", paramPhone); setQuery(paramPhone); }
       if (paramEmail) { localStorage.setItem("customer_email", paramEmail); }
+
+      // Language carried from the buy flow → localize from first paint (before orders load).
+      const paramLang = params.get("lang");
+      if (paramLang) applyLang(coerceLanguage(paramLang));
 
       const accessToken = params.get("access_token");
       if (accessToken) {
@@ -129,7 +166,7 @@ export default function MyBooksPage() {
         if (amount > 0) {
           setIsFinalizing(true);
           setTimeout(() => setIsFinalizing(false), 3000);
-          toast.success("खरेदी यशस्वी! तुमचे पुस्तक खालील आहे.");
+          toast.success(MYBOOKS_LABELS[langRef.current].purchaseSuccessToast);
         }
 
       } else if (params.get("payment_pending") === "true") {
@@ -139,7 +176,7 @@ export default function MyBooksPage() {
         const phoneToSearch = paramPhone || localStorage.getItem("customer_phone");
         if (phoneToSearch) {
           setQuery(phoneToSearch);
-          toast.loading("पेमेंट प्रक्रियेत आहे... कृपया थांबा.", { id: "pending-poll" });
+          toast.loading(MYBOOKS_LABELS[langRef.current].paymentProcessingToast, { id: "pending-poll" });
           let pollCount = 0;
           const MAX_POLLS = 6;
           pollIntervalId = setInterval(async () => {
@@ -154,7 +191,8 @@ export default function MyBooksPage() {
                 if (paidOrder) {
                   if (pollIntervalId !== null) clearInterval(pollIntervalId);
                   setOrders(withAbsoluteUrls(data.orders));
-                  toast.success("खरेदी यशस्वी! तुमचे पुस्तक तयार आहे.", { id: "pending-poll" });
+                  applyLang(dominantLanguage(data.orders));
+                  toast.success(MYBOOKS_LABELS[dominantLanguage(data.orders)].purchaseReadyToast, { id: "pending-poll" });
                   confetti({ particleCount: 100, spread: 60, origin: { y: 0.6 } });
                   // Fire Purchase pixel — payment was captured even though callback failed
                   const pixelAmount = pendingAmount || paidOrder.amount;
@@ -183,7 +221,7 @@ export default function MyBooksPage() {
       }
     }
     return () => { if (pollIntervalId !== null) clearInterval(pollIntervalId); };
-  }, [performSearch]);
+  }, [performSearch, applyLang]);
 
   const handleSearch = async (e: React.FormEvent) => { e.preventDefault(); performSearch(query); };
 
@@ -204,13 +242,15 @@ export default function MyBooksPage() {
     a.remove();
     setTimeout(() => {
       setDownloadingKey(null);
-      toast.success("डाउनलोड सुरू झाले! 📥");
+      toast.success(MYBOOKS_LABELS[langRef.current].downloadStarted);
     }, 2500);
   }, [downloadingKey]);
 
   const justPurchasedItem = justPurchasedOrder && orders
     ? orders.flatMap(o => o.items).find(i => i.ebookId === justPurchasedOrder.ebookId || i.title === justPurchasedOrder.title)
     : null;
+
+  const L = MYBOOKS_LABELS[bookLang];
 
   return (
     <div className="flex min-h-screen flex-col bg-[#F5F5F0]">
@@ -244,7 +284,7 @@ export default function MyBooksPage() {
                 </div>
 
                 <h2 className="text-xl font-black tracking-tight text-white">Payment Successful!</h2>
-                <p className="mt-1 text-xs font-medium text-white/40">तुमचे पुस्तक तयार आहे — आता डाउनलोड करा</p>
+                <p className="mt-1 text-xs font-medium text-white/40">{L.bookReady}</p>
 
                 {/* book block */}
                 <div className="mt-4 w-full rounded-2xl border border-white/10 bg-white/6 px-4 py-3.5 text-left backdrop-blur-sm">
@@ -259,7 +299,7 @@ export default function MyBooksPage() {
                 {/* WhatsApp delivery note */}
                 <div className="mt-3 flex w-full items-start gap-2 rounded-xl border border-green-400/20 bg-green-400/10 px-3 py-2.5 text-left">
                   <FaWhatsapp className="mt-0.5 h-3.5 w-3.5 shrink-0 text-green-400" />
-                  <p className="text-[10px] leading-relaxed text-green-200/80">तुमच्या WhatsApp वर PDF पाठवली आहे. न मिळाल्यास खालील बटन वापरा.</p>
+                  <p className="text-[10px] leading-relaxed text-green-200/80">{L.waDelivered}</p>
                 </div>
 
                 {/* CTAs */}
@@ -273,14 +313,14 @@ export default function MyBooksPage() {
                         className="flex items-center justify-center gap-1.5 rounded-xl bg-brand-gold py-3 text-sm font-black text-white shadow-lg shadow-brand-gold/20 transition-all hover:bg-brand-gold/90 active:scale-95 disabled:opacity-70"
                       >
                         {downloadingKey === "just-purchased" ? (
-                          <><Loader2 className="h-4 w-4 animate-spin" /> डाउनलोड होत आहे...</>
+                          <><Loader2 className="h-4 w-4 animate-spin" /> {L.downloading}</>
                         ) : (
                           <><Download className="h-4 w-4" /> Download</>
                         )}
                       </button>
                       {WA_NUMBER ? (
                         <a
-                          href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`📚 *वकिली आणि कायदे — माझी PDF*\n\n📖 *${justPurchasedItem.title}*\n\n🔗 Download Link:\n${justPurchasedItem.url}\n\n⚠️ हा link फक्त माझ्यासाठी आहे. हे message save करा.`)}`}
+                          href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`📚 *${L.waMyPdf}*\n\n📖 *${justPurchasedItem.title}*\n\n🔗 Download Link:\n${justPurchasedItem.url}\n\n⚠️ ${L.waLinkNote}`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center justify-center gap-1.5 rounded-xl bg-[#25D366] py-3 text-sm font-black text-white shadow-lg shadow-green-500/20 transition-all hover:bg-[#25D366]/90 active:scale-95"
@@ -302,7 +342,7 @@ export default function MyBooksPage() {
                 ) : (
                   <div className="mt-4 flex items-center gap-2 text-sm font-bold text-white/50">
                     <Loader2 className="h-4 w-4 animate-spin text-brand-gold" />
-                    तुमची लिंक तयार होत आहे...
+                    {L.linkPreparing}
                   </div>
                 )}
               </div>
@@ -319,8 +359,8 @@ export default function MyBooksPage() {
                 <Library className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="text-base font-black text-brand-teal">तुमची डिजिटल लायब्ररी</h1>
-                <p className="text-[11px] font-medium text-gray-400">WhatsApp नंबर टाका — तुमची पुस्तके लगेच मिळवा</p>
+                <h1 className="text-base font-black text-brand-teal">{L.libraryTitle}</h1>
+                <p className="text-[11px] font-medium text-gray-400">{L.librarySub}</p>
               </div>
             </div>
 
@@ -330,7 +370,7 @@ export default function MyBooksPage() {
                 <Input
                   type="text"
                   inputMode="numeric"
-                  placeholder="WhatsApp नंबर..."
+                  placeholder={L.phonePlaceholder}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   className="h-12 rounded-xl border-gray-200 bg-white pl-10 text-sm font-semibold shadow-sm focus:border-brand-teal focus:ring-1 focus:ring-brand-teal focus-visible:ring-offset-0"
@@ -341,7 +381,7 @@ export default function MyBooksPage() {
                 disabled={loading || !query.trim()}
                 className="h-12 shrink-0 rounded-xl bg-brand-teal px-6 font-black text-white shadow-sm active:scale-95 disabled:opacity-50"
               >
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Search className="h-4 w-4 sm:mr-1.5" /><span className="hidden sm:inline">शोधा</span></>}
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Search className="h-4 w-4 sm:mr-1.5" /><span className="hidden sm:inline">{L.searchBtn}</span></>}
               </Button>
             </form>
 
@@ -352,7 +392,7 @@ export default function MyBooksPage() {
                   <Phone className="h-3 w-3" />
                   Call Us
                 </a>
-                <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}?text=${encodeURIComponent("नमस्कार 🙏 वकिली आणि कायदे टीम,\nमला माझी पुस्तके डाऊनलोड करताना मदत हवी आहे. कृपया मार्गदर्शन करा.")}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3.5 py-1.5 text-[11px] font-bold text-green-700 transition-all hover:bg-green-100 active:scale-95">
+                <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}?text=${encodeURIComponent(L.waHelpRequest)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3.5 py-1.5 text-[11px] font-bold text-green-700 transition-all hover:bg-green-100 active:scale-95">
                   <FaWhatsapp className="h-3 w-3" />
                   WhatsApp Help
                 </a>
@@ -402,15 +442,15 @@ export default function MyBooksPage() {
                 <Library className="h-9 w-9 text-brand-gold/50" />
               </div>
             </div>
-            <p className="text-base font-black text-brand-teal">तुमची पुस्तके शोधा</p>
-            <p className="mt-1 max-w-xs text-sm text-gray-400">वर तुमचा WhatsApp नंबर टाकून &quot;शोधा&quot; दाबा</p>
+            <p className="text-base font-black text-brand-teal">{L.searchYourBooks}</p>
+            <p className="mt-1 max-w-xs text-sm text-gray-400">{L.searchPrompt}</p>
           </div>
         ) : orders.length > 0 ? (
           <div>
             <div className="mb-3 flex items-center gap-2 px-1">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-teal/8 px-3 py-1 text-[11px] font-black text-brand-teal">
                 <BookOpen className="h-3 w-3" />
-                {orders.reduce((n, o) => n + o.items.length, 0)} पुस्तके
+                {L.booksCount.replace("{n}", String(orders.reduce((n, o) => n + o.items.length, 0)))}
               </span>
               <span className="h-px flex-1 bg-gray-200/70" />
             </div>
@@ -447,7 +487,7 @@ export default function MyBooksPage() {
                       </div>
 
                       <div className="mt-3 grid grid-cols-2 gap-2">
-                        <a href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`📚 *वकिली आणि कायदे — माझी PDF*\n\n📖 *${item.title}*\n\n🔗 Download Link:\n${item.url}\n\n⚠️ हा link फक्त माझ्यासाठी आहे. हे message save करा — link expire होण्यापूर्वी.`)}`} target="_blank" rel="noopener noreferrer"
+                        <a href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`📚 *${L.waMyPdf}*\n\n📖 *${item.title}*\n\n🔗 Download Link:\n${item.url}\n\n⚠️ ${L.waLinkNoteExpire}`)}`} target="_blank" rel="noopener noreferrer"
                           className="flex items-center justify-center gap-1.5 rounded-xl border border-green-200 bg-green-50 py-2.5 text-xs font-bold text-green-700 transition-colors hover:bg-green-100 active:scale-95">
                           <FaWhatsapp className="h-3.5 w-3.5" />
                           Save Link
@@ -457,7 +497,7 @@ export default function MyBooksPage() {
                           className="flex items-center justify-center gap-1.5 rounded-xl bg-brand-teal py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-brand-teal/90 active:scale-95 disabled:opacity-70"
                           onClick={() => handleDownload(item.url, `${order.id}-${idx}`)}>
                           {downloadingKey === `${order.id}-${idx}` ? (
-                            <><Loader2 className="h-3.5 w-3.5 animate-spin" /> डाउनलोड होत आहे...</>
+                            <><Loader2 className="h-3.5 w-3.5 animate-spin" /> {L.downloading}</>
                           ) : (
                             <><Download className="h-3.5 w-3.5" /> Download</>
                           )}
@@ -476,13 +516,13 @@ export default function MyBooksPage() {
               <Search className="h-7 w-7 text-amber-400" />
             </div>
             <div>
-              <p className="font-black text-gray-700">पुस्तके सापडली नाहीत</p>
-              <p className="mt-1 text-xs text-gray-400">नंबर तपासा किंवा सपोर्टशी संपर्क करा.</p>
+              <p className="font-black text-gray-700">{L.noBooksFound}</p>
+              <p className="mt-1 text-xs text-gray-400">{L.checkNumber}</p>
             </div>
-            <button onClick={() => window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`नमस्कार 🙏 वकिली आणि कायदे टीम,\nमी पुस्तकाचे पैसे भरले आहेत, पण ते माझ्या खात्यात दिसत नाही.\n📱 माझा नंबर: ${query || "N/A"}\nकृपया तपासा.`)}`, '_blank')}
+            <button onClick={() => window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(L.waPaidNoBook.replace("{phone}", query || "N/A"))}`, '_blank')}
               className="inline-flex items-center gap-1.5 rounded-xl bg-brand-teal px-4 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-brand-teal/90 active:scale-95">
               <FaWhatsapp className="h-3.5 w-3.5" />
-              पैसे भरले पण पुस्तक नाही?
+              {L.paidButNoBook}
             </button>
           </div>
         )}
@@ -492,7 +532,7 @@ export default function MyBooksPage() {
           <div className="mt-10 mb-2">
             <div className="mb-3 flex items-center gap-2 px-1">
               <Sparkles className="h-3.5 w-3.5 text-brand-gold" />
-              <p className="text-[11px] font-black tracking-widest text-gray-500 uppercase">तुमच्यासाठी सुचवलेले</p>
+              <p className="text-[11px] font-black tracking-widest text-gray-500 uppercase">{L.suggestedForYou}</p>
               <ArrowRight className="h-3 w-3 text-gray-300" />
             </div>
             <ComboCarousel />
@@ -502,17 +542,17 @@ export default function MyBooksPage() {
 
       {/* Support footer */}
       <footer className="border-t border-gray-100 bg-white px-4 py-8 pb-24 text-center md:pb-8">
-        <p className="mb-4 text-xs font-bold text-gray-400">मदत हवी? आम्ही येथे आहोत.</p>
+        <p className="mb-4 text-xs font-bold text-gray-400">{L.needHelp}</p>
             <div className="flex flex-col justify-center gap-3 sm:flex-row">
           {process.env.NEXT_PUBLIC_WA_NUMBER ? (
             <>
               <a href={`tel:+${process.env.NEXT_PUBLIC_WA_NUMBER}`} className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-brand-teal px-8 text-sm font-bold text-white shadow-lg shadow-brand-teal/20 transition-transform hover:-translate-y-0.5 active:scale-95">
                 <Phone className="h-4 w-4" />
-                कॉल करा
+                {L.callCta}
               </a>
-              <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}?text=${encodeURIComponent("नमस्कार 🙏 वकिली आणि कायदे टीम,\nमला माझी पुस्तके डाऊनलोड करण्यास मदत हवी आहे. कृपया मार्गदर्शन करा.")}`} target="_blank" rel="noopener noreferrer" className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-[#25D366] px-8 text-sm font-bold text-white shadow-lg shadow-green-500/20 transition-transform hover:-translate-y-0.5 active:scale-95">
+              <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}?text=${encodeURIComponent(L.waHelpRequest)}`} target="_blank" rel="noopener noreferrer" className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-[#25D366] px-8 text-sm font-bold text-white shadow-lg shadow-green-500/20 transition-transform hover:-translate-y-0.5 active:scale-95">
                 <FaWhatsapp className="h-4 w-4" />
-                WhatsApp वर मदत घ्या
+                {L.whatsappHelpCta}
               </a>
             </>
           ) : (

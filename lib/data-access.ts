@@ -1,5 +1,6 @@
 import { prisma_db } from "./prisma";
 import { cache } from "react";
+import type { Language } from "./languages";
 
 // Cache tags kept for revalidateTag() callers (no-op without persistent cache)
 export const CACHE_TAGS = {
@@ -25,7 +26,7 @@ export async function getEbooks() {
 /**
  * 1b. Get ebooks filtered by language
  */
-export async function getEbooksByLanguage(language: "MARATHI" | "HINDI" | "ENGLISH") {
+export async function getEbooksByLanguage(language: Language) {
     const data = await prisma_db.ebook.findMany({
         where: { isEnabled: true, language },
         orderBy: { createdAt: "desc" },

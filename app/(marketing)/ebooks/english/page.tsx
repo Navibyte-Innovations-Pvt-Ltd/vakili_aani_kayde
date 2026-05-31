@@ -1,9 +1,9 @@
 import { getEbooksByLanguage } from "@/lib/data-access";
 import { EbookCatalog } from "@/components/marketing/ebook-catalog";
+import { EbookLanguageTabs } from "@/components/marketing/ebook-language-tabs";
 
 import { BookOpen } from "lucide-react";
 import { Metadata } from "next";
-import Link from "next/link";
 
 export const revalidate = 0;
 
@@ -38,19 +38,7 @@ export default async function EnglishEbooksPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* Language tabs */}
-      <div className="border-b border-gray-100 bg-white px-4">
-        <div className="mx-auto flex max-w-6xl gap-1 overflow-x-auto py-2">
-          <Link href="/ebooks" className="rounded-full px-4 py-1.5 text-xs font-bold text-gray-500 transition-colors hover:bg-brand-teal/8 hover:text-brand-teal">
-            सर्व
-          </Link>
-          <Link href="/ebooks/hindi" className="rounded-full px-4 py-1.5 text-xs font-bold text-gray-500 transition-colors hover:bg-brand-teal/8 hover:text-brand-teal">
-            हिंदी
-          </Link>
-          <span className="rounded-full bg-brand-teal px-4 py-1.5 text-xs font-black text-white">
-            English
-          </span>
-        </div>
-      </div>
+      <EbookLanguageTabs current="ENGLISH" />
 
       {/* Catalog */}
       <div className="mx-auto max-w-6xl px-4 py-8">
