@@ -61,7 +61,7 @@ const PAGE_LABELS = {
     recommendedTitle: "तुम्हाला हे देखील आवडेल",
     recommendedSub: "आमची इतर काही महत्वाची पुस्तके पहा",
     authorLabel: "लेखकाबद्दल",
-    authorBio: "Adv. Omkar Shinde हे अनुभवी वकील आहेत. त्यांनी सामान्य नागरिकांसाठी कायद्याची माहिती सोप्या मराठी भाषेत उपलब्ध करून देण्यासाठी 'वकिली आणि कायदे' ची स्थापना केली.",
+    authorBio: "'वकिली आणि कायदे' हे अनुभवी वकिलांचे व्यासपीठ आहे. सामान्य नागरिकांसाठी कायद्याची माहिती सोप्या मराठी भाषेत उपलब्ध करून देण्यासाठी याची स्थापना झाली.",
     socialProof: "वाचकांनी विश्वास ठेवला",
   },
   HINDI: {
@@ -100,7 +100,7 @@ const PAGE_LABELS = {
     recommendedTitle: "आपको यह भी पसंद आएगा",
     recommendedSub: "हमारी अन्य महत्वपूर्ण पुस्तकें देखें",
     authorLabel: "लेखक के बारे में",
-    authorBio: "Adv. Omkar Shinde अनुभवी वकील हैं। उन्होंने आम नागरिकों के लिए कानूनी जानकारी को सरल भाषा में उपलब्ध कराने के लिए 'वकिली आणि कायदे' की स्थापना की।",
+    authorBio: "'वकिली आणि कायदे' अनुभवी वकीलों का मंच है। आम नागरिकों के लिए कानूनी जानकारी को सरल भाषा में उपलब्ध कराने के लिए इसकी स्थापना की गई।",
     socialProof: "पाठकों का विश्वास",
   },
   ENGLISH: {
@@ -139,7 +139,7 @@ const PAGE_LABELS = {
     recommendedTitle: "You May Also Like",
     recommendedSub: "Explore more important books",
     authorLabel: "About the Author",
-    authorBio: "Adv. Omkar Shinde is a practising lawyer. He founded 'Vakili Aani Kayde' to make legal knowledge accessible to every citizen in simple, everyday language.",
+    authorBio: "'Vakili Aani Kayde' is a platform run by experienced lawyers. It was founded to make legal knowledge accessible to every citizen in simple, everyday language.",
     socialProof: "Trusted by readers",
   },
 } as const;
@@ -169,7 +169,7 @@ export async function generateMetadata(
         images: [{ url: `/ebooks/${params.id}/opengraph-image`, width: 1200, height: 630, alt: ogTitle }],
       },
       twitter: { card: "summary_large_image", title: ogTitle, description: truncatedDescription, images: [`/ebooks/${params.id}/opengraph-image`] },
-      authors: [{ name: "Adv. Omkar Shinde" }],
+      authors: [{ name: "वकिली आणि कायदे" }],
     };
   } catch {
     return { title: "वकिली आणि कायदे", description: "Legal Knowledge Center." };
@@ -239,7 +239,7 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
     inLanguage: ebook.language === "HINDI" ? "hi" : ebook.language === "ENGLISH" ? "en" : "mr",
     bookFormat: "https://schema.org/EBook",
     fileFormat: "application/pdf",
-    author: { "@type": "Person", name: "Adv. Omkar Shinde" },
+    author: { "@type": "Organization", name: "Vakili Aani Kayde", url: "https://www.vakilianikayde.in" },
     publisher: { "@type": "Organization", name: "Vakili Aani Kayde", url: "https://www.vakilianikayde.in" },
     offers: { "@type": "Offer", price: finalPrice, priceCurrency: "INR", availability: "https://schema.org/InStock", url: `https://www.vakilianikayde.in/ebooks/${id}` },
   };

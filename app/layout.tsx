@@ -60,8 +60,8 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   keywords: ["वकिली", "कायदे", "हक्क", "वकील सल्ला", "ई-बुक्स", "Legal Advice Marathi", "Marathi Law Books", "कायदेशीर माहिती"],
-  authors: [{ name: "Adv. Omkar Shinde", url: SITE_URL }],
-  creator: "Adv. Omkar Shinde",
+  authors: [{ name: "वकिली आणि कायदे", url: SITE_URL }],
+  creator: "वकिली आणि कायदे",
   publisher: SITE_NAME,
   ...(process.env.NEXT_PUBLIC_FACEBOOK_DOMAIN_VERIFICATION
     ? {
@@ -95,7 +95,7 @@ export const metadata: Metadata = {
     locale: "mr_IN",
     url: SITE_URL,
     title: SITE_TITLE,
-    description: "तुमचे हक्क जाणा, योग्य निर्णय घ्या — Adv. Omkar Shinde यांच्या कलमातून थेट कायदेशीर मार्गदर्शन.",
+    description: "तुमचे हक्क जाणा, योग्य निर्णय घ्या — वकिली आणि कायदे कडून थेट कायदेशीर मार्गदर्शन.",
     siteName: SITE_NAME,
     images: [
       {
@@ -109,7 +109,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: SITE_TITLE,
-    description: "तुमचे हक्क जाणा, योग्य निर्णय घ्या — Adv. Omkar Shinde यांच्या कलमातून थेट कायदेशीर मार्गदर्शन.",
+    description: "तुमचे हक्क जाणा, योग्य निर्णय घ्या — वकिली आणि कायदे कडून थेट कायदेशीर मार्गदर्शन.",
     images: ["/image.png"],
     creator: TWITTER_HANDLE,
   },

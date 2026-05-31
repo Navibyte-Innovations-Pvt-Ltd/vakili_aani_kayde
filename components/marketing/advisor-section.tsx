@@ -14,7 +14,7 @@ export function AdvisorSection() {
                             <div className="relative h-full w-full overflow-hidden rounded-full border-[6px] border-white bg-gray-100 shadow-2xl">
                                 <Image
                                     src="/omkar_shinde.png"
-                                    alt="Adv. Omkar Shinde"
+                                    alt="वकिली आणि कायदे"
                                     fill
                                     sizes="(max-width: 768px) 160px, 256px"
                                     className="object-cover object-top"
@@ -31,7 +31,7 @@ export function AdvisorSection() {
                             <span className="mb-3 inline-flex items-center gap-2 rounded-full border border-brand-gold/30 bg-brand-gold/10 px-3 py-1 text-xs font-bold text-brand-gold">
                                 <Scale className="h-3 w-3" /> कायदेशीर सल्लागार
                             </span>
-                            <h2 className="mt-2 text-2xl font-black text-brand-teal md:text-4xl">Adv. Omkar Shinde</h2>
+                            <h2 className="mt-2 text-2xl font-black text-brand-teal md:text-4xl">वकिली आणि कायदे</h2>
                             <p className="mt-1 text-sm font-bold text-brand-gold md:text-base">LL.B | कायदेशीर सल्लागार</p>
                         </div>
 
