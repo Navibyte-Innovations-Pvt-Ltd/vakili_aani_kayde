@@ -7,6 +7,7 @@ import {
   MessageSquare,
   Settings,
   ShoppingCart,
+  TrendingUp,
   Users,
 } from "lucide-react";
 
@@ -46,6 +47,11 @@ export const DASHBOARD_SIDEBAR_ITEMS: DashboardSidebarItem[] = [
     title: "Analytics",
     href: "/dashboard/analytics",
     icon: BarChart,
+  },
+  {
+    title: "Sales Analytics",
+    href: "/dashboard/sales-analytics",
+    icon: TrendingUp,
   },
   {
     title: "WhatsApp",
