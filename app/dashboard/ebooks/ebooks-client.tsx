@@ -24,6 +24,7 @@ import { LANGUAGE_SHORT, LANGUAGE_BADGE, coerceLanguage } from "@/lib/languages"
 
 interface Ebook {
     id: string;
+    slug?: string | null;
     displayId: number;
     title: string;
     description: string;
@@ -345,7 +346,7 @@ export function EbooksClient({ ebooks }: EbooksClientProps) {
                                     </div>
 
                                     <Button variant="outline" size="sm" asChild className="h-8 gap-1.5 px-3 text-xs font-medium hover:bg-gray-50 hover:text-[#0A2342]">
-                                        <Link href={`/ebooks/${ebook.id}`} target="_blank">
+                                        <Link href={`/ebooks/${ebook.slug ?? ebook.id}`} target="_blank">
                                             <Eye className="h-3.5 w-3.5" /> View
                                         </Link>
                                     </Button>

@@ -17,6 +17,7 @@ import { SALE_CONFIG, getInflatedOriginalPrice } from "@/lib/sale-config";
 import { SaleTimer } from "@/components/marketing/sale-timer";
 import { LANGUAGE_NATIVE, LANGUAGE_ISO, coerceLanguage, type Language } from "@/lib/languages";
 import { SetNavLanguage } from "@/components/nav-language-context";
+import { permanentRedirect } from "next/navigation";
 
 export const revalidate = 0;
 
@@ -313,18 +314,20 @@ export async function generateMetadata(
     const truncatedDescription = plainDescription.length > 155 ? plainDescription.slice(0, 152) + "..." : plainDescription;
     const rawTitle = ebook.title.replace(/<[^>]+>/g, "").trim();
     const ogTitle = rawTitle.length > 55 ? rawTitle.slice(0, 52) + "..." : rawTitle;
+    const canonicalId = ebook.slug ?? params.id;
     return {
       title: { absolute: `${ogTitle} | वकिली आणि कायदे` },
       description: truncatedDescription,
+      alternates: { canonical: `https://www.vakilianikayde.in/ebooks/${canonicalId}` },
       openGraph: {
         title: ogTitle,
         description: truncatedDescription,
-        url: `https://www.vakilianikayde.in/ebooks/${params.id}`,
+        url: `https://www.vakilianikayde.in/ebooks/${canonicalId}`,
         type: "book",
         siteName: "वकिली आणि कायदे",
-        images: [{ url: `/ebooks/${params.id}/opengraph-image`, width: 1200, height: 630, alt: ogTitle }],
+        images: [{ url: `/ebooks/${canonicalId}/opengraph-image`, width: 1200, height: 630, alt: ogTitle }],
       },
-      twitter: { card: "summary_large_image", title: ogTitle, description: truncatedDescription, images: [`/ebooks/${params.id}/opengraph-image`] },
+      twitter: { card: "summary_large_image", title: ogTitle, description: truncatedDescription, images: [`/ebooks/${canonicalId}/opengraph-image`] },
       authors: [{ name: "वकिली आणि कायदे" }],
     };
   } catch {
@@ -356,6 +359,11 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
   const params = await props.params;
   const { id } = params;
   const ebook = await getEbookById(id);
+
+  // Old /ebooks/<cuid> links → 301 to the SEO slug URL.
+  if (ebook?.slug && id !== ebook.slug) {
+    permanentRedirect(`/ebooks/${ebook.slug}`);
+  }
 
   if (!ebook || !ebook.isEnabled) {
     return (
@@ -398,7 +406,7 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
     fileFormat: "application/pdf",
     author: { "@type": "Organization", name: "Vakili Aani Kayde", url: "https://www.vakilianikayde.in" },
     publisher: { "@type": "Organization", name: "Vakili Aani Kayde", url: "https://www.vakilianikayde.in" },
-    offers: { "@type": "Offer", price: finalPrice, priceCurrency: "INR", availability: "https://schema.org/InStock", url: `https://www.vakilianikayde.in/ebooks/${id}` },
+    offers: { "@type": "Offer", price: finalPrice, priceCurrency: "INR", availability: "https://schema.org/InStock", url: `https://www.vakilianikayde.in/ebooks/${ebook.slug ?? id}` },
   };
 
   const breadcrumbLd = {
@@ -407,11 +415,11 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: "https://www.vakilianikayde.in" },
       { "@type": "ListItem", position: 2, name: "Ebooks", item: "https://www.vakilianikayde.in/ebooks" },
-      { "@type": "ListItem", position: 3, name: ebook.title, item: `https://www.vakilianikayde.in/ebooks/${id}` },
+      { "@type": "ListItem", position: 3, name: ebook.title, item: `https://www.vakilianikayde.in/ebooks/${ebook.slug ?? id}` },
     ],
   };
 
-  const waHelpUrl = process.env.NEXT_PUBLIC_WA_NUMBER ? `https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}?text=${encodeURIComponent(`${labels.waMessage} ${ebook.title}\nLink: https://www.vakilianikayde.in/ebooks/${ebook.id}`)}` : '#';
+  const waHelpUrl = process.env.NEXT_PUBLIC_WA_NUMBER ? `https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}?text=${encodeURIComponent(`${labels.waMessage} ${ebook.title}\nLink: https://www.vakilianikayde.in/ebooks/${ebook.slug ?? ebook.id}`)}` : '#';
 
   const ComboSection = ebook.isCombo && ebook.includedEbooks.length > 0 ? (() => {
     const individualTotal = ebook.includedEbooks.reduce((sum, b) => sum + Number(b.price), 0);

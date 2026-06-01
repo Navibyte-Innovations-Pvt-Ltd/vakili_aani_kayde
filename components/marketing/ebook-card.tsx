@@ -10,6 +10,7 @@ import { DiscountBadge } from "@/components/marketing/sale-timer";
 interface EbookCardProps {
   ebook: {
     id: string;
+    slug?: string | null;
     displayId?: number;
     title: string;
     description: string;
@@ -54,7 +55,7 @@ export function EbookCard({ ebook, searchQuery, className }: EbookCardProps) {
 
   return (
     <Link
-      href={`/ebooks/${ebook.id}`}
+      href={`/ebooks/${ebook.slug ?? ebook.id}`}
       onClick={() => setIsLoading(true)}
       className={`group relative flex flex-col overflow-hidden rounded-md border border-brand-gold/25 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.07)] transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold hover:shadow-[0_8px_28px_rgba(90,26,43,0.16)] hover:ring-1 hover:ring-brand-gold/40 ${className}`}
     >

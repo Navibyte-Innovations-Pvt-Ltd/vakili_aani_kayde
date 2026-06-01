@@ -23,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const ebookRoutes: MetadataRoute.Sitemap = ebooks
         .filter((e) => !e.isCombo)
         .map((ebook) => ({
-            url: `${BASE_URL}/ebooks/${ebook.id}`,
+            url: `${BASE_URL}/ebooks/${ebook.slug ?? ebook.id}`,
             lastModified: new Date(),
             changeFrequency: "monthly",
             priority: 0.8,

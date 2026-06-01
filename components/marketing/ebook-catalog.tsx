@@ -20,6 +20,7 @@ const ALL_LANGUAGES_LABEL: Record<Language, string> = {
 
 interface Ebook {
     id: string;
+    slug?: string | null;
     displayId: number;
     title: string;
     description: string;

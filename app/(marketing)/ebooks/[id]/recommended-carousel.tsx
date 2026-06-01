@@ -11,6 +11,7 @@ import { SaleTimer, DiscountBadge } from "@/components/marketing/sale-timer";
 
 interface EbookSummary {
     id: string;
+    slug?: string | null;
     displayId: number | null;
     title: string;
     price: number;
@@ -46,7 +47,7 @@ function RecommendedBookCard({ book }: { book: EbookSummary }) {
 
     return (
         <Link
-            href={`/ebooks/${book.id}`}
+            href={`/ebooks/${book.slug ?? book.id}`}
             className="group flex h-full flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
         >
             {/* Book Cover */}

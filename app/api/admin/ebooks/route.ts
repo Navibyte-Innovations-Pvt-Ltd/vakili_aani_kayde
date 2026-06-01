@@ -7,6 +7,24 @@ import { revalidateTag, revalidatePath } from "next/cache";
 
 import { CACHE_TAGS } from "@/lib/data-access";
 import { coerceLanguage } from "@/lib/languages";
+import { slugify } from "@/lib/slug";
+
+/** Normalize a requested slug and guarantee uniqueness (append -2, -3, … on collision). */
+async function resolveUniqueSlug(raw: string | null, excludeId: string | null): Promise<string | null> {
+    const base = raw ? slugify(raw) : "";
+    if (!base) return null;
+    let candidate = base;
+    let n = 1;
+    while (true) {
+        const clash = await prisma_db.ebook.findFirst({
+            where: { slug: candidate, ...(excludeId ? { NOT: { id: excludeId } } : {}) },
+            select: { id: true },
+        });
+        if (!clash) return candidate;
+        n += 1;
+        candidate = `${base}-${n}`;
+    }
+}
 
 type CreateEbookJson = {
     title: string;
@@ -15,6 +33,7 @@ type CreateEbookJson = {
     pages?: number | string;
     category: string;
     language?: string;
+    slug?: string;
     isCombo?: boolean;
     includedEbooks?: string[];
     coverImageUrl?: string | null;
@@ -90,6 +109,7 @@ export async function POST(req: NextRequest) {
         let pages: string;
         let category: string;
         let language: string = "MARATHI";
+        let providedSlug: string | null = null;
         let isCombo: boolean;
         let includedEbookIds: string[];
         let coverImageUrl: string | null = null;
@@ -105,6 +125,7 @@ export async function POST(req: NextRequest) {
             pages = body.pages != null ? String(body.pages) : "";
             category = body.category;
             language = body.language ?? "MARATHI";
+            providedSlug = body.slug ?? null;
             isCombo = !!body.isCombo;
             includedEbookIds = Array.isArray(body.includedEbooks) ? body.includedEbooks : [];
             coverImageUrl = body.coverImageUrl ?? null;
@@ -129,6 +150,7 @@ export async function POST(req: NextRequest) {
             pages = formData.get("pages") as string;
             category = formData.get("category") as string;
             language = (formData.get("language") as string) || "MARATHI";
+            providedSlug = (formData.get("slug") as string) || null;
             const isComboStr = formData.get("isCombo") as string;
             const includedEbooksStr = formData.get("includedEbooks") as string;
             isCombo = isComboStr === "true";
@@ -201,11 +223,13 @@ export async function POST(req: NextRequest) {
             }
         }
 
+        const finalSlug = await resolveUniqueSlug(providedSlug, null);
         const ebook = await prisma_db.ebook.create({
             data: {
                 title,
                 description,
                 category,
+                slug: finalSlug,
                 language: coerceLanguage(language),
                 price: parseFloat(price),
                 pages: pages ? parseInt(pages) : 0,

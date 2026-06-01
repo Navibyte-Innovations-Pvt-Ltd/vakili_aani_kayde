@@ -8,6 +8,7 @@ import {
   Settings,
   ShoppingCart,
   TrendingUp,
+  Megaphone,
   Users,
 } from "lucide-react";
 
@@ -52,6 +53,11 @@ export const DASHBOARD_SIDEBAR_ITEMS: DashboardSidebarItem[] = [
     title: "Sales Analytics",
     href: "/dashboard/sales-analytics",
     icon: TrendingUp,
+  },
+  {
+    title: "Ad Performance",
+    href: "/dashboard/ad-performance",
+    icon: Megaphone,
   },
   {
     title: "WhatsApp",

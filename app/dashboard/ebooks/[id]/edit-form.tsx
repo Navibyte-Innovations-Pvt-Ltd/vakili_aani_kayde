@@ -91,6 +91,7 @@ const formSchema = z.object({
   language: z.enum(LANGUAGES).default("MARATHI"),
   price: z.coerce.number().min(0, "Price must be a valid number"),
   pages: z.coerce.number().min(0, "Pages must be a valid number").optional(),
+  slug: z.string().regex(/^[a-z0-9-]*$/, "Only lowercase letters, numbers, hyphens").optional().or(z.literal("")),
   isEnabled: z.boolean().default(true),
   isCombo: z.boolean().default(false),
   includedEbooks: z.array(z.string()).optional(),
@@ -101,6 +102,7 @@ type FormValues = z.infer<typeof formSchema>;
 interface EditEbookFormProps {
   ebook: {
     id: string;
+    slug?: string | null;
     displayId: number;
     title: string;
     description: string;
@@ -163,6 +165,7 @@ export default function EditEbookForm({ ebook }: EditEbookFormProps) {
       language: coerceLanguage(ebook.language),
       price: Number(ebook.price) || 0,
       pages: ebook.pages || 0,
+      slug: ebook.slug ?? "",
       isEnabled: ebook.isEnabled ?? true,
       isCombo: ebook.isCombo || false,
       includedEbooks: ebook.includedEbooks
@@ -454,6 +457,7 @@ export default function EditEbookForm({ ebook }: EditEbookFormProps) {
           language: values.language,
           price: values.price,
           pages: values.pages,
+          slug: values.slug || undefined,
           isEnabled: values.isEnabled,
           isCombo: values.isCombo,
           includedEbooks: values.isCombo ? values.includedEbooks : [],
@@ -559,6 +563,18 @@ export default function EditEbookForm({ ebook }: EditEbookFormProps) {
                     placeholder="Ex. Maharashtra Rent Control Act"
                     required
                   />
+
+                  <div>
+                    <InputField
+                      name="slug"
+                      label="SEO Page Slug (optional)"
+                      type="text"
+                      placeholder="e.g. rti-warrior-guide"
+                    />
+                    <p className="mt-1 text-[10px] text-muted-foreground">
+                      Detail page URL: <span className="font-mono text-brand-teal">/ebooks/&lt;slug&gt;</span>. Falls back to ID if empty. Changing it 301-redirects the old URL.
+                    </p>
+                  </div>
 
                   <InputField
                     name="description"

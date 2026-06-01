@@ -17,6 +17,7 @@ import Image from "next/image";
 
 export interface Ebook {
     id: string;
+    slug?: string | null;
     displayId: number;
     title: string;
     description: string;
@@ -174,7 +175,7 @@ export function DialogContentWrapper({
                                 key={ebook.id}
                                 value={`${ebook.displayId} ${ebook.title} ${ebook.category}`}
                                 onSelect={() => {
-                                    runCommand(() => router.push(`/ebooks/${ebook.id}`));
+                                    runCommand(() => router.push(`/ebooks/${ebook.slug ?? ebook.id}`));
                                 }}
                                 className="mb-1 flex cursor-pointer items-start gap-4 rounded-xl border-b border-gray-50 p-3 transition-colors last:border-0 hover:bg-brand-teal/5 md:p-2.5"
                             >

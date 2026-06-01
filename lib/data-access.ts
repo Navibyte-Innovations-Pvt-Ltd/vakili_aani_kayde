@@ -13,6 +13,91 @@ export type BookwiseSales = {
     seriesByBook: Record<string, number[]>;
 };
 
+export type AdPerformance = {
+    rangeDays: number;
+    summary: {
+        spend: number; revenue: number; orders: number; roas: number; net: number; cac: number;
+        prevSpend: number; prevRevenue: number; prevRoas: number;
+    };
+    daily: { date: string; spend: number; revenue: number; orders: number; roas: number | null; net: number }[];
+};
+
+/**
+ * Blended ad performance: daily total ad spend vs PAID revenue → ROAS/net/CAC.
+ * Account-level (not per-campaign). IST day-bucketed, with previous equal period.
+ */
+export async function getAdPerformance(rangeDays: number): Promise<AdPerformance> {
+    const nowIST = getNowIST();
+    const startIST = startOfDay(subDays(nowIST, rangeDays - 1));
+    const prevStartIST = startOfDay(subDays(nowIST, rangeDays * 2 - 1));
+    const from = fromIST(startIST);
+    const prevFrom = fromIST(prevStartIST);
+
+    const [orders, spends] = await Promise.all([
+        prisma_db.order.findMany({
+            where: { status: "PAID", createdAt: { gte: prevFrom } },
+            select: { amount: true, createdAt: true },
+        }),
+        prisma_db.adSpend.findMany({
+            where: { date: { gte: prevFrom } },
+            select: { amount: true, date: true },
+        }),
+    ]);
+
+    const dayRev = new Map<string, { revenue: number; orders: number }>();
+    const daySpend = new Map<string, number>();
+    let prevRevenue = 0;
+    let prevSpend = 0;
+
+    for (const o of orders) {
+        if (o.createdAt >= from) {
+            const k = format(toIST(o.createdAt), "yyyy-MM-dd");
+            const d = dayRev.get(k) ?? { revenue: 0, orders: 0 };
+            d.revenue += o.amount; d.orders += 1; dayRev.set(k, d);
+        } else { prevRevenue += o.amount; }
+    }
+    for (const s of spends) {
+        if (s.date >= from) {
+            const k = format(toIST(s.date), "yyyy-MM-dd");
+            daySpend.set(k, (daySpend.get(k) ?? 0) + s.amount);
+        } else { prevSpend += s.amount; }
+    }
+
+    const daily = eachDayOfInterval({ start: startIST, end: nowIST }).map((d) => {
+        const k = format(d, "yyyy-MM-dd");
+        const rev = dayRev.get(k) ?? { revenue: 0, orders: 0 };
+        const spend = Math.round(daySpend.get(k) ?? 0);
+        const revenue = Math.round(rev.revenue);
+        return {
+            date: k,
+            spend,
+            revenue,
+            orders: rev.orders,
+            roas: spend > 0 ? Number((revenue / spend).toFixed(2)) : null,
+            net: revenue - spend,
+        };
+    });
+
+    const spend = daily.reduce((s, d) => s + d.spend, 0);
+    const revenue = daily.reduce((s, d) => s + d.revenue, 0);
+    const ordersCount = daily.reduce((s, d) => s + d.orders, 0);
+    prevRevenue = Math.round(prevRevenue);
+    prevSpend = Math.round(prevSpend);
+
+    return {
+        rangeDays,
+        summary: {
+            spend, revenue, orders: ordersCount,
+            roas: spend > 0 ? Number((revenue / spend).toFixed(2)) : 0,
+            net: revenue - spend,
+            cac: ordersCount > 0 ? Math.round(spend / ordersCount) : 0,
+            prevSpend, prevRevenue,
+            prevRoas: prevSpend > 0 ? Number((prevRevenue / prevSpend).toFixed(2)) : 0,
+        },
+        daily,
+    };
+}
+
 /**
  * Daily book-wise PAID sales for the dashboard, bucketed by IST day.
  * "units" = count of OrderItem rows (no quantity field exists); a combo is a
@@ -157,9 +242,10 @@ export async function getComboEbooks() {
  * 3. Get Ebook by ID with full details
  * React.cache gives per-request memoization only (no cross-request DB cache).
  */
-export const getEbookById = cache(async (id: string) => {
-    const ebook = await prisma_db.ebook.findUnique({
-        where: { id },
+export const getEbookById = cache(async (idOrSlug: string) => {
+    // Resolve by SEO slug first, then fall back to the cuid id (old links).
+    const ebook = await prisma_db.ebook.findFirst({
+        where: { OR: [{ slug: idOrSlug }, { id: idOrSlug }] },
         include: { includedEbooks: { include: { ebook: true } } },
     });
     if (!ebook) return null;

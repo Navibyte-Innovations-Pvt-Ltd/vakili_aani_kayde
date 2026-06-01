@@ -9,6 +9,7 @@ export default async function EbooksPage() {
     const ebooksData = await prisma_db.ebook.findMany({
         select: {
             id: true,
+            slug: true,
             displayId: true,
             title: true,
             description: true,

@@ -130,6 +130,7 @@ model Ebook {
   id           String   @id @default(cuid())
   displayId    Int      @unique @default(autoincrement())
   shortCode    String?  @unique // Permanent short URL code (e.g., /d/abc123)
+  slug         String?  @unique // SEO URL slug for /ebooks/<slug>
   title        String
   description  String   @db.Text
   price        Float
@@ -178,6 +179,29 @@ enum OrderStatus {
   PAID
   FAILED
   CANCELLED
+}
+
+enum AdPlatform {
+  META
+  GOOGLE
+  OTHER
+}
+
+// Daily ad spend for ROAS / ad-performance tracking. One row per platform per IST day.
+model AdSpend {
+  id        String     @id @default(cuid())
+  date      DateTime // IST day start, stored as UTC
+  platform  AdPlatform @default(META)
+  amount    Float // spend in INR
+  campaign  String?
+  clicks    Int?
+  impressions Int?
+  notes     String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([date, platform])
+  @@index([date])
 }
 
 model Order {

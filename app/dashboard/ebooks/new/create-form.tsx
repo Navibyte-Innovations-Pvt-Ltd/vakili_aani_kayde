@@ -58,6 +58,7 @@ const formSchema = z.object({
     price: z.coerce.number().min(0, "Price must be a valid number"),
     pages: z.coerce.number().min(0, "Pages must be a valid number").optional(),
     shortCode: z.string().regex(/^[a-z0-9-]*$/, "Only lowercase letters, numbers, hyphens").optional().or(z.literal("")),
+    slug: z.string().regex(/^[a-z0-9-]*$/, "Only lowercase letters, numbers, hyphens").optional().or(z.literal("")),
     isEnabled: z.boolean().default(true),
     isCombo: z.boolean().default(false),
     includedEbooks: z.array(z.string()).optional(),
@@ -100,6 +101,7 @@ export default function CreateEbookForm() {
             language: "MARATHI" as const,
             price: 0,
             shortCode: "",
+            slug: "",
             isEnabled: true,
             isCombo: false,
             includedEbooks: [],
@@ -330,6 +332,7 @@ export default function CreateEbookForm() {
                     category: values.category,
                     language: values.language,
                     shortCode: values.shortCode || undefined,
+                    slug: values.slug || undefined,
                     isEnabled: values.isEnabled,
                     isCombo: values.isCombo,
                     includedEbooks: values.includedEbooks ?? [],
@@ -465,6 +468,16 @@ export default function CreateEbookForm() {
                                     />
                                     <p className="mt-1 text-[10px] text-muted-foreground">
                                         Used for short links like <span className="font-mono text-brand-teal">/d/rti-guide</span>. Only lowercase, numbers, hyphens.
+                                    </p>
+
+                                    <InputField
+                                        name="slug"
+                                        label="SEO Page Slug (optional)"
+                                        placeholder="e.g. rti-warrior-guide"
+                                        type="text"
+                                    />
+                                    <p className="mt-1 text-[10px] text-muted-foreground">
+                                        Detail page URL: <span className="font-mono text-brand-teal">/ebooks/rti-warrior-guide</span>. Falls back to ID if empty. Only lowercase, numbers, hyphens.
                                     </p>
                                 </CardContent>
                             </Card>

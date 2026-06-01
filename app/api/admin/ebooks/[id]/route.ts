@@ -6,6 +6,21 @@ import { mergePDFs } from "@/lib/pdf-watermark";
 import { revalidateTag } from "next/cache";
 import { CACHE_TAGS } from "@/lib/data-access";
 import { isLanguage } from "@/lib/languages";
+import { slugify } from "@/lib/slug";
+
+/** Normalize a requested slug and guarantee uniqueness, excluding the current ebook. */
+async function resolveUniqueSlug(raw: string | null, excludeId: string): Promise<string | null> {
+    const base = raw ? slugify(raw) : "";
+    if (!base) return null;
+    let candidate = base;
+    let n = 1;
+    while (true) {
+        const clash = await prisma_db.ebook.findFirst({ where: { slug: candidate, NOT: { id: excludeId } }, select: { id: true } });
+        if (!clash) return candidate;
+        n += 1;
+        candidate = `${base}-${n}`;
+    }
+}
 
 export const maxDuration = 120;
 
@@ -35,6 +50,8 @@ export async function PUT(
         let price: string = "";
         let pages: string = "";
         let language: string = "";
+        let providedSlug: string | null = null;
+        let slugProvided = false;
         let isEnabled: string = "";
         let isCombo = false;
         let includedEbookIds: string[] = [];
@@ -63,6 +80,8 @@ export async function PUT(
             price = body.price != null ? String(body.price) : "";
             pages = body.pages != null ? String(body.pages) : "";
             language = (body as { language?: string }).language ?? "";
+            const bodySlug = (body as { slug?: string }).slug;
+            if (bodySlug !== undefined) { providedSlug = bodySlug || null; slugProvided = true; }
             isEnabled = body.isEnabled != null ? String(body.isEnabled) : "";
             isCombo = !!body.isCombo;
             includedEbookIds = Array.isArray(body.includedEbooks) ? body.includedEbooks : [];
@@ -169,6 +188,9 @@ export async function PUT(
             }
         }
 
+        // undefined = leave unchanged; null = explicitly cleared.
+        const finalSlug = slugProvided ? await resolveUniqueSlug(providedSlug, id) : undefined;
+
         // Update the ebook fields first
         const ebook = await prisma_db.ebook.update({
             where: { id },
@@ -177,6 +199,7 @@ export async function PUT(
                 description: description || undefined,
                 price: price ? parseFloat(price) : undefined,
                 pages: pages ? parseInt(pages) : undefined,
+                slug: finalSlug,
                 language: isLanguage(language) ? language : undefined,
                 isEnabled: isEnabled ? isEnabled === "true" : undefined,
                 isCombo: isCombo,

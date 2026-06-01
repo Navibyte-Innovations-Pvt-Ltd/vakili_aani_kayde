@@ -27,7 +27,7 @@ export default async function GujaratiEbooksPage() {
       "itemListElement": ebooks.map((ebook, index) => ({
         "@type": "ListItem",
         "position": index + 1,
-        "url": `https://www.vakilianikayde.in/ebooks/${ebook.id}`,
+        "url": `https://www.vakilianikayde.in/ebooks/${ebook.slug ?? ebook.id}`,
         "name": ebook.title,
       })),
     },
