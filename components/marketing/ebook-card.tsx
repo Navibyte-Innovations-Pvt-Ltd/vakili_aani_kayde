@@ -6,6 +6,18 @@ import { useState } from "react";
 import { ArrowRight, BookOpen, Loader2 } from "lucide-react";
 import { SALE_CONFIG, getInflatedOriginalPrice } from "@/lib/sale-config";
 import { DiscountBadge } from "@/components/marketing/sale-timer";
+import { useNavLanguage } from "@/components/nav-language-context";
+import { type Language } from "@/lib/languages";
+
+const BUY_LABEL: Record<Language, string> = {
+  MARATHI: "खरेदी करा",
+  HINDI: "खरीदें",
+  ENGLISH: "Buy Now",
+  TAMIL: "வாங்கவும்",
+  TELUGU: "కొనుగోలు",
+  GUJARATI: "ખरीदो",
+  BENGALI: "কিনুন",
+};
 
 interface EbookCardProps {
   ebook: {
@@ -52,12 +64,13 @@ export function EbookCard({ ebook, searchQuery, className }: EbookCardProps) {
   const crossedPrice = getInflatedOriginalPrice(finalPrice);
   const [isLoading, setIsLoading] = useState(false);
   const description = stripHtml(ebook.description);
+  const buyLabel = BUY_LABEL[useNavLanguage()];
 
   return (
     <Link
       href={`/ebooks/${ebook.slug ?? ebook.id}`}
       onClick={() => setIsLoading(true)}
-      className={`group relative flex flex-col overflow-hidden rounded-md border border-brand-gold/25 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.07)] transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold hover:shadow-[0_8px_28px_rgba(90,26,43,0.16)] hover:ring-1 hover:ring-brand-gold/40 ${className}`}
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand-teal/30 hover:shadow-[0_8px_32px_rgba(26,76,90,0.14)] ${className}`}
     >
       {/* Loading Overlay */}
       {isLoading && (
@@ -130,8 +143,8 @@ export function EbookCard({ ebook, searchQuery, className }: EbookCardProps) {
           </div>
 
           {/* CTA — full width */}
-          <div className="flex w-full items-center justify-center gap-1 rounded-md bg-brand-gold px-2 py-2 text-[11px] font-bold text-brand-teal transition-colors group-hover:bg-brand-teal group-hover:text-brand-gold">
-            Download PDF
+          <div className="flex w-full items-center justify-center gap-1 rounded-full bg-brand-teal px-2 py-2 text-[11px] font-bold text-white transition-colors group-hover:bg-brand-gold group-hover:text-brand-teal">
+            {buyLabel}
             <ArrowRight className="h-3 w-3 shrink-0 transition-transform group-hover:translate-x-0.5" />
           </div>
         </div>

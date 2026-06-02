@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { BuyButton } from "@/components/buy-button";
-import { ShieldCheck, BookOpen, Download as DownloadIcon, Zap, Mail, Home, ChevronRight, FileText, Smartphone, RefreshCw, Scale } from "lucide-react";
+import { ShieldCheck, BookOpen, Download as DownloadIcon, Zap, Home, ChevronRight, FileText, Smartphone, RefreshCw, Scale } from "lucide-react";
 import { EbookPreview } from "@/components/ebook-preview";
 import { ShareButtons } from "@/components/share-buttons";
 import { RecommendedCarousel } from "./recommended-carousel";
@@ -36,13 +36,12 @@ const MARATHI_PAGE_LABELS = {
     faq1AfterPayment: "पेमेंट यशस्वी झाल्यानंतर:",
     faq1Download: "तुम्हाला लगेच Download Button दिसेल.",
     faq1WhatsApp: "WhatsApp वर पाठवले जाईल.",
-    faq1Email: "Email वर देखील PDF पाठवली जाईल.",
     faq2Q: "पेमेंट सुरक्षित आहे का?",
     faq2A: "हो, Razorpay 100% सुरक्षित आहे. GooglePay, PhonePe, Paytm किंवा कार्डद्वारे पेमेंट करा.",
     faq3Q: "मोबाईलवर वाचता येते का?",
     faq3A: "हो! PDF फाइल कोणत्याही मोबाईल, लॅपटॉप किंवा टॅब्लेटवर वाचता येते.",
     faq4Q: "हे Physical पुस्तक आहे का?",
-    faq4A: "नाही. हे पूर्णपणे Digital PDF E-Book आहे. कोणतीही Printed / Hard Copy पाठवली जात नाही. खरेदी केल्यानंतर तुम्हाला PDF फाइल ईमेल आणि WhatsApp वर मिळेल.",
+    faq4A: "नाही. हे पूर्णपणे Digital PDF E-Book आहे. कोणतीही Printed / Hard Copy पाठवली जात नाही. खरेदी केल्यानंतर तुम्हाला PDF फाइल WhatsApp वर मिळेल.",
     faq5Q: "किती डिव्हाइसवर वाचता येईल?",
     faq5A: "PDF वर कोणतेही बंधन नाही — तुम्ही तुमच्या Mobile, Tablet, Laptop, Desktop — कोणत्याही डिव्हाइसवर वाचू शकता.",
     faq6Q: "भविष्यात Update मिळेल का?",
@@ -80,13 +79,12 @@ const PAGE_LABELS = {
     faq1AfterPayment: "भुगतान सफल होने के बाद:",
     faq1Download: "आपको तुरंत Download Button दिखेगा।",
     faq1WhatsApp: "WhatsApp पर भेजा जाएगा।",
-    faq1Email: "Email पर भी PDF भेजी जाएगी।",
     faq2Q: "क्या भुगतान सुरक्षित है?",
     faq2A: "हां, Razorpay 100% सुरक्षित है। GooglePay, PhonePe, Paytm या कार्ड से भुगतान करें।",
     faq3Q: "क्या मोबाइल पर पढ़ा जा सकता है?",
     faq3A: "हां! PDF फ़ाइल किसी भी मोबाइल, लैपटॉप या टैबलेट पर पढ़ी जा सकती है।",
     faq4Q: "क्या यह Physical पुस्तक है?",
-    faq4A: "नहीं। यह पूरी तरह Digital PDF E-Book है। कोई Printed / Hard Copy नहीं भेजी जाती। खरीद के बाद PDF Email और WhatsApp पर मिलेगी।",
+    faq4A: "नहीं। यह पूरी तरह Digital PDF E-Book है। कोई Printed / Hard Copy नहीं भेजी जाती। खरीद के बाद PDF WhatsApp पर मिलेगी।",
     faq5Q: "कितने डिवाइस पर पढ़ सकते हैं?",
     faq5A: "PDF पर कोई प्रतिबंध नहीं — Mobile, Tablet, Laptop, Desktop — किसी भी डिवाइस पर पढ़ सकते हैं।",
     faq6Q: "क्या भविष्य में Update मिलेगा?",
@@ -119,13 +117,12 @@ const PAGE_LABELS = {
     faq1AfterPayment: "After successful payment:",
     faq1Download: "You will see a Download Button immediately.",
     faq1WhatsApp: "It will be sent to you on WhatsApp.",
-    faq1Email: "PDF will also be sent to your Email.",
     faq2Q: "Is payment secure?",
     faq2A: "Yes, Razorpay is 100% secure. Pay via GooglePay, PhonePe, Paytm or card.",
     faq3Q: "Can I read it on mobile?",
     faq3A: "Yes! The PDF can be read on any mobile, laptop or tablet.",
     faq4Q: "Is this a physical book?",
-    faq4A: "No. This is a Digital PDF E-Book only. No printed or hard copy is shipped. After purchase, you receive the PDF via Email and WhatsApp instantly.",
+    faq4A: "No. This is a Digital PDF E-Book only. No printed or hard copy is shipped. After purchase, you receive the PDF via WhatsApp instantly.",
     faq5Q: "How many devices can I read it on?",
     faq5A: "There are no device restrictions on PDFs — read on your Mobile, Tablet, Laptop, or Desktop.",
     faq6Q: "Will I get future updates?",
@@ -158,13 +155,12 @@ const PAGE_LABELS = {
     faq1AfterPayment: "பணம் செலுத்தியது வெற்றிகரமாக முடிந்த பிறகு:",
     faq1Download: "உடனடியாக Download Button காண்பிக்கப்படும்.",
     faq1WhatsApp: "WhatsApp-இல் அனுப்பப்படும்.",
-    faq1Email: "Email-இலும் PDF அனுப்பப்படும்.",
     faq2Q: "பணம் செலுத்துவது பாதுகாப்பானதா?",
     faq2A: "ஆம், Razorpay 100% பாதுகாப்பானது. GooglePay, PhonePe, Paytm அல்லது கார்டு மூலம் பணம் செலுத்தலாம்.",
     faq3Q: "மொபைலில் படிக்க முடியுமா?",
     faq3A: "ஆம்! PDF கோப்பை எந்த மொபைல், லேப்டாப் அல்லது டேப்லெட்டிலும் படிக்கலாம்.",
     faq4Q: "இது Physical புத்தகமா?",
-    faq4A: "இல்லை. இது முழுக்க Digital PDF E-Book. எந்த Printed / Hard Copy அனுப்பப்படாது. வாங்கிய பிறகு PDF-ஐ Email மற்றும் WhatsApp மூலம் உடனடியாக பெறுவீர்கள்.",
+    faq4A: "இல்லை. இது முழுக்க Digital PDF E-Book. எந்த Printed / Hard Copy அனுப்பப்படாது. வாங்கிய பிறகு PDF-ஐ WhatsApp மூலம் உடனடியாக பெறுவீர்கள்.",
     faq5Q: "எத்தனை சாதனங்களில் படிக்கலாம்?",
     faq5A: "PDF-இல் எந்த கட்டுப்பாடும் இல்லை — Mobile, Tablet, Laptop, Desktop என எந்த சாதனத்திலும் படிக்கலாம்.",
     faq6Q: "எதிர்காலத்தில் Update கிடைக்குமா?",
@@ -197,13 +193,12 @@ const PAGE_LABELS = {
     faq1AfterPayment: "చెల్లింపు విజయవంతమైన తర్వాత:",
     faq1Download: "మీకు వెంటనే Download Button కనిపిస్తుంది.",
     faq1WhatsApp: "WhatsApp లో పంపబడుతుంది.",
-    faq1Email: "Email కు కూడా PDF పంపబడుతుంది.",
     faq2Q: "చెల్లింపు సురక్షితమేనా?",
     faq2A: "అవును, Razorpay 100% సురక్షితం. GooglePay, PhonePe, Paytm లేదా కార్డ్ ద్వారా చెల్లించండి.",
     faq3Q: "మొబైల్‌లో చదవవచ్చా?",
     faq3A: "అవును! PDF ఫైల్‌ను ఏ మొబైల్, ల్యాప్‌టాప్ లేదా టాబ్లెట్‌లోనైనా చదవవచ్చు.",
     faq4Q: "ఇది Physical పుస్తకమా?",
-    faq4A: "కాదు. ఇది పూర్తిగా Digital PDF E-Book. ఎటువంటి Printed / Hard Copy పంపబడదు. కొనుగోలు తర్వాత PDF Email మరియు WhatsApp ద్వారా వెంటనే అందుతుంది.",
+    faq4A: "కాదు. ఇది పూర్తిగా Digital PDF E-Book. ఎటువంటి Printed / Hard Copy పంపబడదు. కొనుగోలు తర్వాత PDF WhatsApp ద్వారా వెంటనే అందుతుంది.",
     faq5Q: "ఎన్ని పరికరాలలో చదవవచ్చు?",
     faq5A: "PDF పై ఎటువంటి పరిమితి లేదు — Mobile, Tablet, Laptop, Desktop ఏ పరికరంలోనైనా చదవవచ్చు.",
     faq6Q: "భవిష్యత్తులో Update లభిస్తుందా?",
@@ -236,13 +231,12 @@ const PAGE_LABELS = {
     faq1AfterPayment: "ચુકવણી સફળ થયા પછી:",
     faq1Download: "તમને તરત જ Download Button દેખાશે.",
     faq1WhatsApp: "WhatsApp પર મોકલવામાં આવશે.",
-    faq1Email: "Email પર પણ PDF મોકલવામાં આવશે.",
     faq2Q: "શું ચુકવણી સુરક્ષિત છે?",
     faq2A: "હા, Razorpay 100% સુરક્ષિત છે. GooglePay, PhonePe, Paytm અથવા કાર્ડ દ્વારા ચુકવણી કરો.",
     faq3Q: "શું મોબાઇલ પર વાંચી શકાય?",
     faq3A: "હા! PDF ફાઇલ કોઈપણ મોબાઇલ, લેપટોપ અથવા ટેબ્લેટ પર વાંચી શકાય છે.",
     faq4Q: "શું આ Physical પુસ્તક છે?",
-    faq4A: "ના. આ સંપૂર્ણપણે Digital PDF E-Book છે. કોઈ Printed / Hard Copy મોકલવામાં આવતી નથી. ખરીદી પછી PDF Email અને WhatsApp પર તરત જ મળશે.",
+    faq4A: "ના. આ સંપૂર્ણપણે Digital PDF E-Book છે. કોઈ Printed / Hard Copy મોકલવામાં આવતી નથી. ખરીદી પછી PDF WhatsApp પર તરત જ મળશે.",
     faq5Q: "કેટલા ઉપકરણો પર વાંચી શકાય?",
     faq5A: "PDF પર કોઈ મર્યાદા નથી — Mobile, Tablet, Laptop, Desktop કોઈપણ ઉપકરણ પર વાંચી શકાય છે.",
     faq6Q: "શું ભવિષ્યમાં Update મળશે?",
@@ -275,13 +269,12 @@ const PAGE_LABELS = {
     faq1AfterPayment: "পেমেন্ট সফল হওয়ার পরে:",
     faq1Download: "আপনি সঙ্গে সঙ্গে Download Button দেখতে পাবেন।",
     faq1WhatsApp: "WhatsApp-এ পাঠানো হবে।",
-    faq1Email: "Email-এও PDF পাঠানো হবে।",
     faq2Q: "পেমেন্ট কি নিরাপদ?",
     faq2A: "হ্যাঁ, Razorpay 100% নিরাপদ। GooglePay, PhonePe, Paytm বা কার্ডের মাধ্যমে পেমেন্ট করুন।",
     faq3Q: "মোবাইলে কি পড়া যায়?",
     faq3A: "হ্যাঁ! PDF ফাইলটি যেকোনো মোবাইল, ল্যাপটপ বা ট্যাবলেটে পড়া যায়।",
     faq4Q: "এটি কি Physical বই?",
-    faq4A: "না। এটি সম্পূর্ণরূপে Digital PDF E-Book। কোনো Printed / Hard Copy পাঠানো হয় না। কেনার পরে PDF Email এবং WhatsApp-এ সঙ্গে সঙ্গে পাবেন।",
+    faq4A: "না। এটি সম্পূর্ণরূপে Digital PDF E-Book। কোনো Printed / Hard Copy পাঠানো হয় না। কেনার পরে PDF WhatsApp-এ সঙ্গে সঙ্গে পাবেন।",
     faq5Q: "কতগুলো ডিভাইসে পড়া যাবে?",
     faq5A: "PDF-এ কোনো সীমাবদ্ধতা নেই — Mobile, Tablet, Laptop, Desktop যেকোনো ডিভাইসে পড়তে পারবেন।",
     faq6Q: "ভবিষ্যতে কি Update পাওয়া যাবে?",
@@ -461,7 +454,6 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
         <div className="space-y-1.5 pl-1">
           <div className="flex items-start gap-2"><DownloadIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-teal" /><span>{labels.faq1Download}</span></div>
           <div className="flex items-start gap-2"><span className="mt-0.5 shrink-0 text-green-600 text-xs">●</span><span>{labels.faq1WhatsApp}</span></div>
-          <div className="flex items-start gap-2"><Mail className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-500" /><span>{labels.faq1Email}</span></div>
         </div>
       </FaqItem>
       <FaqItem q={labels.faq2Q}>{labels.faq2A}</FaqItem>

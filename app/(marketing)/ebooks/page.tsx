@@ -33,8 +33,21 @@ export default async function EbooksPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-cream">
+    <div className="min-h-screen bg-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+
+      {/* Page header */}
+      <div className="border-b border-gray-100 bg-white px-4 py-6">
+        <div className="mx-auto max-w-6xl">
+          <div className="flex items-center gap-3">
+            <span className="h-8 w-1 rounded-full bg-brand-teal" />
+            <div>
+              <h1 className="text-xl font-black text-brand-teal">ई-बुक्स संग्रह</h1>
+              <p className="text-xs text-gray-400">Digital PDF · Instant Delivery · सर्व कायदेशीर विषय</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Language tabs */}
       <EbookLanguageTabs current="ALL" />

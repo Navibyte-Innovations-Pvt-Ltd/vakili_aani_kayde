@@ -102,17 +102,17 @@ export function EbookCatalog({ initialEbooks }: { initialEbooks: Ebook[] }) {
                     </div>
                 </div>
 
-                {/* Language Tabs - only shown when multiple languages exist */}
+                {/* Language Tabs - underline style */}
                 {showLanguageTabs && (
-                    <div className="hide-scrollbar -mx-4 flex flex-nowrap gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
+                    <div className="hide-scrollbar -mx-4 flex flex-nowrap gap-5 overflow-x-auto border-b border-gray-100 px-4 pb-0 sm:mx-0 sm:flex-wrap sm:px-0">
                         {(["All", ...availableLanguages] as string[]).map((lang) => (
                             <button
                                 key={lang}
                                 onClick={() => setSelectedLanguage(lang)}
-                                className={`rounded-full border px-4 py-1.5 text-xs font-bold whitespace-nowrap transition-all ${
+                                className={`relative shrink-0 pb-2.5 text-sm font-bold whitespace-nowrap transition-colors ${
                                     selectedLanguage === lang
-                                        ? "border-brand-gold bg-brand-gold text-brand-teal"
-                                        : "border-gray-200 bg-white text-gray-500 hover:border-brand-gold/50 hover:bg-amber-50"
+                                        ? "text-brand-teal after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-brand-teal"
+                                        : "text-gray-400 hover:text-gray-600"
                                 }`}
                             >
                                 {lang === "All" ? ALL_LANGUAGES_LABEL[navLang] : LANGUAGE_NATIVE[coerceLanguage(lang)]}
@@ -121,16 +121,16 @@ export function EbookCatalog({ initialEbooks }: { initialEbooks: Ebook[] }) {
                     </div>
                 )}
 
-                {/* Category Chips - Scrollable on mobile */}
+                {/* Category Chips */}
                 {categories.length > 1 && (
                     <div className="hide-scrollbar -mx-4 flex flex-nowrap gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0 sm:pb-0">
                         {categories.map((cat) => (
                             <button
                                 key={cat as string}
                                 onClick={() => setSelectedCategory(cat as string)}
-                                className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-bold whitespace-nowrap shadow-sm transition-all ${selectedCategory === cat
-                                    ? "scale-105 border-brand-teal bg-brand-teal text-white"
-                                    : "border-gray-200 bg-white text-gray-600 hover:border-brand-teal/50 hover:bg-gray-50"
+                                className={`flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-all ${selectedCategory === cat
+                                    ? "border-brand-teal bg-brand-teal text-white shadow-sm shadow-brand-teal/20"
+                                    : "border-gray-200 bg-white text-gray-500 hover:border-brand-teal/40 hover:text-brand-teal"
                                     }`}
                             >
                                 {cat === "All" ? categoryIcons["All"] : (categoryIcons[cat as string] || categoryIcons["Default"])}
@@ -143,7 +143,7 @@ export function EbookCatalog({ initialEbooks }: { initialEbooks: Ebook[] }) {
 
             {/* Compact Grid */}
             {filteredEbooks.length > 0 ? (
-                <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-6">
+                <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 lg:gap-6">
                     {filteredEbooks.map((ebook) => (
                         <div key={ebook.id} className="animate-in fade-in zoom-in-95 h-full duration-300">
                             <EbookCard ebook={ebook} searchQuery={searchQuery} className="h-full" />
