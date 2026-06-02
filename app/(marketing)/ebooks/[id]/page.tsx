@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { BuyButton } from "@/components/buy-button";
-import { ShieldCheck, BookOpen, Download as DownloadIcon, Zap, Mail, Home, ChevronRight, ChevronLeft, FileText, Smartphone, RefreshCw, Scale } from "lucide-react";
+import { ShieldCheck, BookOpen, Download as DownloadIcon, Zap, Mail, Home, ChevronRight, FileText, Smartphone, RefreshCw, Scale } from "lucide-react";
 import { EbookPreview } from "@/components/ebook-preview";
 import { ShareButtons } from "@/components/share-buttons";
 import { RecommendedCarousel } from "./recommended-carousel";
@@ -482,16 +482,6 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
       <link rel="preload" href="https://checkout.razorpay.com/v1/checkout.js" as="script" />
       <PixelViewContent ebookId={ebook.id} title={ebook.title} price={finalPrice} />
 
-      {/* ── MOBILE TOP NAV ── */}
-      <div className="sticky top-0 z-40 md:hidden">
-        <div className="flex h-12 items-center gap-3 bg-brand-teal px-4 shadow-md">
-          <Link href="/ebooks" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/70 transition-colors hover:text-white">
-            <ChevronLeft className="h-4 w-4" />
-          </Link>
-          <span className="flex-1 truncate text-xs font-bold text-white">{ebook.title}</span>
-          <ShareButtons title={ebook.title} text={`Check out this book: ${ebook.title}`} variant="minimal" />
-        </div>
-      </div>
 
       {/* ── DESKTOP BREADCRUMB ── */}
       <div className="sticky top-0 z-30 hidden border-b border-brand-gold/15 bg-brand-cream/95 backdrop-blur-md md:block">
@@ -847,8 +837,8 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
       </div>
 
       {/* ── MOBILE STICKY BUY BAR ── */}
-      <div className="fixed right-0 bottom-(--sticky-bar-bottom) left-0 z-40 md:hidden">
-        <div className="border-t border-white/10 bg-brand-teal px-3 py-2.5 shadow-[0_-8px_24px_rgba(10,31,61,0.2)]">
+      <div className="fixed right-0 bottom-0 left-0 z-40 md:hidden">
+        <div className="bg-brand-teal px-3 py-2.5 shadow-[0_-8px_24px_rgba(10,31,61,0.2)]">
           <div className="flex items-center gap-3">
             <div className="flex shrink-0 flex-col leading-none">
               <span className="text-[10px] text-white/30 line-through">₹{crossedPrice}</span>
