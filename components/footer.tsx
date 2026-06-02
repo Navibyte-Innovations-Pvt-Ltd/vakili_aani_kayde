@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Mail, Phone, Instagram, MessageCircle, ShieldCheck, Scale } from "lucide-react";
-import { SITE_INSTAGRAM_URL } from "@/lib/constants/site";
+import { Mail, Phone, MessageCircle, ShieldCheck } from "lucide-react";
 import { type Language } from "@/lib/languages";
 import { useNavLanguage } from "@/components/nav-language-context";
 
@@ -181,56 +180,6 @@ export function Footer() {
 
   return (
     <footer className="bg-brand-teal text-white">
-      {/* Brand hero block */}
-      <div className="border-b border-white/8 px-4 py-14">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 text-center">
-          <div className="space-y-1">
-            <h2 className="text-2xl font-black tracking-tight text-white md:text-3xl">
-              {t.brand}
-            </h2>
-            <p className="text-sm font-medium text-brand-gold">
-              {t.tagline}
-            </p>
-          </div>
-
-          <p className="max-w-md text-sm leading-relaxed text-white/55">
-            {t.description}
-          </p>
-
-          {/* Social + contact row */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <a
-              href={SITE_INSTAGRAM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-brand-gold hover:text-white"
-            >
-              <Instagram className="h-4 w-4" />
-              Instagram
-            </a>
-              {process.env.NEXT_PUBLIC_WA_NUMBER ? (
-                <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER}`} className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-[#25D366] hover:text-white">
-                  <MessageCircle className="h-4 w-4" />
-                  WhatsApp
-                </a>
-              ) : null}
-            <a
-              href="mailto:vakilianikayde@gmail.com"
-              className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-white/20"
-            >
-              <Mail className="h-4 w-4" />
-              Email
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* Gold rule with scale icon */}
-      <div className="flex items-center gap-3 px-4 py-0">
-        <div className="h-px flex-1 bg-brand-gold/20" />
-        <Scale className="h-4 w-4 text-brand-gold/40" />
-        <div className="h-px flex-1 bg-brand-gold/20" />
-      </div>
 
       {/* 3-column links grid */}
       <div className="px-4 py-12">

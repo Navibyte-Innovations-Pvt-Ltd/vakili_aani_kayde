@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, Phone, Scale, X, BookOpen, Home, Download, ArrowRight } from "lucide-react";
+import { Menu, Phone, X, BookOpen, Home, Download, ArrowRight } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -49,26 +49,6 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full">
-      {/* Top authority bar */}
-      <div className="hidden w-full bg-brand-teal md:block">
-        <div className="mx-auto flex h-9 max-w-6xl items-center justify-between px-4">
-          <div className="flex items-center gap-1.5">
-            <Scale className="h-3 w-3 text-brand-gold" />
-            <span className="text-[11px] font-bold tracking-widest text-brand-gold uppercase">
-              vakilianikayde.in — {t.authorityTag}
-            </span>
-          </div>
-          {process.env.NEXT_PUBLIC_WA_NUMBER ? (
-            <a
-              href={`tel:+${process.env.NEXT_PUBLIC_WA_NUMBER}`}
-              className="flex items-center gap-1.5 text-[11px] font-medium text-white/70 transition-colors hover:text-brand-gold"
-            >
-              <Phone className="h-3 w-3" />
-              +{process.env.NEXT_PUBLIC_WA_NUMBER.replace(/^91/, "")}
-            </a>
-          ) : null}
-        </div>
-      </div>
 
       {/* Main nav */}
       <nav className="w-full border-b-2 border-brand-gold/20 bg-white shadow-sm">
