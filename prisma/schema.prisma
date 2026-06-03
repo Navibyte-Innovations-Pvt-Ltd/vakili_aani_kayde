@@ -204,6 +204,24 @@ model AdSpend {
   @@index([date])
 }
 
+// Per-ebook, per-day Meta ad spend for the Daily Analytics ROAS/profit tracker.
+// One row per ebook per IST day. `date` follows the same convention as AdSpend:
+// IST day start stored as UTC midnight, buckets back via toIST().
+model EbookAdSpend {
+  id        String   @id @default(cuid())
+  date      DateTime // IST day start, stored as UTC
+  ebookId   String
+  metaSpend Float    @default(0) // spend in INR on Meta ads for this book on this date
+  enteredOn DateTime @default(now()) // audit: when the admin entered it (usually next day)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([date, ebookId])
+  @@index([date])
+  @@index([ebookId])
+  @@map("ebook_ad_spend")
+}
+
 model Order {
   id             String      @id @default(cuid())
   customerName   String?

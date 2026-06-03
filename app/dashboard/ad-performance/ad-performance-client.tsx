@@ -43,21 +43,38 @@ function StatCard({ icon, label, value, children }: { icon: React.ReactNode; lab
   );
 }
 
-export function AdPerformanceClient({ data, todayStr }: { data: AdPerformance; todayStr: string }) {
+export function AdPerformanceClient({
+  data,
+  todayStr,
+  books = [],
+}: {
+  data: AdPerformance;
+  todayStr: string;
+  books?: { id: string; title: string }[];
+}) {
   const { summary, daily, rangeDays } = data;
   const router = useRouter();
   const [insights, setInsights] = useState<string | null>(null);
   const [date, setDate] = useState(todayStr);
   const [platform, setPlatform] = useState("META");
+  const [bookId, setBookId] = useState(""); // "" = account-level (all books)
   const [amount, setAmount] = useState("");
 
   const saveSpend = useMutation({
     mutationFn: async () => {
-      const res = await fetch("/api/admin/ad-spend", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date, platform, amount }),
-      });
+      // A specific book → per-book Meta spend (ebook_ad_spend). Otherwise the
+      // account-level blended entry (one row per platform per day).
+      const res = bookId
+        ? await fetch("/api/admin/ebook-ad-spend", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ date, book_id: bookId, meta_spend: amount }),
+          })
+        : await fetch("/api/admin/ad-spend", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ date, platform, amount }),
+          });
       if (!res.ok) throw new Error(await res.text());
       return res.json();
     },
@@ -92,9 +109,20 @@ export function AdPerformanceClient({ data, todayStr }: { data: AdPerformance; t
               <label className="mb-1 block text-[11px] font-semibold text-gray-400">Date (IST)</label>
               <Input type="date" value={date} max={todayStr} onChange={(e) => setDate(e.target.value)} className="h-9 w-40" />
             </div>
+            {books.length > 0 && (
+              <div>
+                <label className="mb-1 block text-[11px] font-semibold text-gray-400">Book</label>
+                <select value={bookId} onChange={(e) => setBookId(e.target.value)} className="h-9 max-w-56 rounded-md border border-gray-200 bg-white px-2 text-sm">
+                  <option value="">All books (account-level)</option>
+                  {books.map((b) => (
+                    <option key={b.id} value={b.id}>{b.title}</option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div>
               <label className="mb-1 block text-[11px] font-semibold text-gray-400">Platform</label>
-              <select value={platform} onChange={(e) => setPlatform(e.target.value)} className="h-9 rounded-md border border-gray-200 bg-white px-2 text-sm">
+              <select value={bookId ? "META" : platform} onChange={(e) => setPlatform(e.target.value)} disabled={!!bookId} className="h-9 rounded-md border border-gray-200 bg-white px-2 text-sm disabled:bg-gray-50 disabled:text-gray-400">
                 <option value="META">Meta</option>
                 <option value="GOOGLE">Google</option>
                 <option value="OTHER">Other</option>
@@ -108,7 +136,11 @@ export function AdPerformanceClient({ data, todayStr }: { data: AdPerformance; t
               {saveSpend.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
             </Button>
           </div>
-          <p className="mt-2 text-[11px] text-gray-400">One entry per platform per day — saving the same day/platform updates it.</p>
+          <p className="mt-2 text-[11px] text-gray-400">
+            {bookId
+              ? "Per-book Meta spend for the selected day — saving the same day/book updates it. View it under the Per-Book Daily tab."
+              : "Account-level: one entry per platform per day — saving the same day/platform updates it."}
+          </p>
         </CardContent>
       </Card>
 
@@ -200,7 +232,7 @@ export function AdPerformanceClient({ data, todayStr }: { data: AdPerformance; t
         </CardHeader>
         <CardContent>
           {insights ? (
-            <div className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">{insights}</div>
+            <div className="text-sm leading-relaxed whitespace-pre-wrap text-gray-700">{insights}</div>
           ) : (
             <p className="text-sm text-gray-400">Generate an AI read of spend vs ROAS — what to scale, cut, or investigate. {summary.spend === 0 && "Log some spend first."}</p>
           )}

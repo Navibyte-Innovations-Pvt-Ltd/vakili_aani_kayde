@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { format } from "date-fns";
-import { getAdPerformance } from "@/lib/data-access";
+import { getAdPerformance, getEbooks } from "@/lib/data-access";
 import { getNowIST } from "@/lib/date-utils";
 import { AdPerformanceClient } from "./ad-performance-client";
+import { DailyAnalyticsClient } from "./daily-analytics-client";
 
 export const dynamic = "force-dynamic";
 
@@ -12,39 +13,73 @@ const RANGES = [
   { days: 90, label: "90 days" },
 ];
 
+const TABS = [
+  { view: "blended", label: "Blended" },
+  { view: "bookwise", label: "Per-Book Daily" },
+];
+
 export default async function AdPerformancePage({
   searchParams,
 }: {
-  searchParams: Promise<{ range?: string }>;
+  searchParams: Promise<{ range?: string; view?: string }>;
 }) {
-  const { range } = await searchParams;
+  const { range, view } = await searchParams;
   const rangeDays = [7, 30, 90].includes(Number(range)) ? Number(range) : 30;
-  const data = await getAdPerformance(rangeDays);
+  const activeView = view === "bookwise" ? "bookwise" : "blended";
   const todayStr = format(getNowIST(), "yyyy-MM-dd");
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-xl font-black text-gray-900">Ad Performance</h1>
-          <p className="text-sm text-gray-400">Daily spend · blended ROAS · IST</p>
+          <p className="text-sm text-gray-400">
+            {activeView === "bookwise" ? "Per-book spend · ROAS · net profit · IST" : "Daily spend · blended ROAS · IST"}
+          </p>
         </div>
-        <div className="flex gap-1 rounded-lg border border-gray-200 bg-white p-1">
-          {RANGES.map((r) => (
-            <Link
-              key={r.days}
-              href={`/dashboard/ad-performance?range=${r.days}`}
-              className={`rounded-md px-3 py-1.5 text-xs font-bold transition-colors ${
-                rangeDays === r.days ? "bg-brand-teal text-white" : "text-gray-500 hover:bg-gray-50"
-              }`}
-            >
-              {r.label}
-            </Link>
-          ))}
-        </div>
+        {activeView === "blended" && (
+          <div className="flex gap-1 rounded-lg border border-gray-200 bg-white p-1">
+            {RANGES.map((r) => (
+              <Link
+                key={r.days}
+                href={`/dashboard/ad-performance?range=${r.days}`}
+                className={`rounded-md px-3 py-1.5 text-xs font-bold transition-colors ${
+                  rangeDays === r.days ? "bg-brand-teal text-white" : "text-gray-500 hover:bg-gray-50"
+                }`}
+              >
+                {r.label}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
-      <AdPerformanceClient data={data} todayStr={todayStr} />
+      {/* Tab nav */}
+      <div className="mb-5 flex gap-1 border-b border-gray-200">
+        {TABS.map((t) => (
+          <Link
+            key={t.view}
+            href={`/dashboard/ad-performance?view=${t.view}`}
+            className={`-mb-px border-b-2 px-4 py-2 text-sm font-bold transition-colors ${
+              activeView === t.view
+                ? "border-brand-teal text-brand-teal"
+                : "border-transparent text-gray-400 hover:text-gray-600"
+            }`}
+          >
+            {t.label}
+          </Link>
+        ))}
+      </div>
+
+      {activeView === "blended" ? (
+        <AdPerformanceClient
+          data={await getAdPerformance(rangeDays)}
+          todayStr={todayStr}
+          books={(await getEbooks()).map((b) => ({ id: b.id, title: b.title }))}
+        />
+      ) : (
+        <DailyAnalyticsClient />
+      )}
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { prisma_db } from "./prisma";
 import { cache } from "react";
 import type { Language } from "./languages";
 import { toIST, fromIST, getNowIST } from "./date-utils";
-import { startOfDay, subDays, eachDayOfInterval, format } from "date-fns";
+import { startOfDay, subDays, eachDayOfInterval, format, parseISO, addDays } from "date-fns";
 
 export type BookwiseSales = {
     rangeDays: number;
@@ -185,6 +185,134 @@ export async function getBookwiseSales(rangeDays: number): Promise<BookwiseSales
         daily,
         seriesByBook,
     };
+}
+
+export type DailyAnalyticsBook = {
+    book_id: string;
+    book_name: string;
+    is_combo: boolean;
+    units: number;
+    revenue: number;
+    /** Meta ad spend entered for this book on this day; null if not yet entered. */
+    meta_spend: number | null;
+};
+export type DailyAnalyticsDay = {
+    date: string; // yyyy-MM-dd IST
+    total_revenue: number;
+    total_units: number;
+    /** Sum of all books' entered spend; null if no spend entered that day. */
+    total_spend: number | null;
+    books: DailyAnalyticsBook[];
+};
+export type DailyAnalytics = {
+    from: string;
+    to: string;
+    /** Canonical, dynamic book list (enabled ebooks ∪ any book with sales in range). */
+    books: { id: string; title: string; isCombo: boolean }[];
+    days: DailyAnalyticsDay[];
+};
+
+/**
+ * Per-day, per-book PAID sales merged with manually-entered Meta ad spend for the
+ * Daily Analytics ROAS/profit tracker. IST day-bucketed using the SAME logic as
+ * getBookwiseSales (sum of OrderItem.price), so totals reconcile with the overview tab.
+ *
+ * @param from yyyy-MM-dd IST calendar day (inclusive)
+ * @param to   yyyy-MM-dd IST calendar day (inclusive); clamped to today IST — no future rows.
+ */
+export async function getDailyAnalytics(from: string, to: string): Promise<DailyAnalytics> {
+    const todayKey = format(getNowIST(), "yyyy-MM-dd");
+    // Clamp `to` to today (no future dates) and guard inverted ranges.
+    if (to > todayKey) to = todayKey;
+    if (from > to) return { from, to, books: [], days: [] };
+
+    const startIST = startOfDay(parseISO(from));
+    const endIST = startOfDay(parseISO(to));
+    const lowerUTC = fromIST(startIST);
+    const upperUTC = fromIST(addDays(endIST, 1)); // exclusive upper bound
+
+    const [items, spends, enabledBooks] = await Promise.all([
+        prisma_db.orderItem.findMany({
+            where: { order: { status: "PAID", createdAt: { gte: lowerUTC, lt: upperUTC } } },
+            select: {
+                price: true,
+                ebookId: true,
+                order: { select: { createdAt: true } },
+                ebook: { select: { title: true, isCombo: true } },
+            },
+        }),
+        prisma_db.ebookAdSpend.findMany({
+            where: { date: { gte: lowerUTC, lt: upperUTC } },
+            select: { ebookId: true, metaSpend: true, date: true },
+        }),
+        prisma_db.ebook.findMany({
+            where: { isEnabled: true },
+            select: { id: true, title: true, isCombo: true },
+            orderBy: { createdAt: "asc" },
+        }),
+    ]);
+
+    // Canonical book list: enabled ebooks ∪ any book that has sales in range
+    // (so a since-disabled book with historical sales still shows). Dynamic — new
+    // books appear automatically with no code change.
+    const bookList = new Map<string, { id: string; title: string; isCombo: boolean }>();
+    for (const b of enabledBooks) bookList.set(b.id, { id: b.id, title: b.title, isCombo: b.isCombo });
+    for (const it of items) {
+        if (!bookList.has(it.ebookId)) {
+            bookList.set(it.ebookId, { id: it.ebookId, title: it.ebook.title, isCombo: it.ebook.isCombo });
+        }
+    }
+    const books = Array.from(bookList.values());
+
+    // dayKey -> ebookId -> { units, revenue }
+    const sales = new Map<string, Map<string, { units: number; revenue: number }>>();
+    for (const it of items) {
+        const dayKey = format(toIST(it.order.createdAt), "yyyy-MM-dd");
+        const day = sales.get(dayKey) ?? new Map();
+        const cur = day.get(it.ebookId) ?? { units: 0, revenue: 0 };
+        cur.units += 1;
+        cur.revenue += it.price;
+        day.set(it.ebookId, cur);
+        sales.set(dayKey, day);
+    }
+
+    // dayKey -> ebookId -> spend
+    const spendMap = new Map<string, Map<string, number>>();
+    for (const s of spends) {
+        const dayKey = format(toIST(s.date), "yyyy-MM-dd");
+        const day = spendMap.get(dayKey) ?? new Map();
+        day.set(s.ebookId, (day.get(s.ebookId) ?? 0) + s.metaSpend);
+        spendMap.set(dayKey, day);
+    }
+
+    const dayKeys = eachDayOfInterval({ start: startIST, end: endIST }).map((d) => format(d, "yyyy-MM-dd"));
+
+    const days: DailyAnalyticsDay[] = dayKeys.map((date) => {
+        const daySales = sales.get(date);
+        const daySpend = spendMap.get(date);
+        let total_revenue = 0;
+        let total_units = 0;
+        let total_spend: number | null = null;
+
+        const bookRows: DailyAnalyticsBook[] = books.map((b) => {
+            const s = daySales?.get(b.id);
+            const units = s?.units ?? 0;
+            const revenue = Math.round(s?.revenue ?? 0);
+            const rawSpend = daySpend?.get(b.id);
+            const meta_spend = rawSpend != null ? Math.round(rawSpend) : null;
+            total_revenue += revenue;
+            total_units += units;
+            if (meta_spend !== null) total_spend = (total_spend ?? 0) + meta_spend;
+            return { book_id: b.id, book_name: b.title, is_combo: b.isCombo, units, revenue, meta_spend };
+        });
+
+        return { date, total_revenue, total_units, total_spend, books: bookRows };
+    });
+
+    // Most recent day first (matches "enter yesterday's spend today" workflow).
+    days.reverse();
+
+    return { from, to, books, days };
 }
 
 // Cache tags kept for revalidateTag() callers (no-op without persistent cache)
