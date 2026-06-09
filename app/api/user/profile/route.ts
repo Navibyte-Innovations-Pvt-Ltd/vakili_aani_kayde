@@ -1,9 +1,24 @@
 import { auth } from '@/lib/auth';
 import { prisma_db } from '@/lib/prisma';
-import { uploadToS3 } from '@/lib/s3';
+import { uploadToS3, getCloudFrontSignedUrl } from '@/lib/s3';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
+
+async function resolveAvatarUrl(image: string | null | undefined): Promise<string | null | undefined> {
+    if (!image) return image;
+    const domain = process.env.CLOUDFRONT_DOMAIN;
+    if (domain && image.includes(domain) && image.includes('/avatars/')) {
+        try {
+            const url = new URL(image);
+            const key = url.pathname.slice(1);
+            return await getCloudFrontSignedUrl(key, 3600);
+        } catch {
+            return image;
+        }
+    }
+    return image;
+}
 
 // Schema for profile update
 const updateProfileSchema = z.object({
@@ -58,15 +73,10 @@ export async function GET(_req: NextRequest) {
         // Check if user is OAuth (has external accounts)
         const isOAuthUser = user.accounts.length > 0;
 
-        // Add cache-busting timestamp to image URL
-        const imageWithTimestamp = user.image
-            ? `${user.image}?t=${Date.now()}`
-            : user.image;
-
         return NextResponse.json({
             user: {
                 ...user,
-                image: imageWithTimestamp,
+                image: await resolveAvatarUrl(user.image),
                 isOAuthUser,
             }
         });
@@ -246,16 +256,11 @@ export async function PATCH(req: NextRequest) {
             message += '. Please verify your new email address.';
         }
 
-        // Add cache-busting timestamp to image URL
-        const imageWithTimestamp = updatedUser.image
-            ? `${updatedUser.image}?t=${Date.now()}`
-            : updatedUser.image;
-
         return NextResponse.json({
             message,
             user: {
                 ...updatedUser,
-                image: imageWithTimestamp,
+                image: await resolveAvatarUrl(updatedUser.image),
             },
             requiresEmailVerification: !!updateData.email,
         });

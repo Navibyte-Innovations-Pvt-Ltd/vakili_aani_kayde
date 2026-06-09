@@ -5,6 +5,7 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma_db } from "./prisma";
+import { getCloudFrontSignedUrl } from "./s3";
 
 // Extend session type
 declare module "next-auth" {
@@ -203,10 +204,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.id as string;
         session.user.name = token.name as string;
         session.user.email = token.email as string;
-        session.user.image = token.picture as string;
         session.user.role = token.role as string;
         session.user.isVerified = token.isVerified as boolean;
         session.user.provider = token.provider as string;
+
+        const rawImage = token.picture as string | null | undefined;
+        if (rawImage) {
+          const cloudfrontDomain = process.env.CLOUDFRONT_DOMAIN;
+          if (cloudfrontDomain && rawImage.includes(cloudfrontDomain) && rawImage.includes("/avatars/")) {
+            try {
+              const url = new URL(rawImage);
+              const key = url.pathname.slice(1); // strip leading /
+              session.user.image = await getCloudFrontSignedUrl(key, 3600);
+            } catch {
+              session.user.image = rawImage;
+            }
+          } else {
+            session.user.image = rawImage;
+          }
+        } else {
+          session.user.image = rawImage ?? null;
+        }
       }
       return session;
     },
