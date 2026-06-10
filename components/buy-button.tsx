@@ -385,6 +385,8 @@ export function BuyButton({
   const [isVerifying, setIsVerifying] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [isRazorpayLoaded, setIsRazorpayLoaded] = useState(false);
+  const [isIAB, setIsIAB] = useState(false);
+  const [isAndroidIAB, setIsAndroidIAB] = useState(false);
 
   // Fix: Cleanup pointerEvents on unmount to prevent stuck page
   useEffect(() => {
@@ -392,6 +394,32 @@ export function BuyButton({
       document.body.style.pointerEvents = "";
     };
   }, []);
+
+  // IAB detection (Instagram / Facebook / WhatsApp in-app browser)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const ua = navigator.userAgent || navigator.vendor || (window.opera as string);
+    if (
+      ua.indexOf("Instagram") > -1 ||
+      ua.indexOf("FBAN") > -1 ||
+      ua.indexOf("FBAV") > -1 ||
+      ua.indexOf("WhatsApp") > -1
+    ) {
+      setTimeout(() => {
+        setIsIAB(true);
+        setIsAndroidIAB(/android/i.test(ua));
+      }, 0);
+    }
+  }, []);
+
+  const handleOpenInBrowser = () => {
+    const url = window.location.href;
+    if (isAndroidIAB) {
+      window.location.href = `intent://${window.location.hostname}${window.location.pathname}${window.location.search || ""}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(url)};end`;
+    } else {
+      window.open(url, "_blank");
+    }
+  };
 
   // Robust Mobile OS Detection (User Agent)
   useEffect(() => {
@@ -561,6 +589,9 @@ export function BuyButton({
       const order = await res.json();
       currentOrderIdRef.current = order.orderId;
 
+      // Tracks whether any Razorpay event fired — used by safety timeout to detect silent modal failure
+      let rzpInteracted = false;
+
       // 2. Initialize Razorpay Options
       const options: RazorpayOptions = {
         key: order.keyId,
@@ -582,6 +613,7 @@ export function BuyButton({
       // Shared Modal Options (ondismiss handler)
       options.modal = {
         ondismiss: function () {
+          rzpInteracted = true;
           // Reset state when user closes Razorpay modal
           setLoading(false);
           document.body.style.pointerEvents = "auto";
@@ -603,6 +635,7 @@ export function BuyButton({
       } else {
         // MODAL FLOW (Desktop)
         options.handler = async function (response: RazorpayResponse) {
+          rzpInteracted = true;
           setIsVerifying(true);
           // 3. Verify Payment
           try {
@@ -704,8 +737,21 @@ export function BuyButton({
           body: JSON.stringify({ event: "MODAL_OPENED", orderId: currentOrderIdRef.current }),
         }).catch(() => {});
 
+        // Safety net: if no Razorpay event fires within 15s, the modal silently failed to open.
+        // Reset loading so user is not stuck on "Processing..." forever.
+        const safetyTimer = setTimeout(() => {
+          if (!rzpInteracted) {
+            setLoading(false);
+            toast.error(
+              "पेमेंट पेज उघडले नाही. कृपया पेज रिफ्रेश करा आणि पुन्हा प्रयत्न करा.",
+              { duration: 8000 },
+            );
+          }
+        }, 15000);
 
         rzp1.on("payment.failed", function (rawResponse: unknown) {
+          rzpInteracted = true;
+          clearTimeout(safetyTimer);
           const response = rawResponse as { error: { code?: string; description?: string; reason?: string } };
           toast.error("पेमेंट अयशस्वी. कृपया पुन्हा प्रयत्न करा.");
           console.error(response.error);
@@ -794,6 +840,9 @@ export function BuyButton({
                 title={title}
                 price={price}
                 language={language}
+                isIAB={isIAB}
+                isAndroidIAB={isAndroidIAB}
+                onOpenInBrowser={handleOpenInBrowser}
                 initialData={{
                   name: customerName,
                   phone: customerPhone,
@@ -826,6 +875,9 @@ export function BuyButton({
                   price={price}
                   isMobile={true}
                   language={language}
+                  isIAB={isIAB}
+                  isAndroidIAB={isAndroidIAB}
+                  onOpenInBrowser={handleOpenInBrowser}
                   initialData={{
                     name: customerName,
                     phone: customerPhone,
@@ -849,6 +901,9 @@ interface CheckoutFormProps {
   isMobile?: boolean;
   language?: string;
   initialData: { name: string; phone: string; email: string };
+  isIAB?: boolean;
+  isAndroidIAB?: boolean;
+  onOpenInBrowser?: () => void;
 }
 
 // CountdownTimer removed (replaced by global SaleTimer)
@@ -861,6 +916,9 @@ function CheckoutForm({
   isMobile,
   language,
   initialData,
+  isIAB,
+  isAndroidIAB,
+  onOpenInBrowser,
 }: CheckoutFormProps) {
   const labels = CHECKOUT_LABELS[coerceLanguage(language)];
 
@@ -875,26 +933,7 @@ function CheckoutForm({
     },
   });
 
-  const [isIAB, setIsIAB] = useState(false);
   const [legalModal, setLegalModal] = useState<"terms" | "privacy" | null>(null);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const ua =
-      navigator.userAgent || navigator.vendor || (window.opera as string);
-    // Detect Instagram, Facebook, or WhatsApp In-App Browser
-    if (
-      ua.indexOf("Instagram") > -1 ||
-      ua.indexOf("FBAN") > -1 ||
-      ua.indexOf("FBAV") > -1 ||
-      ua.indexOf("WhatsApp") > -1
-    ) {
-      // Delay setting state to avoid "synchronous update" lint warning
-      setTimeout(() => {
-        setIsIAB(true);
-      }, 0);
-    }
-  }, []);
 
   const handleNextStep = async () => {
     const isValid = await form.trigger();
@@ -912,6 +951,34 @@ function CheckoutForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handlePayment)} className="relative bg-[#F7F7F4]">
+
+        {/* ── IAB REDIRECT BANNER ── */}
+        {isIAB && (
+          <div className="border-b border-amber-200 bg-amber-50 px-4 py-3">
+            <div className="flex items-start gap-2.5">
+              <span className="shrink-0 text-base">⚠️</span>
+              <div className="flex-1 space-y-2">
+                <p className="text-[11px] font-black text-amber-900">
+                  {isAndroidIAB
+                    ? "Instagram/Facebook Browser मध्ये UPI Payment काम करत नाही"
+                    : "In-App Browser मध्ये Payment काम करत नाही"}
+                </p>
+                <p className="text-[10px] leading-relaxed text-amber-700">
+                  {isAndroidIAB
+                    ? "Google Pay / PhonePe उघडण्यासाठी Chrome Browser आवश्यक आहे."
+                    : "Payment साठी Safari मध्ये उघडणे आवश्यक आहे. खालील बटणावर क्लिक करा किंवा वरील ⋮ मेनूमधून 'Open in Safari' निवडा."}
+                </p>
+                <button
+                  type="button"
+                  onClick={onOpenInBrowser}
+                  className="w-full rounded-xl bg-amber-600 py-2 text-[12px] font-black text-white active:scale-[0.98]"
+                >
+                  {isAndroidIAB ? "Chrome मध्ये उघडा →" : "Safari मध्ये उघडा →"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ── HEADER ── */}
         <div className="relative overflow-hidden bg-brand-teal px-4 pb-4 pt-4">
@@ -1105,20 +1172,6 @@ function CheckoutForm({
                 <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-gold" />
                 <p className="text-[10px] leading-relaxed text-gray-600">{labels.pdfNotice}</p>
               </div> */}
-
-              {/* IAB warning */}
-              {isIAB && (
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3">
-                  <div className="flex items-start gap-2">
-                    <span className="text-sm">⚠️</span>
-                    <div className="space-y-0.5">
-                      <p className="text-[10px] font-black tracking-wider text-amber-800 uppercase">{labels.iabTitle}</p>
-                      <p className="text-[10px] leading-relaxed text-amber-700">{labels.iabMsg1}</p>
-                      <p className="text-[10px] font-black text-amber-800">{labels.iabMsg2}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* Consent */}
               <p className="text-center text-[10px] text-gray-400">
