@@ -46,22 +46,23 @@ export async function GET(req: Request) {
         return NextResponse.json({ processed: 0, message: "No abandoned orders found" });
     }
 
-    // Check which orders already received a reminder (via OrderLog)
+    // Check which orders already received a reminder OR were explicitly dismissed by user
     const orderIds = pendingOrders.map((o) => o.id);
-    const alreadyReminded = await prisma_db.orderLog.findMany({
+    const logEntries = await prisma_db.orderLog.findMany({
         where: {
             orderId: { in: orderIds },
-            event: "PAYMENT_REMINDER_SENT",
+            event: { in: ["PAYMENT_REMINDER_SENT", "MODAL_DISMISSED"] },
         },
-        select: { orderId: true },
+        select: { orderId: true, event: true },
     });
-    const remindedSet = new Set(alreadyReminded.map((r) => r.orderId));
+    const remindedSet = new Set(logEntries.filter((r) => r.event === "PAYMENT_REMINDER_SENT").map((r) => r.orderId));
+    const dismissedSet = new Set(logEntries.filter((r) => r.event === "MODAL_DISMISSED").map((r) => r.orderId));
 
     const results: { orderId: string; success: boolean; error?: string; skipped?: boolean }[] = [];
 
     for (const order of pendingOrders) {
-        // Skip if already reminded
-        if (remindedSet.has(order.id)) {
+        // Skip if already reminded or user explicitly dismissed the payment modal
+        if (remindedSet.has(order.id) || dismissedSet.has(order.id)) {
             results.push({ orderId: order.id, success: true, skipped: true });
             continue;
         }
