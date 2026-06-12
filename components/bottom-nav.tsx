@@ -29,9 +29,6 @@ export function BottomNav() {
   const pathname = usePathname();
   const labels = NAV_LABELS[useNavLanguage()];
 
-  // Hide on ebook detail pages (/ebooks/[id])
-  if (/^\/ebooks\/[^/]+$/.test(pathname)) return null;
-
   return (
     <nav className="pb-safe fixed right-0 bottom-0 left-0 z-50 md:hidden">
       {/* Solid paper backing with maroon top hairline */}

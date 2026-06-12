@@ -803,7 +803,7 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
       </div>
 
       {/* ── MOBILE STICKY BUY BAR ── */}
-      <div className="fixed right-0 bottom-0 left-0 z-40 md:hidden">
+      <div className="fixed right-0 bottom-16 left-0 z-40 md:hidden">
         <div className="bg-brand-teal px-3 py-2.5 shadow-[0_-8px_24px_rgba(10,31,61,0.2)]">
           <div className="flex items-center gap-3">
             <div className="flex shrink-0 flex-col leading-none">

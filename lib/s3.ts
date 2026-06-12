@@ -113,8 +113,6 @@ export async function getUploadPresignedUrl(
  * Build public URL (CloudFront if configured, else direct S3) for a key.
  */
 export function getPublicUrlForKey(key: string): string {
-  const domain = process.env.CLOUDFRONT_DOMAIN;
-  if (domain) return `https://${domain}/${key}`;
   const bucketName = process.env.S3_BUCKET_NAME;
   const region = process.env.AWS_REGION || "ap-south-1";
   return `https://${bucketName}.s3.${region}.amazonaws.com/${key}`;
