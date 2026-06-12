@@ -101,15 +101,22 @@ export default function MyBooksPage() {
     contentIds: string[];
   } | null>(null);
 
+  const [isUnauthorized, setIsUnauthorized] = useState(false);
+
   const performSearch = useCallback(async (searchTerm: string) => {
     if (!searchTerm.trim()) return;
     setLoading(true);
+    setIsUnauthorized(false);
     try {
+      const phoneTokens: Record<string, string> = JSON.parse(localStorage.getItem("phone_access_tokens") || "{}");
+      const accessToken = phoneTokens[searchTerm.trim()] ?? null;
+
       const res = await fetch("/api/orders/lookup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: searchTerm.trim() }),
+        body: JSON.stringify({ query: searchTerm.trim(), accessToken }),
       });
+      if (res.status === 401) { setIsUnauthorized(true); setOrders([]); return; }
       if (res.status === 429) throw new Error(MYBOOKS_LABELS[langRef.current].rateLimited);
       if (!res.ok) throw new Error(MYBOOKS_LABELS[langRef.current].somethingWrong);
       const data = await res.json();
@@ -144,10 +151,11 @@ export default function MyBooksPage() {
       if (paramLang) applyLang(coerceLanguage(paramLang));
 
       const accessToken = params.get("access_token");
-      if (accessToken) {
+      if (accessToken && paramPhone) {
         try {
-          const existingTokens = JSON.parse(localStorage.getItem("authorized_tokens") || "[]");
-          if (!existingTokens.includes(accessToken)) { existingTokens.push(accessToken); localStorage.setItem("authorized_tokens", JSON.stringify(existingTokens)); }
+          const phoneTokens: Record<string, string> = JSON.parse(localStorage.getItem("phone_access_tokens") || "{}");
+          phoneTokens[paramPhone] = accessToken;
+          localStorage.setItem("phone_access_tokens", JSON.stringify(phoneTokens));
         } catch(e) { console.error(e); }
       }
 
@@ -429,6 +437,26 @@ export default function MyBooksPage() {
               <Button size="sm" onClick={() => { setPollingTimedOut(false); performSearch(query); }} className="shrink-0 rounded-xl bg-amber-500 text-xs font-bold text-white hover:bg-amber-600 active:scale-95">
                 <RefreshCw className="h-3.5 w-3.5" />
               </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Unauthorized — no device token */}
+        {isUnauthorized && (
+          <div className="animate-in fade-in mb-4 duration-500">
+            <div className="flex flex-col items-center gap-3 rounded-2xl border border-red-100 bg-red-50 p-5 text-center">
+              <ShieldCheck className="h-8 w-8 text-red-400" />
+              <div>
+                <p className="font-black text-red-800">Access not authorized on this device</p>
+                <p className="mt-1 text-xs text-red-600/80">Your books are linked to the device/browser where you purchased. Open the download link from your WhatsApp message, or contact us.</p>
+              </div>
+              {WA_NUMBER ? (
+                <a href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`मला माझ्या books access करायच्या आहेत. Phone: ${query}`)}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#25D366] px-4 py-2.5 text-xs font-bold text-white active:scale-95">
+                  <FaWhatsapp className="h-3.5 w-3.5" /> Get Access via WhatsApp
+                </a>
+              ) : null}
             </div>
           </div>
         )}

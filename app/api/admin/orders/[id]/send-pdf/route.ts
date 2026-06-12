@@ -4,7 +4,7 @@ import { prisma_db } from "@/lib/prisma";
 import { sendOrderWhatsapp } from "@/lib/send-order-whatsapp";
 
 export async function POST(
-    _req: NextRequest,
+    req: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
     const session = await auth();
@@ -13,6 +13,8 @@ export async function POST(
     }
 
     const { id } = await params;
+    const body = await req.json().catch(() => ({})) as { testPhone?: string };
+    const testPhone: string | undefined = body.testPhone?.trim() || undefined;
 
     const order = await prisma_db.order.findUnique({
         where: { id },
@@ -46,12 +48,12 @@ export async function POST(
 
     if (!order) return new NextResponse("Order not found", { status: 404 });
     if (order.status !== "PAID") return new NextResponse("Order not paid", { status: 400 });
-    if (!order.customerPhone) return new NextResponse("No phone number", { status: 400 });
+    if (!testPhone && !order.customerPhone) return new NextResponse("No phone number", { status: 400 });
 
     const orderForWhatsapp = {
         id: order.id,
-        customerPhone: order.customerPhone,
-        customerName: order.customerName,
+        customerPhone: testPhone ?? order.customerPhone,
+        customerName: testPhone ? "Test" : order.customerName,
         items: order.items.map((item) => ({
             ebook: {
                 id: item.ebook.id,

@@ -23,6 +23,14 @@ import {
     SheetTitle,
 } from "@/components/ui/sheet";
 import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
     Search,
     Download,
     CheckCircle2,
@@ -182,6 +190,8 @@ export function OrdersClient({ orders, loadedAt, customFrom, customTo }: OrdersC
     const [fromInput, setFromInput] = useState(customFrom || "");
     const [toInput, setToInput] = useState(customTo || "");
     const [showCustom, setShowCustom] = useState(!!customFrom);
+    const [pdfDialogOrder, setPdfDialogOrder] = useState<Order | null>(null);
+    const [testPhone, setTestPhone] = useState("");
 
     const dateFilter = searchParams.get("date") || "today";
     const isCustomActive = !!customFrom;
@@ -268,12 +278,21 @@ export function OrdersClient({ orders, loadedAt, customFrom, customTo }: OrdersC
         toast.success(label);
     }, []);
 
-    const handleSendPdf = async (order: Order) => {
-        const promise = fetch(`/api/admin/orders/${order.id}/send-pdf`, { method: "POST" })
-            .then(async (res) => { if (!res.ok) throw new Error(await res.text() || "Failed"); });
+    const handleSendPdf = (order: Order) => {
+        setTestPhone("");
+        setPdfDialogOrder(order);
+    };
+
+    const doSendPdf = async (order: Order, phone?: string) => {
+        setPdfDialogOrder(null);
+        const promise = fetch(`/api/admin/orders/${order.id}/send-pdf`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(phone ? { testPhone: phone } : {}),
+        }).then(async (res) => { if (!res.ok) throw new Error(await res.text() || "Failed"); });
         toast.promise(promise, {
-            loading: "PDF पाठवत आहे...",
-            success: "PDF WhatsApp वर पाठवले!",
+            loading: phone ? `Test PDF → ${phone}...` : "PDF पाठवत आहे...",
+            success: phone ? `Test sent to ${phone}!` : "PDF WhatsApp वर पाठवले!",
             error: (err) => `Failed: ${(err as Error).message}`,
         });
         await promise;
@@ -969,6 +988,47 @@ export function OrdersClient({ orders, loadedAt, customFrom, customTo }: OrdersC
                     </div>
                 </div>
             </div>
+
+            {/* PDF Send Dialog */}
+            <Dialog open={!!pdfDialogOrder} onOpenChange={(open) => !open && setPdfDialogOrder(null)}>
+                <DialogContent className="max-w-sm">
+                    <DialogHeader>
+                        <DialogTitle>WhatsApp PDF पाठवा</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-2">
+                        <Button
+                            className="w-full"
+                            onClick={() => pdfDialogOrder && doSendPdf(pdfDialogOrder)}
+                        >
+                            Send to customer ({pdfDialogOrder?.customerPhone ?? "—"})
+                        </Button>
+                        <div className="flex items-center gap-2">
+                            <div className="h-px flex-1 bg-border" />
+                            <span className="text-xs text-muted-foreground">OR test</span>
+                            <div className="h-px flex-1 bg-border" />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label htmlFor="test-phone" className="text-xs">Test phone number</Label>
+                            <Input
+                                id="test-phone"
+                                placeholder="91XXXXXXXXXX"
+                                value={testPhone}
+                                onChange={(e) => setTestPhone(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setPdfDialogOrder(null)}>Cancel</Button>
+                        <Button
+                            variant="secondary"
+                            disabled={!testPhone.trim()}
+                            onClick={() => pdfDialogOrder && doSendPdf(pdfDialogOrder, testPhone.trim())}
+                        >
+                            Send Test
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

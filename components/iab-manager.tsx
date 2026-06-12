@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, ExternalLink, MoreVertical, Compass, Chrome } from "lucide-react";
+import { X, ExternalLink, MoreVertical, ArrowUp, Chrome } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function IABManager() {
@@ -71,9 +71,20 @@ export function IABManager() {
         </button>
 
         <div className="mt-4 space-y-4 text-center">
-          <div className="mb-2 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-teal/5 text-brand-teal">
-            <Compass className="animate-spin-slow h-8 w-8" />
-          </div>
+          {isAndroid ? (
+            <div className="mb-2 flex flex-col items-center gap-1">
+              <div className="animate-bounce inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-teal/10 text-brand-teal">
+                <ArrowUp className="h-8 w-8 stroke-[3]" />
+              </div>
+              <span className="text-xs font-black tracking-wide text-brand-teal uppercase">
+                वरती &quot;CONTINUE&quot; वर दाबा
+              </span>
+            </div>
+          ) : (
+            <div className="mb-2 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-teal/5 text-brand-teal">
+              <ExternalLink className="h-8 w-8" />
+            </div>
+          )}
 
           <div className="space-y-2">
             <h2 className="text-xl font-black text-brand-teal">
@@ -150,19 +161,6 @@ export function IABManager() {
         </div>
       </div>
 
-      <style jsx global>{`
-        @keyframes spin-slow {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-        .animate-spin-slow {
-          animation: spin-slow 8s linear infinite;
-        }
-      `}</style>
     </div>
   );
 }

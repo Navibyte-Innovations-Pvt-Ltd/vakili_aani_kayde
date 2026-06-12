@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma_db } from "@/lib/prisma";
+import crypto from "crypto";
 
 export async function POST(req: NextRequest) {
     try {
-        const { query } = await req.json();
+        const { query, accessToken } = await req.json();
 
         if (!query) {
             return new NextResponse("Query is required", { status: 400 });
         }
 
         const cleanedQuery = query.trim();
+        const isPhoneQuery = /^\d{10,15}$/.test(cleanedQuery);
 
         // Find PAID orders matching email or phone
         const rawOrders = await prisma_db.order.findMany({
@@ -41,6 +43,24 @@ export async function POST(req: NextRequest) {
 
         if (rawOrders.length === 0) {
             return NextResponse.json({ orders: [] });
+        }
+
+        // Phone lookups require a valid Browser Access Token (device-bound).
+        // Token = HMAC-SHA256(AUTH_SECRET, orderId) — generated at purchase time.
+        // Email lookups are exempt (used internally, rate-limited separately).
+        if (isPhoneQuery) {
+            const secret = process.env.AUTH_SECRET;
+            if (!secret) {
+                console.error("[LOOKUP] AUTH_SECRET not set");
+                return new NextResponse("Server misconfiguration", { status: 500 });
+            }
+            const isValid = accessToken && rawOrders.some((order) => {
+                const expected = crypto.createHmac("sha256", secret).update(order.id).digest("hex");
+                return expected === accessToken;
+            });
+            if (!isValid) {
+                return new NextResponse("Unauthorized", { status: 401 });
+            }
         }
 
         // Map orders — use permanent ebook short codes (no DB writes, no CloudFront signing)
