@@ -34,22 +34,7 @@ export function IABManager() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- Client-side only state initialization
     setIsIOS(ios);
 
-    // FOR ANDROID: Attempt instant force-jump to Chrome
-    if (android) {
-      const currentUrl = window.location.href.replace(/^https?:\/\//, "");
-      const intentUrl = `intent://${currentUrl}#Intent;scheme=https;package=com.android.chrome;end`;
-
-      const timer = setTimeout(() => {
-        window.location.href = intentUrl;
-        // If the user isn't redirected after 2 seconds, show the manual button
-        setTimeout(() => setIsVisible(true), 2000);
-      }, 500);
-
-      return () => clearTimeout(timer);
-    }
-
-    // FOR iOS: Just show the handoff UI immediately
-    if (ios) {
+    if (android || ios) {
       setIsVisible(true);
     }
   }, []);
