@@ -1,5 +1,5 @@
 import { prisma_db } from "./prisma";
-import { getCloudFrontSignedUrl } from "./s3";
+import { getPresignedUrl } from "./s3";
 
 const INTERAKT_API_KEY = process.env.INTERAKT_API_KEY;
 const AISENSY_API_KEY = process.env.AISENSY_API_KEY;
@@ -283,7 +283,7 @@ export const sendBookWithPdfWhatsapp = async (
 
     // Generate a signed URL for WhatsApp (CloudFront)
     // We use a longer expiry for WhatsApp (e.g., 24 hours) to ensure reliability
-    const pdfUrl = await getCloudFrontSignedUrl(ebook.fileUrl, 86400);
+    const pdfUrl = await getPresignedUrl(ebook.fileUrl, 86400);
 
     const bodyValues = config.templateName === "payment_sucess_pdf_v2"
         ? [bookTitle]

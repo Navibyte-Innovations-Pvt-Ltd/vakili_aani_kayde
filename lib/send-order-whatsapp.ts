@@ -1,5 +1,5 @@
 import { sendAisensyTemplate } from "@/lib/whatsapp";
-import { getCloudFrontSignedUrl } from "@/lib/s3";
+import { getPresignedUrl } from "@/lib/s3";
 
 type OrderForWhatsapp = {
     id: string;
@@ -30,7 +30,7 @@ export async function sendOrderWhatsapp(order: OrderForWhatsapp): Promise<boolea
         return false;
     }
 
-    const pdfUrl = await getCloudFrontSignedUrl(ebook.fileUrl, 86400);
+    const pdfUrl = await getPresignedUrl(ebook.fileUrl, 86400);
 
     await sendAisensyTemplate({
         phone: order.customerPhone,

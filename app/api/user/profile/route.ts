@@ -1,6 +1,6 @@
 import { auth } from '@/lib/auth';
 import { prisma_db } from '@/lib/prisma';
-import { uploadToS3, getCloudFrontSignedUrl } from '@/lib/s3';
+import { uploadToS3, getPublicUrlForKey } from '@/lib/s3';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
@@ -12,7 +12,7 @@ async function resolveAvatarUrl(image: string | null | undefined): Promise<strin
         try {
             const url = new URL(image);
             const key = url.pathname.slice(1);
-            return await getCloudFrontSignedUrl(key, 3600);
+            return getPublicUrlForKey(key);
         } catch {
             return image;
         }

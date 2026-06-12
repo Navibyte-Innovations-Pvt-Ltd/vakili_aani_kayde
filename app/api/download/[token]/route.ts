@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma_db } from "@/lib/prisma";
 import jwt from "jsonwebtoken";
-import { fetchPdfBuffer, getPresignedUrl, getCloudFrontSignedUrl } from "@/lib/s3";
+import { fetchPdfBuffer, getPresignedUrl } from "@/lib/s3";
 import { mergePDFs } from "@/lib/pdf-watermark";
 import { cacheComboPdf } from "@/lib/combo-cache";
 
@@ -206,7 +206,7 @@ export async function GET(
 
     console.info('[DOWNLOAD] Redirecting to CloudFront for:', targetEbook.fileUrl);
 
-    const signedUrl = await getCloudFrontSignedUrl(
+    const signedUrl = await getPresignedUrl(
       targetEbook.fileUrl,
       3600 // 1 hour expiry
     );

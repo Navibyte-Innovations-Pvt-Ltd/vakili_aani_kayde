@@ -5,7 +5,7 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma_db } from "./prisma";
-import { getCloudFrontSignedUrl } from "./s3";
+import { getPublicUrlForKey } from "./s3";
 
 // Extend session type
 declare module "next-auth" {
@@ -215,7 +215,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             try {
               const url = new URL(rawImage);
               const key = url.pathname.slice(1); // strip leading /
-              session.user.image = await getCloudFrontSignedUrl(key, 3600);
+              session.user.image = getPublicUrlForKey(key);
             } catch {
               session.user.image = rawImage;
             }
