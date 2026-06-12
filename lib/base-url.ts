@@ -1,6 +1,11 @@
 export function getBaseUrl() {
     if (typeof window !== "undefined") {
-        return window.location.origin;
+        return process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+    }
+
+    // Canonical production domain — highest priority for user-facing links
+    if (process.env.NEXT_PUBLIC_SITE_URL) {
+        return process.env.NEXT_PUBLIC_SITE_URL;
     }
 
     // Server-side: check explicit env first
