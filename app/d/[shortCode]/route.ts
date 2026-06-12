@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { resolveShortLink } from "@/lib/short-link";
 import { prisma_db } from "@/lib/prisma";
-import { getCloudFrontSignedUrl, getPresignedUrl } from "@/lib/s3";
+import { getPresignedUrl } from "@/lib/s3";
 import { notFound } from "next/navigation";
 
 export async function GET(
@@ -30,8 +30,8 @@ export async function GET(
                 const downloadUrl = await getPresignedUrl(ebook.fileUrl, 3600, disposition, "application/pdf");
                 return NextResponse.redirect(downloadUrl, { status: 302 });
             }
-            // Generate a fresh CloudFront signed URL (1h expiry) and redirect
-            const signedUrl = await getCloudFrontSignedUrl(ebook.fileUrl, 3600);
+            // Generate S3 presigned URL (1h expiry) and redirect
+            const signedUrl = await getPresignedUrl(ebook.fileUrl, 3600);
             return NextResponse.redirect(signedUrl, { status: 302 });
         }
 
