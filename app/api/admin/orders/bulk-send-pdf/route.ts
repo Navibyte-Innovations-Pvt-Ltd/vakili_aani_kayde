@@ -1,9 +1,15 @@
 
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 import { prisma_db } from "@/lib/prisma";
-import { sendBookWithPdfWhatsapp, hasBookPdfConfig } from "@/lib/whatsapp";
+import { sendOrderWhatsapp } from "@/lib/send-order-whatsapp";
 
 export async function POST(req: NextRequest) {
+    const session = await auth();
+    if (!session || session.user.role !== "ADMIN") {
+        return new NextResponse("Unauthorized", { status: 401 });
+    }
+
     try {
         const { orderIds } = await req.json();
 
@@ -11,19 +17,33 @@ export async function POST(req: NextRequest) {
             return new NextResponse("orderIds must be a non-empty array", { status: 400 });
         }
 
-        // Fetch all PAID orders in the selection
         const orders = await prisma_db.order.findMany({
-            where: {
-                id: { in: orderIds },
-                status: "PAID"
-            },
-            include: {
+            where: { id: { in: orderIds }, status: "PAID" },
+            select: {
+                id: true,
+                customerPhone: true,
+                customerName: true,
                 items: {
-                    include: {
-                        ebook: true
-                    }
-                }
-            }
+                    select: {
+                        ebook: {
+                            select: {
+                                id: true,
+                                title: true,
+                                fileUrl: true,
+                                pages: true,
+                                isCombo: true,
+                                includedEbooks: {
+                                    select: {
+                                        ebook: {
+                                            select: { id: true, title: true, fileUrl: true, pages: true },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         });
 
         if (orders.length === 0) {
@@ -40,33 +60,36 @@ export async function POST(req: NextRequest) {
                 continue;
             }
 
-            // Process each item in the order
-            for (const item of order.items) {
-                // Check if this ebook has a PDF configuration
-                if (hasBookPdfConfig(item.ebookId)) {
-                    try {
-                        console.info(`[BULK_PDF] Sending PDF for book "${item.ebook.title}" to ${order.customerName} (${order.customerPhone})...`);
+            try {
+                const sent = await sendOrderWhatsapp({
+                    id: order.id,
+                    customerPhone: order.customerPhone,
+                    customerName: order.customerName,
+                    items: order.items.map((item) => ({
+                        ebook: {
+                            id: item.ebook.id,
+                            title: item.ebook.title,
+                            fileUrl: item.ebook.fileUrl,
+                            pages: item.ebook.pages,
+                            isCombo: item.ebook.isCombo,
+                            includedEbooks: item.ebook.includedEbooks.map((ci) => ci.ebook),
+                        },
+                    })),
+                });
 
-                        await sendBookWithPdfWhatsapp(
-                            order.customerPhone,
-                            order.customerName || "Customer",
-                            item.ebookId,
-                            item.ebook.title
-                        );
-
-                        successCount++;
-                        // Add a small delay to avoid overwhelming the API
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                    } catch (error) {
-                        console.error(`[BULK_PDF] Failed to send for order ${order.id}, item ${item.ebookId}:`, error);
-                        errors.push({
-                            orderId: order.id,
-                            error: error instanceof Error ? error.message : "Unknown error sending PDF"
-                        });
-                    }
+                if (sent) {
+                    successCount++;
                 } else {
-                    skippedCount++; // Item doesn't have config
+                    skippedCount++;
                 }
+
+                await new Promise(resolve => setTimeout(resolve, 500));
+            } catch (error) {
+                console.error(`[BULK_PDF] Failed for order ${order.id}:`, error);
+                errors.push({
+                    orderId: order.id,
+                    error: error instanceof Error ? error.message : "Unknown error",
+                });
             }
         }
 
@@ -75,7 +98,7 @@ export async function POST(req: NextRequest) {
             successCount,
             skippedCount,
             totalOrders: orders.length,
-            errors: errors.length > 0 ? errors : undefined
+            errors: errors.length > 0 ? errors : undefined,
         });
 
     } catch (error) {
