@@ -34,85 +34,57 @@ const rateLimitConfigs: Record<RateLimitAction, RateLimitConfig> = {
   },
   "send-payment-link": {
     maxAttempts: 5,
-    windowMinutes: 1440, // 24 hours
+    windowMinutes: 1440,
   },
 };
 
+type RateLimitRow = {
+  id: string;
+  count: number;
+  resetAt: Date;
+};
+
 /**
- * Check if rate limit has been exceeded
- * @param identifier - User identifier (email or IP)
- * @param action - Action being rate limited
- * @returns Object with isAllowed flag and optional retry time
+ * Atomic upsert via ON CONFLICT DO UPDATE — eliminates the read-then-write race
+ * that caused deadlocks under concurrent load with the old findUnique → create/update pattern.
  */
+async function upsertRateLimit(
+  identifier: string,
+  action: string,
+  resetAt: Date,
+): Promise<RateLimitRow[]> {
+  return prisma_db.$queryRaw<RateLimitRow[]>`
+    INSERT INTO "RateLimit" (id, identifier, action, count, "resetAt", "updatedAt")
+    VALUES (gen_random_uuid(), ${identifier}, ${action}, 1, ${resetAt}, NOW())
+    ON CONFLICT (identifier, action) DO UPDATE
+    SET
+      count   = CASE WHEN "RateLimit"."resetAt" <= NOW() THEN 1 ELSE "RateLimit".count + 1 END,
+      "resetAt" = CASE WHEN "RateLimit"."resetAt" <= NOW() THEN ${resetAt} ELSE "RateLimit"."resetAt" END,
+      "updatedAt" = NOW()
+    RETURNING id, count, "resetAt"
+  `;
+}
+
 export async function checkRateLimit(
   identifier: string,
   action: RateLimitAction
 ): Promise<{ isAllowed: boolean; retryAfter?: Date }> {
   const config = rateLimitConfigs[action];
-  const now = new Date();
+  const resetAt = new Date(Date.now() + config.windowMinutes * 60 * 1000);
 
   try {
-    // Find existing rate limit record
-    const record = await prisma_db.rateLimit.findUnique({
-      where: {
-        identifier_action: {
-          identifier,
-          action,
-        },
-      },
-    });
+    const rows = await upsertRateLimit(identifier, action, resetAt);
+    const row = rows[0];
 
-    // No existing record - allow and create new
-    if (!record) {
-      const resetAt = new Date(now.getTime() + config.windowMinutes * 60 * 1000);
-      await prisma_db.rateLimit.create({
-        data: {
-          identifier,
-          action,
-          count: 1,
-          resetAt,
-        },
-      });
-      return { isAllowed: true };
+    if (!row) return { isAllowed: true };
+
+    if (row.count > config.maxAttempts) {
+      return { isAllowed: false, retryAfter: row.resetAt };
     }
-
-    // Check if reset window has passed
-    if (now >= record.resetAt) {
-      // Reset the counter
-      const resetAt = new Date(now.getTime() + config.windowMinutes * 60 * 1000);
-      await prisma_db.rateLimit.update({
-        where: { id: record.id },
-        data: {
-          count: 1,
-          resetAt,
-          updatedAt: now,
-        },
-      });
-      return { isAllowed: true };
-    }
-
-    // Within window - check if limit exceeded
-    if (record.count >= config.maxAttempts) {
-      return {
-        isAllowed: false,
-        retryAfter: record.resetAt,
-      };
-    }
-
-    // Increment counter
-    await prisma_db.rateLimit.update({
-      where: { id: record.id },
-      data: {
-        count: record.count + 1,
-        updatedAt: now,
-      },
-    });
 
     return { isAllowed: true };
   } catch (error) {
     console.error("Error checking rate limit:", error);
-    // On error, allow the action (fail open)
     return { isAllowed: true };
   }
 }
-

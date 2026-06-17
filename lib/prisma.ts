@@ -27,14 +27,15 @@ const createPrismaClient = () => {
       : (connectionString.includes("localhost") || connectionString.includes("127.0.0.1"))
         ? undefined
         : (process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined),
-    max: process.env.NODE_ENV === "production" ? 5 : 1, // Reduced from 10 to 5 - sufficient for serverless
-    min: 0, // Allow pool to scale down to 0 when idle
-    idleTimeoutMillis: process.env.NODE_ENV === "production" ? 20000 : 2000, // Faster idle timeout (20s vs 30s)
-    connectionTimeoutMillis: 10000, // Reduced from 15s to 10s
+    // Vercel serverless: 1 connection per Lambda instance. Neon PgBouncer handles multiplexing.
+    // Multiple connections per instance double-pools against PgBouncer and causes connection explosion.
+    max: 1,
+    min: 0,
+    idleTimeoutMillis: 10000, // Release back to pooler quickly
+    connectionTimeoutMillis: 8000,
     allowExitOnIdle: true,
     maxUses: 7500,
-    // Enable statement timeout to prevent long-running queries
-    statement_timeout: 30000, // 30 second query timeout
+    statement_timeout: 30000,
   });
   const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter });
