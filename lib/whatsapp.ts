@@ -227,19 +227,27 @@ export const sendAisensyTemplate = async ({
         };
     }
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+
     try {
         const res = await fetch("https://backend.aisensy.com/campaign/t1/api/v2", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
+            signal: controller.signal,
         });
+        clearTimeout(timeout);
         if (!res.ok) {
-            console.error("[AISENSY] Failed:", res.status, await res.text().catch(() => ""));
-        } else {
-            console.info("[AISENSY] Sent template", campaignName, "to", targetPhone);
+            const body = await res.text().catch(() => "");
+            throw new Error(`AiSensy HTTP ${res.status}: ${body}`);
         }
+        console.info("[AISENSY] Sent template", campaignName, "to", targetPhone);
     } catch (err) {
-        console.error("[AISENSY] Network error:", err instanceof Error ? err.message : err);
+        clearTimeout(timeout);
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error("[AISENSY] Send failed:", msg);
+        throw err;
     }
 };
 
