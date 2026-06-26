@@ -294,6 +294,72 @@ const PAGE_LABELS = {
   },
 } satisfies Record<Language, PageLabels>;
 
+const HOW_TO_BUY: Record<Language, { header: string; steps: { n: string; primary: string; en: string; done?: boolean }[] }> = {
+  MARATHI: {
+    header: "खरेदी कशी करावी / How to Buy",
+    steps: [
+      { n: "1", primary: "बटन दाबा", en: "Click" },
+      { n: "2", primary: "माहिती भरा", en: "Fill Info" },
+      { n: "3", primary: "पेमेंट करा", en: "Pay" },
+      { n: "✓", primary: "PDF मिळवा", en: "Get PDF", done: true },
+    ],
+  },
+  HINDI: {
+    header: "खरीदी कैसे करें / How to Buy",
+    steps: [
+      { n: "1", primary: "बटन दबाएं", en: "Click" },
+      { n: "2", primary: "जानकारी भरें", en: "Fill Info" },
+      { n: "3", primary: "भुगतान करें", en: "Pay" },
+      { n: "✓", primary: "PDF पाएं", en: "Get PDF", done: true },
+    ],
+  },
+  ENGLISH: {
+    header: "How to Buy",
+    steps: [
+      { n: "1", primary: "Click", en: "Click" },
+      { n: "2", primary: "Fill Info", en: "Fill Info" },
+      { n: "3", primary: "Pay", en: "Pay" },
+      { n: "✓", primary: "Get PDF", en: "Get PDF", done: true },
+    ],
+  },
+  TAMIL: {
+    header: "எவ்வாறு வாங்குவது / How to Buy",
+    steps: [
+      { n: "1", primary: "கிளிக் செய்", en: "Click" },
+      { n: "2", primary: "தகவல் நிரப்பு", en: "Fill Info" },
+      { n: "3", primary: "பணம் செலுத்து", en: "Pay" },
+      { n: "✓", primary: "PDF பெறு", en: "Get PDF", done: true },
+    ],
+  },
+  TELUGU: {
+    header: "కొనుగోలు ఎలా చేయాలి / How to Buy",
+    steps: [
+      { n: "1", primary: "క్లిక్ చేయండి", en: "Click" },
+      { n: "2", primary: "వివరాలు నమోదు", en: "Fill Info" },
+      { n: "3", primary: "చెల్లించండి", en: "Pay" },
+      { n: "✓", primary: "PDF పొందండి", en: "Get PDF", done: true },
+    ],
+  },
+  GUJARATI: {
+    header: "ખરીદી કેવી રીતે કરવી / How to Buy",
+    steps: [
+      { n: "1", primary: "બટન દબાવો", en: "Click" },
+      { n: "2", primary: "માહિતી ભરો", en: "Fill Info" },
+      { n: "3", primary: "ચૂકવણી કરો", en: "Pay" },
+      { n: "✓", primary: "PDF મેળવો", en: "Get PDF", done: true },
+    ],
+  },
+  BENGALI: {
+    header: "কীভাবে কিনবেন / How to Buy",
+    steps: [
+      { n: "1", primary: "বাটন দাবান", en: "Click" },
+      { n: "2", primary: "তথ্য পূরণ করুন", en: "Fill Info" },
+      { n: "3", primary: "পেমেন্ট করুন", en: "Pay" },
+      { n: "✓", primary: "PDF পান", en: "Get PDF", done: true },
+    ],
+  },
+};
+
 export async function generateMetadata(
   props: { params: Promise<{ id: string }> }
 ): Promise<Metadata> {
@@ -381,6 +447,7 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
   const plainDescription = ebook.description?.replace(/<[^>]+>/g, " ").trim().slice(0, 160) + "..." || "";
   const bookLanguage = coerceLanguage(ebook.language);
   const labels = PAGE_LABELS[bookLanguage];
+  const howToBuy = HOW_TO_BUY[bookLanguage];
   const finalPrice = Number(ebook.price);
   const crossedPrice = getInflatedOriginalPrice(finalPrice);
   const isSaleActive = SALE_CONFIG.isActive;
@@ -718,18 +785,13 @@ export default async function EbookDetailPage(props: { params: Promise<{ id: str
               </div>
 
               <div className="mb-5 rounded-2xl bg-brand-teal px-4 py-4">
-                <p className="mb-3 text-center text-[9px] font-black tracking-[0.18em] text-white/40 uppercase">खरेदी कशी करावी / How to Buy</p>
+                <p className="mb-3 text-center text-[9px] font-black tracking-[0.18em] text-white/40 uppercase">{howToBuy.header}</p>
                 <div className="flex items-center justify-between">
-                  {[
-                    { n: "1", mr: "बटन दाबा", en: "Click" },
-                    { n: "2", mr: "माहिती भरा", en: "Fill Info" },
-                    { n: "3", mr: "पेमेंट करा", en: "Pay" },
-                    { n: "✓", mr: "PDF मिळवा", en: "Get PDF", done: true },
-                  ].map((step, i, arr) => (
+                  {howToBuy.steps.map((step, i, arr) => (
                     <div key={i} className="flex flex-1 items-center">
                       <div className="flex flex-1 flex-col items-center gap-1.5 text-center">
                         <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-black ${step.done ? "bg-brand-gold text-brand-teal" : "border border-white/20 bg-white/10 text-white"}`}>{step.n}</div>
-                        <div className="text-[9px] leading-tight text-white/70">{step.mr}<br /><span className="opacity-50">{step.en}</span></div>
+                        <div className="text-[9px] leading-tight text-white/70">{step.primary}<br /><span className="opacity-50">{step.en}</span></div>
                       </div>
                       {i < arr.length - 1 && <div className="mb-4 h-px w-3 shrink-0 bg-white/15" />}
                     </div>

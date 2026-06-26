@@ -372,6 +372,7 @@ export function BuyButton({
   language,
 }: BuyButtonProps) {
   const [loading, setLoading] = useState(false);
+  const [loadingStage, setLoadingStage] = useState<string>("");
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -547,6 +548,7 @@ export function BuyButton({
 
   async function onPaymentSubmit(data: CheckoutFormValues) {
     setLoading(true);
+    setLoadingStage("ऑर्डर तयार करत आहोत...");
 
     const { name = "", email = "", phone } = data;
 
@@ -559,19 +561,23 @@ export function BuyButton({
     saveToLocal("customer_phone", phone);
     saveToLocal("customer_email", email);
 
+    // If the API takes >5s (cold DB wake-up), tell the user to hold on so they don't abandon.
+    const waitHintTimer = setTimeout(() => {
+      toast.loading("जरा वेळ लागेल, कृपया थांबा...", { id: "wait-hint", duration: 10000 });
+    }, 5000);
+
     try {
       let isLoaded = isRazorpayLoaded || typeof window.Razorpay !== "undefined";
       if (!isLoaded) {
-        toast.loading("पेमेंट गेटवे तयार करत आहोत...", { id: "rzp-load", duration: 5000 });
+        toast.loading("पेमेंट गेटवे तयार करत आहोत...", { id: "rzp-load", duration: 8000 });
         isLoaded = await loadScript(RZP_SCRIPT_URL);
         if (isLoaded) {
           setIsRazorpayLoaded(true);
-          toast.success("पेमेंट गेटवे तयार आहे!", { id: "rzp-load" });
         }
+        toast.dismiss("rzp-load");
       }
 
       if (!isLoaded || typeof window.Razorpay === "undefined") {
-        toast.dismiss("rzp-load");
         throw new Error("तुमचे इंटरनेट स्लो आहे किंवा ब्राउझरने पेमेंट स्क्रिप्ट ब्लॉक केली आहे. कृपया रिफ्रेश करा (Refresh) आणि पुन्हा प्रयत्न करा.");
       }
 
@@ -581,6 +587,9 @@ export function BuyButton({
         body: JSON.stringify({ ebookId, name, email, phone }),
       });
 
+      clearTimeout(waitHintTimer);
+      toast.dismiss("wait-hint");
+
       if (!res.ok) {
         const errorText = await res.text();
         throw new Error(`Order Creation Failed: ${res.status} ${errorText}`);
@@ -588,6 +597,7 @@ export function BuyButton({
 
       const order = await res.json();
       currentOrderIdRef.current = order.orderId;
+      setLoadingStage("Razorpay उघडत आहे...");
 
       // Tracks whether any Razorpay event fired — used by safety timeout to detect silent modal failure
       let rzpInteracted = false;
@@ -614,8 +624,8 @@ export function BuyButton({
       options.modal = {
         ondismiss: function () {
           rzpInteracted = true;
-          // Reset state when user closes Razorpay modal
           setLoading(false);
+          setLoadingStage("");
           document.body.style.pointerEvents = "auto";
 
           // Log dismissal
@@ -756,6 +766,7 @@ export function BuyButton({
           toast.error("पेमेंट अयशस्वी. कृपया पुन्हा प्रयत्न करा.");
           console.error(response.error);
           setLoading(false);
+          setLoadingStage("");
           fetch("/api/orders/log", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -770,6 +781,10 @@ export function BuyButton({
 
       initRazorpay();
     } catch (error: unknown) {
+      clearTimeout(waitHintTimer);
+      toast.dismiss("wait-hint");
+      toast.dismiss("rzp-load");
+      setLoadingStage("");
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
       console.error(error);
@@ -837,6 +852,7 @@ export function BuyButton({
               <CheckoutForm
                 handlePayment={onPaymentSubmit}
                 loading={loading}
+                loadingStage={loadingStage}
                 title={title}
                 price={price}
                 language={language}
@@ -871,6 +887,7 @@ export function BuyButton({
                 <CheckoutForm
                   handlePayment={onPaymentSubmit}
                   loading={loading}
+                  loadingStage={loadingStage}
                   title={title}
                   price={price}
                   isMobile={true}
@@ -896,6 +913,7 @@ export function BuyButton({
 interface CheckoutFormProps {
   handlePayment: (data: CheckoutFormValues) => Promise<void>;
   loading: boolean;
+  loadingStage?: string;
   title: string;
   price: number;
   isMobile?: boolean;
@@ -911,6 +929,7 @@ interface CheckoutFormProps {
 function CheckoutForm({
   handlePayment,
   loading,
+  loadingStage,
   title,
   price,
   isMobile,
@@ -1191,7 +1210,7 @@ function CheckoutForm({
               >
                 <span className="relative z-10 flex items-center justify-center gap-2 text-base">
                   {loading ? (
-                    <><Loader2 className="h-5 w-5 animate-spin" />{labels.processingText}</>
+                    <><Loader2 className="h-5 w-5 animate-spin" />{loadingStage || labels.processingText}</>
                   ) : (
                     <><Lock className="h-4 w-4" />{labels.payBtn} — ₹{price}</>
                   )}
